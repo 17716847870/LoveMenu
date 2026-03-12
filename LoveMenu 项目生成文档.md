@@ -1,280 +1,122 @@
-# LoveMenu 菜单页面（MenuPage）UI 重构 Prompt（含底部导航栏）
+# LoveMenu 主题系统 UI 升级 Prompt
 
-当前 **LoveMenu H5 菜单页面** UI 结构比较基础，需要进行全面升级。
-
-当前问题：
-
-```text
-1 UI过于简单
-2 没有动效
-3 菜品卡片没有层级感
-4 分类导航不够明显
-5 没有主题风格
-6 没有菜品热度展示
-7 页面缺乏真实 App 体验
-```
+当前页面是 **主题切换页面**，需要升级为更高级的 **主题控制中心**。
 
 目标：
 
-```text
-设计一个现代、有动效、支持主题系统，并且符合 H5 App 结构的菜单页面
-```
-
-需要优化组件：
-
-```text
-MenuPage
-DishCard
-CategoryTabs
-FloatingCartButton
-```
-
-注意：
-
-```text
-页面底部仍然存在 BottomNavigationBar
-```
-
-不要重新生成导航栏组件，只需要 **适配已有导航栏布局**。
+1. 用户可以在任何页面切换主题
+2. 每个主题有自己的视觉风格
+3. 用户可以实时预览主题效果
+4. 切换具有动画效果
 
 ---
 
-# 一、页面结构设计
+# 一、全局主题系统
 
-页面路径：
+主题必须是 **全局状态**。
 
-```text
-/app/menu/page.tsx
-```
-
-完整页面结构：
+技术方案：
 
 ```text
-AppLayout
- ├ PageHeader
- ├ CategoryTabs
- ├ DishGrid
- │   ├ DishCard
- │   ├ DishCard
- │   └ DishCard
- ├ FloatingCartButton
- └ BottomNavigationBar
+ThemeContext
 ```
 
-页面宽度：
+目录：
+
+```text
+/context
+ └ ThemeContext.tsx
+```
+
+支持主题：
+
+```text
+couple
+cute
+minimal
+night
+```
+
+主题需要保存：
+
+```text
+localStorage
+```
+
+刷新页面保持主题。
+
+---
+
+# 二、任何页面都可以切换主题
+
+需要新增：
+
+```text
+FloatingThemeButton
+```
+
+组件路径：
+
+```text
+/components/mobile/FloatingThemeButton.tsx
+```
+
+UI：
+
+右下角浮动按钮：
+
+```text
+🎨
+```
+
+样式：
 
 ```css
-max-width: 480px;
-margin: auto;
-padding: 16px;
-padding-bottom: 90px;
+position: fixed
+right: 16px
+bottom: 90px
+width: 48px
+height: 48px
+border-radius: 50%
+box-shadow
 ```
 
-说明：
+点击：
 
 ```text
-padding-bottom 用于避免内容被底部导航栏遮挡
-```
-
----
-
-# 二、顶部标题区
-
-当前标题：
-
-```text
-菜单
-```
-
-升级为：
-
-```text
-LoveMenu
-今天想吃什么？
-```
-
-UI结构：
-
-```text
-┌──────────────────┐
-LoveMenu
-
-今天想吃什么？
-└──────────────────┘
-```
-
-特点：
-
-```text
-标题更像 App
-增加情绪化文案
+打开 Theme Drawer
 ```
 
 ---
 
-# 三、分类导航（CategoryTabs）
+# 三、主题抽屉（Theme Drawer）
 
-分类示例：
+UI：
+
+从底部滑出：
 
 ```text
-全部 甜品 主食 小食 饮品
+ThemeDrawer
 ```
 
-升级为：
+结构：
 
 ```text
-横向滚动分类导航
-```
-
-UI结构：
-
-```text
-┌────────────────────────┐
-[全部] [甜品] [主食] [小食] [饮品]
-└────────────────────────┘
-```
-
-功能：
-
-```text
-横向滚动
-选中高亮
-点击切换分类
+ThemeDrawer
+ ├ DrawerHeader
+ ├ ThemeGrid
+ │   ├ ThemeCard
+ │   ├ ThemeCard
+ │   ├ ThemeCard
+ │   └ ThemeCard
+ └ CloseButton
 ```
 
 动画：
 
 ```text
-滑动过渡动画
+slide up
 ```
-
----
-
-# 四、菜品布局
-
-使用：
-
-```text
-两列 Grid 布局
-```
-
-示例：
-
-```text
-┌──────────────┐ ┌──────────────┐
-DishCard        DishCard
-
-DishCard        DishCard
-└──────────────┘ └──────────────┘
-```
-
-CSS：
-
-```css
-grid-template-columns: repeat(2, 1fr);
-gap: 16px;
-```
-
----
-
-# 五、DishCard 卡片设计
-
-当前卡片问题：
-
-```text
-图片比例混乱
-视觉普通
-信息层级不明显
-没有动效
-```
-
-升级为 **现代卡片 UI**。
-
----
-
-## DishCard 结构
-
-```text
-DishCard
- ├ DishImage
- ├ HotBadge
- ├ DishInfo
- │   ├ DishName
- │   ├ DishDesc
- │   └ PriceTag
- └ AddToCartButton
-```
-
----
-
-# 六、菜品热度设计
-
-每个菜品支持：
-
-```text
-hotScore
-```
-
-表示热度。
-
-规则：
-
-```text
-hotScore > 80 显示 本周最火
-hotScore > 50 显示 热门
-```
-
-UI示例：
-
-```text
-🔥 本周最火
-🔥 热门
-```
-
-卡片展示：
-
-```text
-┌─────────────────────┐
-│ 🔥 本周最火          │
-│        图片          │
-├─────────────────────┤
-草莓松饼
-
-微甜松软，配草莓酱
-
-❤️ 2   🤗 1
-
-[加入购物车]
-└─────────────────────┘
-```
-
----
-
-# 七、价格展示（情侣价格）
-
-LoveMenu 价格单位：
-
-```text
-亲亲
-贴贴
-```
-
-UI展示：
-
-```text
-❤️ 2   🤗 1
-```
-
-含义：
-
-```text
-2个亲亲
-1个贴贴
-```
-
----
-
-# 八、动效设计
 
 使用：
 
@@ -284,274 +126,232 @@ framer-motion
 
 ---
 
-## 卡片加载动画
+# 四、主题卡片升级
 
-页面加载：
+当前主题卡片过于简单。
+
+需要增加：
 
 ```text
-fade in + slide up
+主题预览
+主题说明
+选中状态
 ```
 
-动画：
+新卡片结构：
 
 ```text
-initial: opacity 0
-animate: opacity 1
-translateY: 20 → 0
-```
-
----
-
-## DishCard hover 动画
-
-hover：
-
-```text
-scale: 1 → 1.03
-shadow增强
-```
-
-tap：
-
-```text
-scale: 0.97
+ThemeCard
+ ├ ThemePreview
+ ├ ThemeName
+ ├ ThemeDescription
+ └ ActiveIndicator
 ```
 
 ---
 
-## 加入购物车按钮动画
+# 五、主题预览设计
 
-点击：
+## 情侣风
+
+预览：
 
 ```text
-按钮缩放
+粉色渐变
+爱心元素
+圆角卡片
 ```
 
-触发：
+卡片示例：
 
 ```text
-购物车数量动画
-```
-
----
-
-# 九、FloatingCartButton
-
-新增：
-
-```text
-FloatingCartButton
-```
-
-位置：
-
-```text
-右下角
-在 BottomNavigationBar 上方
-```
-
-示例：
-
-```text
-🛒 2
-```
-
-点击：
-
-```text
-跳转购物车页面
-```
-
-动画：
-
-```text
-点击弹跳
+┌─────────────┐
+💗 情侣风
+浪漫恋爱主题
+└─────────────┘
 ```
 
 ---
 
-# 十、主题系统（重点）
+## 可爱风
 
-组件必须支持主题系统：
-
-```text
-couple
-cute
-minimal
-night
-```
-
-每个主题必须有明显视觉差异。
-
----
-
-# 十一、主题 UI 设计
-
-## Couple Theme（情侣风）
-
-视觉：
-
-```text
-粉色
-爱心
-柔和渐变
-```
-
-示例：
-
-```text
-❤️ 草莓松饼
-
-❤️ 2   🤗 1
-
-❤️ 加入购物车
-```
-
-特点：
-
-```text
-粉色按钮
-柔和阴影
-爱心 icon
-```
-
----
-
-## Cute Theme（可爱风）
-
-视觉：
+预览：
 
 ```text
 糖果色
-emoji
-卡通风
+卡通emoji
+圆形组件
 ```
 
 示例：
 
 ```text
-🍓 草莓松饼
-
-💗 2  🤗 1
-
-🍱 加入购物车
-```
-
-特点：
-
-```text
-更圆角
-更大阴影
-sticker风格
+┌─────────────┐
+🍭 可爱风
+元气少女主题
+└─────────────┘
 ```
 
 ---
 
-## Minimal Theme（极简风）
+## 极简风
 
-视觉：
+预览：
 
 ```text
 黑白
-极简
-线条
-```
-
-示例：
-
-```text
-草莓松饼
-
-2 ♥  1 🤗
-
-加入购物车 →
-```
-
-特点：
-
-```text
 细边框
-无背景
-简洁按钮
-```
-
----
-
-## Night Theme（夜间风）
-
-视觉：
-
-```text
-深色
-neon glow
-科技感
+干净布局
 ```
 
 示例：
 
 ```text
-⚡ 草莓松饼
-
-❤️ 2   🤗 1
-
-⚡ 加入购物车
+┌─────────────┐
+⬛ 极简风
+纯净极简设计
+└─────────────┘
 ```
 
-特点：
+---
+
+## 夜间模式
+
+预览：
 
 ```text
-深色卡片
-霓虹边框
-glow阴影
+深色背景
+霓虹色按钮
+发光元素
 ```
 
----
-
-# 十二、数据结构
-
-接口：
+示例：
 
 ```text
-/api/dishes
-```
-
-返回示例：
-
-```json
-[
- {
-   "id": "1",
-   "name": "草莓松饼",
-   "desc": "微甜松软，配草莓酱",
-   "kissPrice": 2,
-   "hugPrice": 1,
-   "hotScore": 82,
-   "image": "/dish1.jpg"
- }
-]
+┌─────────────┐
+🌙 夜间模式
+深色护眼主题
+└─────────────┘
 ```
 
 ---
 
-# 十三、组件 Props
+# 六、当前主题提示
 
-Dish 类型：
+当前主题卡片需要高亮：
 
-```ts
-interface Dish {
- id: string
- name: string
- desc: string
- kissPrice: number
- hugPrice: number
- hotScore: number
- image: string
-}
+```text
+边框高亮
+选中标记
+```
+
+示例：
+
+```text
+✔ 当前使用
+```
+
+样式：
+
+```css
+border:2px solid
 ```
 
 ---
 
-# 十四、技术要求
+# 七、主题切换动效
+
+切换主题时需要动画：
+
+```text
+background fade
+```
+
+动画：
+
+```text
+300ms
+```
+
+使用：
+
+```text
+framer-motion
+```
+
+---
+
+# 八、页面优化
+
+当前主题页面可以增加：
+
+## 1 主题介绍
+
+页面顶部增加：
+
+```text
+个性化你的 LoveMenu
+选择你喜欢的主题
+```
+
+---
+
+## 2 今日推荐主题
+
+可以随机推荐：
+
+```text
+今日推荐主题
+```
+
+示例：
+
+```text
+🌙 今天适合夜间模式
+```
+
+---
+
+## 3 主题自动切换
+
+夜间模式可以支持：
+
+```text
+自动跟随系统
+```
+
+---
+
+# 九、组件结构
+
+需要生成组件：
+
+```text
+/components/mobile
+
+ThemeCard.tsx
+ThemeDrawer.tsx
+FloatingThemeButton.tsx
+```
+
+---
+
+# 十、页面结构
+
+```text
+ThemePage
+ ├ PageHeader
+ ├ ThemeIntro
+ ├ ThemeGrid
+ │   ├ ThemeCard
+ │   ├ ThemeCard
+ │   ├ ThemeCard
+ │   └ ThemeCard
+```
+
+---
+
+# 十一、技术要求
 
 使用：
 
@@ -561,37 +361,41 @@ React
 TypeScript
 TailwindCSS
 framer-motion
-ThemeContext
+Context API
 ```
 
 ---
 
-# 十五、输出要求
+# 十二、输出要求
 
-请生成：
+生成：
 
 ```text
-/app/menu/page.tsx
-/components/mobile/DishCard.tsx
-/components/mobile/CategoryTabs.tsx
-/components/mobile/FloatingCartButton.tsx
+/context/ThemeContext.tsx
+
+/components/mobile
+ ThemeCard.tsx
+ ThemeDrawer.tsx
+ FloatingThemeButton.tsx
 ```
 
-输出内容：
+并修改：
 
 ```text
-完整组件代码
-动画实现
-主题样式逻辑
-数据渲染逻辑
-使用示例
+/app/layout.tsx
 ```
 
-注意：
+加入：
 
 ```text
-不要重新生成 BottomNavigationBar
-只需要保证页面布局不会被底部导航遮挡
+ThemeProvider
+FloatingThemeButton
+```
+
+确保：
+
+```text
+任何页面都可以切换主题
 ```
 
 不要生成其它页面代码。

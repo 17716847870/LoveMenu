@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/context/ThemeContext";
+import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -25,9 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-screen`}>
         <ThemeProvider>
-          <div id="app-root">{children}</div>
+          <div id="app-root" className="relative w-full">
+            {children}
+            <FloatingThemeButton />
+          </div>
         </ThemeProvider>
       </body>
     </html>

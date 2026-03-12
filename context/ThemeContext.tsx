@@ -1,10 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { ThemeName } from "@/types";
-import { defaultTheme, setDocumentTheme } from "@/lib/theme";
-
-const storageKey = "lovemenu-theme";
 
 interface ThemeContextType {
   theme: ThemeName;
@@ -13,44 +10,41 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>(defaultTheme);
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<ThemeName>("couple");
   const [mounted, setMounted] = useState(false);
 
-  // Load from storage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(storageKey) as ThemeName | null;
-    if (stored) {
-      setThemeState(stored);
-      setDocumentTheme(stored);
-    } else {
-      setDocumentTheme(defaultTheme);
+    // Check localStorage for saved theme
+    const savedTheme = localStorage.getItem("love-menu-theme") as ThemeName;
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
     setMounted(true);
   }, []);
 
-  const setTheme = (newTheme: ThemeName) => {
-    setThemeState(newTheme);
-    setDocumentTheme(newTheme);
-    localStorage.setItem(storageKey, newTheme);
+  const handleSetTheme = (newTheme: ThemeName) => {
+    setTheme(newTheme);
+    localStorage.setItem("love-menu-theme", newTheme);
   };
 
-  // Prevent hydration mismatch
-  // if (!mounted) {
-  //   return <>{children}</>;
-  // }
+  if (!mounted) {
+    return null; // or a loading spinner
+  }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {mounted ? children : <div style={{ visibility: "hidden" }}>{children}</div>}
+    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme }}>
+      <div data-theme={theme} className="transition-colors duration-300 min-h-screen bg-background text-foreground w-full">
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 }
 
-export const useTheme = () => {
+export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
-};
+}

@@ -8,12 +8,11 @@ import TodayRecommendCard from "@/components/mobile/TodayRecommendCard";
 import WishlistCard from "@/components/mobile/WishlistCard";
 import UrgentCravingCard from "@/components/mobile/UrgentCravingCard";
 import RecentFeedbackCard from "@/components/mobile/RecentFeedbackCard";
-import { Card } from "@/components/ui/Card";
 
 export default function HomePage() {
 
   return (
-    <div className="flex flex-col gap-6 p-4 pt-8 max-w-[480px] mx-auto">
+    <div className="flex flex-col gap-6 p-4 pt-8 w-full">
       {/* Mood Card */}
       <CoupleMoodCard />
 

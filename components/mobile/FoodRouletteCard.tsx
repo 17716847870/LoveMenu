@@ -91,7 +91,21 @@ export default function FoodRouletteCard({ dishes = defaultDishes as Dish[] }: F
     // Random rotation: at least 5 full spins (1800deg) + random segment
     const segmentAngle = 360 / dishes.length;
     const randomSegment = Math.floor(Math.random() * dishes.length);
-    const extraRotation = 360 - (randomSegment * segmentAngle); 
+    
+    // Calculate current rotation to ensure smooth spinning
+    // We need to rotate enough to land on the target segment
+    // The pointer is at the top (270 degrees in our coordinate system where 0 is right)
+    // But since we rotate the wheel container, we need the target segment to be at -90deg (or 270deg)
+    
+    // Target calculation:
+    // Segment i center is at: i * segmentAngle + segmentAngle / 2 (relative to start)
+    // We want this center to align with -90deg (Top)
+    // So Rotation + SegmentCenter = -90
+    // Rotation = -90 - SegmentCenter
+    // Rotation = -90 - (i + 0.5) * segmentAngle
+    
+    // Add extra spins (5 full spins = 1800deg)
+    const extraRotation = -90 - (randomSegment + 0.5) * segmentAngle;
     const totalRotation = 1800 + extraRotation;
 
     await controls.start({
@@ -146,7 +160,7 @@ export default function FoodRouletteCard({ dishes = defaultDishes as Dish[] }: F
              {dishes.map((_, index) => (
                 <div 
                     key={index}
-                    className="absolute top-1/2 left-0 w-full h-[1px] bg-gray-200/50 origin-center"
+                    className="absolute top-1/2 left-1/2 w-1/2 h-[1px] bg-gray-200/50 origin-left"
                     style={{ transform: `rotate(${index * (360 / dishes.length)}deg)` }}
                 />
              ))}

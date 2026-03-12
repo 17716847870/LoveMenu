@@ -1,202 +1,344 @@
-# LoveMenu 首页「随机吃什么转盘」组件设计 Prompt
+# LoveMenu 首页新增模块优化 Prompt
 
-请重新设计 **LoveMenu H5 首页的“随机吃什么”模块**。
-该模块需要升级为 **互动转盘（Food Roulette）组件**。
+当前 **LoveMenu H5 首页**已经包含以下模块：
 
-当前版本只是一个按钮：
-
-```text
-随机吃什么
-不知道吃什么？
-帮我选一个
+```
+CoupleMoodCard      情侣情绪卡片
+FoodRouletteCard    随机吃什么转盘
+TodayOrderedCard    今日已点
+WeeklyFavoriteCard  本周最爱
 ```
 
-问题：
+现在需要 **新增 4 个首页模块**，提升产品完整度和情侣互动体验。
 
-* 互动感弱
-* 没有游戏感
-* 没有视觉吸引力
-* 不符合 App 产品体验
+新增模块：
 
-目标：
-
-升级为：
-
-```text
-FoodRouletteCard（随机吃什么转盘卡片）
+```
+TodayRecommendCard  今日推荐
+WishlistCard        想吃清单
+UrgentCravingCard   紧急想吃
+RecentFeedbackCard  最近反馈
 ```
 
-用户点击后 **转盘旋转并随机停在某个菜品上**。
+所有组件 **必须支持主题系统**：
+
+```
+couple
+cute
+minimal
+night
+```
+
+并且每个主题 **都需要有不同的视觉特色**。
 
 只生成：
 
-```text
-FoodRouletteCard 组件
+```
+这 4 个组件
 ```
 
-不要生成整个页面。
+不要修改已有组件。
 
 ---
 
-# 一、组件位置
+# 一、首页最终结构
+
+首页模块顺序：
+
+```
+HomePage
+
+ ├ CoupleMoodCard
+ ├ FoodRouletteCard
+ ├ TodayRecommendCard
+ ├ TodayOrderedCard
+ ├ WeeklyFavoriteCard
+ ├ WishlistCard
+ ├ UrgentCravingCard
+ └ RecentFeedbackCard
+```
+
+页面最大宽度：
+
+```
+max-width: 480px
+margin: auto
+```
+
+---
+
+# 二、模块一：TodayRecommendCard（今日推荐）
 
 组件路径：
 
 ```
-components/mobile/FoodRouletteCard.tsx
+components/mobile/TodayRecommendCard.tsx
 ```
 
-首页结构：
+功能：
+
+系统根据历史订单或热门数据 **推荐一个菜品**。
+
+---
+
+## UI结构
 
 ```
-HomePage
- ├ CoupleMoodCard
- ├ FoodRouletteCard
- ├ TodayOrderCard
- └ WeeklyFavoriteCard
+┌──────────────────────┐
+今日推荐 🍱
+
+🍗 炸鸡
+
+推荐原因：
+你最近很喜欢
+
+[加入购物车]
+└──────────────────────┘
 ```
 
 ---
 
-# 二、组件 UI 结构
+## 数据来源
 
-基础结构：
-
-```
-┌─────────────────────────┐
-│ 🎲 随机吃什么           │
-│                         │
-│        (转盘)           │
-│                         │
-│      [开始转盘]         │
-└─────────────────────────┘
-```
-
-转盘中心显示：
+接口：
 
 ```
-开始
+/api/recommend/today
 ```
 
-转盘周围显示：
+返回：
 
-```
-🍜 🍗 🍔 🍣 🍕
+```json
+{
+ "dishName": "炸鸡",
+ "reason": "你最近很喜欢"
+}
 ```
 
 ---
 
-# 三、转盘交互流程
-
-用户点击：
+## 组件结构
 
 ```
-开始转盘
-```
-
-流程：
-
-1 用户点击按钮
-2 转盘开始快速旋转
-3 逐渐减速
-4 停在一个菜品
-
-结果展示：
-
-```
-今天推荐吃：
-
-🍜 拉面
-```
-
----
-
-# 四、组件结构
-
-组件结构：
-
-```
-FoodRouletteCard
+TodayRecommendCard
  ├ CardHeader
- ├ RouletteWheel
- ├ ResultDisplay
+ ├ DishDisplay
+ ├ RecommendReason
  └ ActionButton
 ```
 
-组件状态：
+---
+
+# 三、模块二：WishlistCard（想吃清单）
+
+组件路径：
 
 ```
-idle
-spinning
-result
+components/mobile/WishlistCard.tsx
+```
+
+功能：
+
+显示 **想吃但还没点的菜**。
+
+---
+
+## UI结构
+
+```
+┌──────────────────────┐
+想吃清单 ❤️
+
+🍣 寿司
+🍰 蛋糕
+🍜 螺蛳粉
+
+[查看全部]
+└──────────────────────┘
+```
+
+最多显示：
+
+```
+3 条
 ```
 
 ---
 
-# 五、转盘逻辑
+## 数据来源
 
-转盘数据：
+接口：
 
 ```
+/api/wishlist
+```
+
+返回：
+
+```json
 [
- "拉面",
- "炒饭",
- "炸鸡",
- "汉堡",
- "寿司"
+ { "dishName": "寿司" },
+ { "dishName": "蛋糕" },
+ { "dishName": "螺蛳粉" }
 ]
 ```
 
-实现逻辑：
+---
 
-1 随机选一个菜
-2 计算旋转角度
-3 执行动画
-4 停在对应菜品
-
-示例：
+## 组件结构
 
 ```
-rotation = 360 * 4 + randomAngle
+WishlistCard
+ ├ CardHeader
+ ├ WishList
+ │   ├ WishItem
+ │   ├ WishItem
+ │   └ WishItem
+ └ ViewAllButton
 ```
 
 ---
 
-# 六、动画设计
+# 四、模块三：UrgentCravingCard（紧急想吃）
 
-使用：
-
-```
-framer-motion
-```
-
-转盘动画：
+组件路径：
 
 ```
-initial: rotate(0)
-animate: rotate(1440deg + randomAngle)
-duration: 2s
-ease: easeOut
+components/mobile/UrgentCravingCard.tsx
 ```
 
-按钮动画：
+功能：
+
+当用户 **非常想吃某个菜时**，可以标记为紧急。
+
+---
+
+## UI结构
 
 ```
-hover scale 1.05
-tap scale 0.95
+┌──────────────────────┐
+⚡ 紧急想吃
+
+🍗 炸鸡
+
+[立即下单]
+└──────────────────────┘
 ```
 
-结果出现动画：
+特点：
+
+* 视觉更突出
+* 卡片颜色更醒目
+
+---
+
+## 数据来源
+
+接口：
 
 ```
-fade in + scale
+/api/craving
+```
+
+返回：
+
+```json
+{
+ "dishName": "炸鸡"
+}
 ```
 
 ---
 
-# 七、主题系统（重点）
+## 组件结构
 
-组件必须支持主题系统。
+```
+UrgentCravingCard
+ ├ CardHeader
+ ├ DishDisplay
+ └ OrderButton
+```
+
+---
+
+# 五、模块四：RecentFeedbackCard（最近反馈）
+
+组件路径：
+
+```
+components/mobile/RecentFeedbackCard.tsx
+```
+
+功能：
+
+显示最近一次订单反馈。
+
+支持：
+
+```
+文字
+图片
+```
+
+---
+
+## UI结构
+
+```
+┌──────────────────────┐
+最近反馈 ❤️
+
+🍜 拉面
+
+很好吃！！
+
+📷 图片
+└──────────────────────┘
+```
+
+---
+
+## 数据来源
+
+接口：
+
+```
+/api/feedback/latest
+```
+
+返回：
+
+```json
+{
+ "dishName": "拉面",
+ "content": "很好吃！",
+ "image": "/feedback/1.jpg"
+}
+```
+
+---
+
+## 组件结构
+
+```
+RecentFeedbackCard
+ ├ CardHeader
+ ├ DishInfo
+ ├ FeedbackText
+ └ FeedbackImage
+```
+
+---
+
+# 六、主题系统设计（重点）
+
+组件必须根据：
+
+```
+ThemeContext
+```
+
+切换主题。
 
 主题：
 
@@ -207,219 +349,187 @@ minimal
 night
 ```
 
-每个主题需要 **不同视觉设计**。
-
 ---
 
-# 八、主题 UI 设计
+# 七、主题 UI 设计
 
-## 1 Couple Theme（情侣风）
+## Couple Theme（情侣风）
 
 视觉特点：
 
-* 粉色渐变
-* 爱心元素
-* 温柔风格
+```
+粉色
+爱心
+温柔 UI
+```
 
 示例：
 
 ```
-┌─────────────────────────┐
-│ ❤️ 随机吃什么           │
-│                         │
-│        ❤️转盘❤️         │
-│                         │
-│     ❤️ 开始选择 ❤️      │
-└─────────────────────────┘
+❤️ 今日推荐
+❤️ 想吃清单
+❤️ 最近反馈
 ```
 
-转盘装饰：
+卡片：
 
 ```
-爱心图标
-```
-
-结果展示：
-
-```
-今天适合吃：
-
-🍗 炸鸡
+柔和渐变
+大圆角
+轻阴影
 ```
 
 ---
 
-## 2 Cute Theme（可爱风）
+## Cute Theme（可爱风）
 
 视觉特点：
 
-* 糖果色
-* 圆形 UI
-* Q弹动画
+```
+糖果色
+emoji
+卡通 UI
+```
 
 示例：
 
 ```
-┌─────────────────────────┐
-│ 🎲 今天吃什么？         │
-│                         │
-│       🍭转盘🍭          │
-│                         │
-│      🍱 随机一下        │
-└─────────────────────────┘
+🍭 今日推荐
+🍩 想吃清单
+🍓 最近反馈
 ```
 
-转盘元素：
+卡片：
 
 ```
-🍜 🍔 🍟 🍣 🍕
-```
-
-动画：
-
-```
-emoji bounce
+圆角
+卡通阴影
+sticker 风格
 ```
 
 ---
 
-## 3 Minimal Theme（极简风）
+## Minimal Theme（极简风）
 
 视觉特点：
 
-* 黑白
-* 线条
-* 简约
+```
+黑白
+线条
+极简
+```
 
 示例：
 
 ```
-┌─────────────────────────┐
-│ 随机选择                │
-│                         │
-│        转盘             │
-│                         │
-│        Start →          │
-└─────────────────────────┘
+Today Recommend
+Wishlist
+Recent Feedback
 ```
 
-转盘：
+卡片：
 
 ```
-黑白线条
-```
-
-结果：
-
-```
-拉面
+细边框
+无背景
+无装饰
 ```
 
 ---
 
-## 4 Night Theme（夜间风）
+## Night Theme（夜间风）
 
 视觉特点：
 
-* 深色背景
-* neon glow
-* 科技感
+```
+深色
+neon glow
+科技感
+```
 
 示例：
 
 ```
-┌─────────────────────────┐
-│ ⚡ Food Roulette        │
-│                         │
-│        ⚡转盘⚡          │
-│                         │
-│      ⚡ Start           │
-└─────────────────────────┘
+⚡ Today Recommend
+⚡ Wishlist
+⚡ Feedback
 ```
 
-转盘效果：
+卡片：
 
 ```
-霓虹光环
-```
-
-结果：
-
-```
-🍜 拉面
+深色背景
+霓虹边框
+发光阴影
 ```
 
 ---
 
-# 九、数据来源
+# 八、组件 Props 示例
 
-菜品数据来自：
-
-```
-/api/dishes
-```
-
-返回示例：
-
-```json
-[
- { "name": "拉面" },
- { "name": "炒饭" },
- { "name": "炸鸡" },
- { "name": "汉堡" }
-]
-```
-
-组件随机选择一个。
-
----
-
-# 十、组件 Props
-
-```ts
-interface FoodRouletteCardProps {
- dishes: Dish[]
-}
-```
-
-Dish 类型：
+示例：
 
 ```ts
 interface Dish {
- id: string
- name: string
+ dishName: string
+}
+```
+
+推荐：
+
+```ts
+interface Recommend {
+ dishName: string
+ reason: string
+}
+```
+
+反馈：
+
+```ts
+interface Feedback {
+ dishName: string
+ content: string
+ image?: string
 }
 ```
 
 ---
 
-# 十一、技术要求
+# 九、技术要求
 
 使用：
 
-* Next.js
-* React
-* TypeScript
-* TailwindCSS
-* ThemeContext
-* framer-motion
+```
+Next.js
+React
+TypeScript
+TailwindCSS
+ThemeContext
+framer-motion
+```
 
 ---
 
-# 十二、输出要求
+# 十、输出要求
 
-请生成：
+生成以下组件：
 
 ```
-components/mobile/FoodRouletteCard.tsx
+components/mobile/TodayRecommendCard.tsx
+components/mobile/WishlistCard.tsx
+components/mobile/UrgentCravingCard.tsx
+components/mobile/RecentFeedbackCard.tsx
 ```
 
 输出内容：
 
-1 完整组件代码
-2 转盘动画实现
-3 随机逻辑
-4 主题样式逻辑
-5 使用示例
+```
+完整组件代码
+子组件
+主题样式逻辑
+数据渲染逻辑
+使用示例
+```
 
 不要生成其它页面代码。

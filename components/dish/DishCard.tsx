@@ -1,30 +1,51 @@
-import Image from "next/image";
-import { Dish } from "../../types";
-import { Card } from "../ui/Card";
-import { Button } from "../ui/Button";
-import { formatPrice } from "../../utils/format";
+import { Dish } from "@/types";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Heart, User } from "lucide-react";
 
-type DishCardProps = {
+interface DishCardProps {
   dish: Dish;
-  onAdd?: (dish: Dish) => void;
-};
+  onAddToCart: (dish: Dish) => void;
+}
 
-export const DishCard = ({ dish, onAdd }: DishCardProps) => {
+export default function DishCard({ dish, onAddToCart }: DishCardProps) {
   return (
-    <Card className="flex h-full flex-col gap-4">
-      <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-[var(--color-accent)]">
+    <Card className="overflow-hidden">
+      <div className="aspect-[4/3] bg-muted w-full relative">
+        {/* Placeholder for image */}
         {dish.image ? (
-          <Image src={dish.image} alt={dish.name} fill className="object-cover" />
-        ) : null}
+            <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
+        ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-secondary/30">
+                🍽️
+            </div>
+        )}
       </div>
-      <div className="flex flex-1 flex-col gap-2">
-        <div>
-          <h3 className="text-base font-semibold">{dish.name}</h3>
-          <p className="text-sm text-[var(--color-muted)]">{dish.description}</p>
+      <div className="p-4 flex flex-col gap-2">
+        <h3 className="font-semibold text-lg">{dish.name}</h3>
+        {dish.description && (
+            <p className="text-xs text-muted-foreground line-clamp-2">{dish.description}</p>
+        )}
+        <div className="flex items-center gap-3 mt-1">
+          {dish.kissPrice > 0 && (
+            <span className="flex items-center gap-1 text-pink-500 font-medium">
+              <Heart size={16} fill="currentColor" /> {dish.kissPrice}
+            </span>
+          )}
+          {dish.hugPrice > 0 && (
+            <span className="flex items-center gap-1 text-orange-500 font-medium">
+              <User size={16} /> {dish.hugPrice}
+            </span>
+          )}
         </div>
-        <p className="text-sm font-medium">{formatPrice(dish.kissPrice, dish.hugPrice)}</p>
+        <Button 
+            className="w-full mt-2 rounded-full" 
+            size="sm"
+            onClick={() => onAddToCart(dish)}
+        >
+            加入购物车
+        </Button>
       </div>
-      <Button onClick={() => onAdd?.(dish)}>加入购物车</Button>
     </Card>
   );
-};
+}

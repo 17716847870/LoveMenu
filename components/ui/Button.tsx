@@ -1,37 +1,39 @@
-import { ButtonHTMLAttributes, PropsWithChildren } from "react";
-import { cn } from "../../utils/format";
+import * as React from "react"
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  PropsWithChildren<{
-    variant?: "primary" | "secondary" | "ghost";
-    size?: "sm" | "md" | "lg";
-  }>;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive";
+  size?: "default" | "sm" | "lg" | "icon";
+}
 
-export const Button = ({
-  children,
-  className,
-  variant = "primary",
-  size = "md",
-  ...props
-}: ButtonProps) => {
-  const base =
-    "inline-flex items-center justify-center rounded-full font-medium transition disabled:opacity-60";
-  const variants = {
-    primary: "bg-[var(--color-primary)] text-white",
-    secondary: "bg-[var(--color-accent)] text-[var(--color-text)]",
-    ghost: "bg-transparent text-[var(--color-text)]",
-  };
-  const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm",
-    lg: "px-5 py-2.5 text-base",
-  };
-  return (
-    <button
-      className={cn(base, variants[variant], sizes[size], className)}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
+    const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    
+    const variants = {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+    }
+    
+    const sizes = {
+      default: "h-10 px-4 py-2",
+      sm: "h-9 rounded-[var(--radius-sm)] px-3",
+      lg: "h-11 rounded-[var(--radius-lg)] px-8",
+      icon: "h-10 w-10",
+    }
+
+    return (
+      <button
+        className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+export { Button }

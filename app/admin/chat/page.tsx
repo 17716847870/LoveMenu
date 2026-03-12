@@ -1,20 +1,12 @@
-import { PageContainer } from "../../../components/ui/PageContainer";
-import { ChatBubble } from "../../../components/chat/ChatBubble";
-import { chatMessages } from "../../../lib/mock-data";
+import ChatBubble from "@/components/chat/ChatBubble";
 
 export default function AdminChatPage() {
   return (
-    <PageContainer>
-      <h1 className="text-2xl font-semibold">聊天管理</h1>
-      <div className="mt-6 space-y-3 rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-4">
-        {chatMessages.map((message) => (
-          <ChatBubble
-            key={message.id}
-            message={message}
-            isSelf={message.senderId === "user-a"}
-          />
-        ))}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">聊天管理</h1>
+      <div className="border rounded-lg p-4 bg-muted/10">
+        <p className="text-muted-foreground text-center">暂无消息</p>
       </div>
-    </PageContainer>
+    </div>
   );
 }

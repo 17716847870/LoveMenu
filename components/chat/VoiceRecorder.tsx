@@ -1,16 +1,18 @@
+import { Button } from "@/components/ui/Button";
+import { Mic, Square } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/Button";
 
-export const VoiceRecorder = () => {
+export default function VoiceRecorder() {
   const [recording, setRecording] = useState(false);
 
   return (
     <Button
-      variant={recording ? "primary" : "secondary"}
-      size="sm"
-      onClick={() => setRecording((prev) => !prev)}
+      variant={recording ? "destructive" : "secondary"}
+      size="icon"
+      className="rounded-full"
+      onClick={() => setRecording(!recording)}
     >
-      {recording ? "录音中" : "语音"}
+      {recording ? <Square size={20} /> : <Mic size={20} />}
     </Button>
   );
-};
+}

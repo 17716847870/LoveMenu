@@ -1,420 +1,425 @@
-# LoveMenu 项目开发说明
+# LoveMenu 首页「随机吃什么转盘」组件设计 Prompt
 
-## 一、项目介绍
+请重新设计 **LoveMenu H5 首页的“随机吃什么”模块**。
+该模块需要升级为 **互动转盘（Food Roulette）组件**。
 
-LoveMenu 是一个为情侣设计的互动点餐系统。
+当前版本只是一个按钮：
 
-系统只有两个主要用户。一方负责点餐。另一方负责查看订单并准备食物。
+```text
+随机吃什么
+不知道吃什么？
+帮我选一个
+```
 
-用户可以在前台选择想吃的菜，并提交订单。
-系统使用 **“亲亲” 和 “贴贴”** 作为价格单位，而不是使用金钱。
+问题：
 
-系统还支持聊天功能。用户可以发送文字、图片、语音和表情。
+* 互动感弱
+* 没有游戏感
+* 没有视觉吸引力
+* 不符合 App 产品体验
 
-系统支持高度 UI 配置。管理员可以配置背景图片、主题颜色和情侣文案。
+目标：
 
-系统需要支持多个 UI 主题，并且用户可以在前台自由切换主题。
+升级为：
 
----
+```text
+FoodRouletteCard（随机吃什么转盘卡片）
+```
 
-# 二、技术栈
+用户点击后 **转盘旋转并随机停在某个菜品上**。
 
-前端框架：
+只生成：
 
-* Next.js (App Router)
-* React
-* TypeScript
+```text
+FoodRouletteCard 组件
+```
 
-UI技术：
-
-* TailwindCSS
-* CSS Variables 主题系统
-
-后端：
-
-* Next.js API Routes
-
-数据库：
-
-* PostgreSQL
-
-文件存储：
-
-* 本地存储或对象存储
+不要生成整个页面。
 
 ---
 
-# 三、UI主题系统
+# 一、组件位置
 
-系统需要支持主题切换。
+组件路径：
 
-支持以下主题：
+```
+components/mobile/FoodRouletteCard.tsx
+```
 
-* couple（情侣风）
-* cute（可爱风）
-* minimal（极简风）
-* night（夜间模式）
+首页结构：
 
-主题需要使用 CSS Variables 实现。
+```
+HomePage
+ ├ CoupleMoodCard
+ ├ FoodRouletteCard
+ ├ TodayOrderCard
+ └ WeeklyFavoriteCard
+```
+
+---
+
+# 二、组件 UI 结构
+
+基础结构：
+
+```
+┌─────────────────────────┐
+│ 🎲 随机吃什么           │
+│                         │
+│        (转盘)           │
+│                         │
+│      [开始转盘]         │
+└─────────────────────────┘
+```
+
+转盘中心显示：
+
+```
+开始
+```
+
+转盘周围显示：
+
+```
+🍜 🍗 🍔 🍣 🍕
+```
+
+---
+
+# 三、转盘交互流程
+
+用户点击：
+
+```
+开始转盘
+```
+
+流程：
+
+1 用户点击按钮
+2 转盘开始快速旋转
+3 逐渐减速
+4 停在一个菜品
+
+结果展示：
+
+```
+今天推荐吃：
+
+🍜 拉面
+```
+
+---
+
+# 四、组件结构
+
+组件结构：
+
+```
+FoodRouletteCard
+ ├ CardHeader
+ ├ RouletteWheel
+ ├ ResultDisplay
+ └ ActionButton
+```
+
+组件状态：
+
+```
+idle
+spinning
+result
+```
+
+---
+
+# 五、转盘逻辑
+
+转盘数据：
+
+```
+[
+ "拉面",
+ "炒饭",
+ "炸鸡",
+ "汉堡",
+ "寿司"
+]
+```
+
+实现逻辑：
+
+1 随机选一个菜
+2 计算旋转角度
+3 执行动画
+4 停在对应菜品
 
 示例：
 
-```css
-:root {
-  --color-primary: #ff6b9a;
-  --color-bg: #fff7f9;
-  --color-card: #ffffff;
-  --color-text: #333333;
+```
+rotation = 360 * 4 + randomAngle
+```
+
+---
+
+# 六、动画设计
+
+使用：
+
+```
+framer-motion
+```
+
+转盘动画：
+
+```
+initial: rotate(0)
+animate: rotate(1440deg + randomAngle)
+duration: 2s
+ease: easeOut
+```
+
+按钮动画：
+
+```
+hover scale 1.05
+tap scale 0.95
+```
+
+结果出现动画：
+
+```
+fade in + scale
+```
+
+---
+
+# 七、主题系统（重点）
+
+组件必须支持主题系统。
+
+主题：
+
+```
+couple
+cute
+minimal
+night
+```
+
+每个主题需要 **不同视觉设计**。
+
+---
+
+# 八、主题 UI 设计
+
+## 1 Couple Theme（情侣风）
+
+视觉特点：
+
+* 粉色渐变
+* 爱心元素
+* 温柔风格
+
+示例：
+
+```
+┌─────────────────────────┐
+│ ❤️ 随机吃什么           │
+│                         │
+│        ❤️转盘❤️         │
+│                         │
+│     ❤️ 开始选择 ❤️      │
+└─────────────────────────┘
+```
+
+转盘装饰：
+
+```
+爱心图标
+```
+
+结果展示：
+
+```
+今天适合吃：
+
+🍗 炸鸡
+```
+
+---
+
+## 2 Cute Theme（可爱风）
+
+视觉特点：
+
+* 糖果色
+* 圆形 UI
+* Q弹动画
+
+示例：
+
+```
+┌─────────────────────────┐
+│ 🎲 今天吃什么？         │
+│                         │
+│       🍭转盘🍭          │
+│                         │
+│      🍱 随机一下        │
+└─────────────────────────┘
+```
+
+转盘元素：
+
+```
+🍜 🍔 🍟 🍣 🍕
+```
+
+动画：
+
+```
+emoji bounce
+```
+
+---
+
+## 3 Minimal Theme（极简风）
+
+视觉特点：
+
+* 黑白
+* 线条
+* 简约
+
+示例：
+
+```
+┌─────────────────────────┐
+│ 随机选择                │
+│                         │
+│        转盘             │
+│                         │
+│        Start →          │
+└─────────────────────────┘
+```
+
+转盘：
+
+```
+黑白线条
+```
+
+结果：
+
+```
+拉面
+```
+
+---
+
+## 4 Night Theme（夜间风）
+
+视觉特点：
+
+* 深色背景
+* neon glow
+* 科技感
+
+示例：
+
+```
+┌─────────────────────────┐
+│ ⚡ Food Roulette        │
+│                         │
+│        ⚡转盘⚡          │
+│                         │
+│      ⚡ Start           │
+└─────────────────────────┘
+```
+
+转盘效果：
+
+```
+霓虹光环
+```
+
+结果：
+
+```
+🍜 拉面
+```
+
+---
+
+# 九、数据来源
+
+菜品数据来自：
+
+```
+/api/dishes
+```
+
+返回示例：
+
+```json
+[
+ { "name": "拉面" },
+ { "name": "炒饭" },
+ { "name": "炸鸡" },
+ { "name": "汉堡" }
+]
+```
+
+组件随机选择一个。
+
+---
+
+# 十、组件 Props
+
+```ts
+interface FoodRouletteCardProps {
+ dishes: Dish[]
 }
 ```
 
-用户可以在前台切换主题。
-
-系统需要记住用户选择的主题。
-
----
-
-# 四、UI组件清单
-
-系统需要实现以下 UI 组件。
-
-基础组件：
-
-* Button
-* IconButton
-* Input
-* Textarea
-* Select
-* Modal
-* Avatar
-* Badge
-* Tabs
-* ThemeSwitcher
-
-布局组件：
-
-* PageContainer
-* Card
-* Grid
-* EmptyState
-
-业务组件：
-
-* DishCard
-* DishCategory
-* CartItem
-* OrderCard
-* OrderStatusTag
-* ChatBubble
-* MessageInput
-* ImageUploader
-* VoiceRecorder
-* EmojiPicker
-
-统计组件：
-
-* PopularDishList
-* WeeklyFavoriteList
-* TodayOrderList
-
----
-
-# 五、页面结构
-
-前台页面：
-
-* 首页
-* 菜单页面
-* 购物车页面
-* 订单页面
-* 历史订单页面
-* 聊天页面
-
-后台页面：
-
-* 管理后台首页
-* 菜品管理
-* 分类管理
-* 订单管理
-* 聊天管理
-* UI配置管理
-
----
-
-# 六、数据库设计
-
-需要以下数据表。
-
-## users
-
-用户表
-
-字段：
-
-* id
-* name
-* email
-* avatar
-* role
-* created_at
-
----
-
-## dish_categories
-
-菜品分类
-
-字段：
-
-* id
-* name
-* sort_order
-
----
-
-## dishes
-
-菜品
-
-字段：
-
-* id
-* name
-* description
-* category_id
-* kiss_price
-* hug_price
-* image
-* popularity
-* allow_cook
-* allow_restaurant
-* created_at
-
----
-
-## orders
-
-订单
-
-字段：
-
-* id
-* user_id
-* status
-* total_kiss
-* total_hug
-* note
-* created_at
-
----
-
-## order_items
-
-订单菜品
-
-字段：
-
-* id
-* order_id
-* dish_id
-* quantity
-* note
-
----
-
-## cart_items
-
-购物车
-
-字段：
-
-* id
-* user_id
-* dish_id
-* quantity
-
----
-
-## wish_dishes
-
-愿望菜
-
-字段：
-
-* id
-* name
-* description
-* created_at
-
----
-
-## urgent_requests
-
-紧急想吃
-
-字段：
-
-* id
-* content
-* created_at
-
----
-
-## order_feedback
-
-订单反馈
-
-字段：
-
-* id
-* order_id
-* text
-* image
-* created_at
-
----
-
-## chat_messages
-
-聊天消息
-
-字段：
-
-* id
-* sender_id
-* type
-* content
-* created_at
-
-消息类型：
-
-* text
-* image
-* voice
-* emoji
-
----
-
-## system_configs
-
-系统配置
-
-字段：
-
-* id
-* key
-* value
-
-配置内容：
-
-* background_image
-* theme
-* couple_text
-* empty_state_image
-
----
-
-# 七、Next.js 项目目录结构
-
-项目目录结构如下：
-
-```
-/app
-  /api
-  /admin
-  /menu
-  /cart
-  /orders
-  /chat
-
-/components
-  /ui
-  /dish
-  /order
-  /chat
-
-/lib
-  db.ts
-  theme.ts
-
-/themes
-  couple.ts
-  cute.ts
-  minimal.ts
-  night.ts
-
-/hooks
-  useTheme.ts
-  useCart.ts
-
-/utils
-  format.ts
-
-/types
-  index.ts
-
-/prisma
-  schema.prisma
+Dish 类型：
+
+```ts
+interface Dish {
+ id: string
+ name: string
+}
 ```
 
 ---
 
-# 八、核心功能
+# 十一、技术要求
 
-系统需要实现以下核心功能：
+使用：
 
-1 菜单浏览
-2 分类筛选
-3 添加购物车
-4 提交订单
-5 订单状态管理
-6 历史订单
-7 今日已点
-8 本周最爱
-9 随机吃什么
-
-互动功能：
-
-* 聊天系统
-* 表情消息
-* 图片消息
-* 语音消息
-
-互动系统：
-
-* 愿望菜
-* 紧急想吃
-* 订单反馈
-
-系统功能：
-
-* UI主题切换
-* 背景图片配置
-* 情侣文案配置
+* Next.js
+* React
+* TypeScript
+* TailwindCSS
+* ThemeContext
+* framer-motion
 
 ---
 
-# 九、开发要求
+# 十二、输出要求
 
-代码需要满足以下要求：
+请生成：
 
-* 使用 TypeScript
-* 组件化设计
-* 使用 TailwindCSS
-* 支持主题切换
-* 代码结构清晰
-* API 使用 REST 风格
+```
+components/mobile/FoodRouletteCard.tsx
+```
 
----
+输出内容：
 
-# 十、目标
+1 完整组件代码
+2 转盘动画实现
+3 随机逻辑
+4 主题样式逻辑
+5 使用示例
 
-生成一个可以运行的第一版系统。
-
-系统需要包括：
-
-* 前台页面
-* 管理后台
-* 数据库结构
-* API接口
-* UI组件
+不要生成其它页面代码。

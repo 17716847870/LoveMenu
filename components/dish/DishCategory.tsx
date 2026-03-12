@@ -1,20 +1,21 @@
-import { DishCategory } from "../../types";
-import { Badge } from "../ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { DishCategory as CategoryType } from "@/types";
 
-type DishCategoryProps = {
-  category: DishCategory;
-  active?: boolean;
-  onSelect?: (id: string) => void;
-};
+interface DishCategoryProps {
+  category: CategoryType;
+  isActive: boolean;
+  onClick: (id: string) => void;
+}
 
-export const DishCategoryTag = ({
-  category,
-  active,
-  onSelect,
-}: DishCategoryProps) => {
+export default function DishCategory({ category, isActive, onClick }: DishCategoryProps) {
   return (
-    <button onClick={() => onSelect?.(category.id)}>
-      <Badge variant={active ? "success" : "default"}>{category.name}</Badge>
-    </button>
+    <Button
+      variant={isActive ? "default" : "secondary"}
+      size="sm"
+      className="rounded-full px-4 whitespace-nowrap"
+      onClick={() => onClick(category.id)}
+    >
+      {category.name}
+    </Button>
   );
-};
+}

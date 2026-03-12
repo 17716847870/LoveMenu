@@ -1,14 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CartItem, Dish } from "../types";
+import { CartItem, Dish } from "@/types";
 
 const storageKey = "lovemenu-cart";
 
-const loadItems = () => {
+const loadItems = (): CartItem[] => {
   if (typeof window === "undefined") return [];
-  const stored = localStorage.getItem(storageKey);
-  return stored ? (JSON.parse(stored) as CartItem[]) : [];
+  try {
+    const stored = localStorage.getItem(storageKey);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error("Failed to load cart", e);
+    return [];
+  }
 };
 
 export const useCart = () => {
@@ -22,50 +27,60 @@ export const useCart = () => {
 
   const addItem = useCallback((dish: Dish) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.dishId === dish.id);
+      const existing = prev.find((item) => item.dish.id === dish.id);
       if (existing) {
         return prev.map((item) =>
-          item.dishId === dish.id
+          item.dish.id === dish.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item,
+            : item
         );
       }
       return [
         ...prev,
         {
           id: `${dish.id}-${Date.now()}`,
-          dishId: dish.id,
-          name: dish.name,
-          kissPrice: dish.kissPrice,
-          hugPrice: dish.hugPrice,
+          dish: dish,
           quantity: 1,
+          note: "",
         },
       ];
     });
   }, []);
 
-  const updateQuantity = useCallback((dishId: string, quantity: number) => {
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     setItems((prev) =>
       prev
         .map((item) =>
-          item.dishId === dishId ? { ...item, quantity } : item,
+          item.id === itemId ? { ...item, quantity } : item
         )
-        .filter((item) => item.quantity > 0),
+        .filter((item) => item.quantity > 0)
     );
   }, []);
 
-  const removeItem = useCallback((dishId: string) => {
-    setItems((prev) => prev.filter((item) => item.dishId !== dishId));
+  const updateNote = useCallback((itemId: string, note: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, note } : item
+      )
+    );
+  }, []);
+
+  const removeItem = useCallback((itemId: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== itemId));
+  }, []);
+
+  const clearCart = useCallback(() => {
+    setItems([]);
   }, []);
 
   const totals = useMemo(() => {
     return items.reduce(
       (acc, item) => {
-        acc.kiss += item.kissPrice * item.quantity;
-        acc.hug += item.hugPrice * item.quantity;
+        acc.kiss += item.dish.kissPrice * item.quantity;
+        acc.hug += item.dish.hugPrice * item.quantity;
         return acc;
       },
-      { kiss: 0, hug: 0 },
+      { kiss: 0, hug: 0 }
     );
   }, [items]);
 
@@ -74,6 +89,8 @@ export const useCart = () => {
     totals,
     addItem,
     updateQuantity,
+    updateNote,
     removeItem,
+    clearCart,
   };
 };

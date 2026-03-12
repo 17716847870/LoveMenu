@@ -1,26 +1,21 @@
-import { PropsWithChildren } from "react";
-import { cn } from "../../utils/format";
+import * as React from "react"
 
-type BadgeProps = PropsWithChildren<{
-  variant?: "default" | "success" | "warning";
-  className?: string;
-}>;
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "secondary" | "destructive" | "outline"
+}
 
-export const Badge = ({ children, variant = "default", className }: BadgeProps) => {
+function Badge({ className, variant = "default", ...props }: BadgeProps) {
+  const base = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
   const variants = {
-    default: "bg-[var(--color-accent)] text-[var(--color-text)]",
-    success: "bg-emerald-100 text-emerald-700",
-    warning: "bg-amber-100 text-amber-700",
-  };
+    default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+    secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+    destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+    outline: "text-foreground",
+  }
+  
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
-        variants[variant],
-        className,
-      )}
-    >
-      {children}
-    </span>
-  );
-};
+    <div className={`${base} ${variants[variant]} ${className}`} {...props} />
+  )
+}
+
+export { Badge }

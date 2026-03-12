@@ -1,29 +1,23 @@
-import Image from "next/image";
-import { cn } from "../../utils/format";
+import * as React from "react"
 
-type AvatarProps = {
-  src?: string;
-  alt: string;
-  size?: number;
-  className?: string;
-};
+const Avatar = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { src?: string; alt?: string }
+>(({ className, src, alt, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={`relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full ${className}`}
+    {...props}
+  >
+    {src ? (
+      <img src={src} alt={alt} className="aspect-square h-full w-full" />
+    ) : (
+      <div className="flex h-full w-full items-center justify-center rounded-full bg-muted text-muted-foreground">
+        {alt?.charAt(0) || "U"}
+      </div>
+    )}
+  </div>
+))
+Avatar.displayName = "Avatar"
 
-export const Avatar = ({ src, alt, size = 40, className }: AvatarProps) => {
-  return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-full bg-[var(--color-accent)]",
-        className,
-      )}
-      style={{ width: size, height: size }}
-    >
-      {src ? (
-        <Image src={src} alt={alt} fill className="object-cover" />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-sm text-[var(--color-muted)]">
-          {alt.slice(0, 1)}
-        </div>
-      )}
-    </div>
-  );
-};
+export { Avatar }

@@ -1,27 +1,27 @@
 "use client";
 
-import { themes } from "../../lib/theme";
-import { useTheme } from "../../hooks/useTheme";
-import { cn } from "../../utils/format";
+import { useTheme } from "@/context/ThemeContext";
+import { themes } from "@/lib/theme";
+import { ThemeName } from "@/types";
 
-export const ThemeSwitcher = () => {
+export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {themes.map((item) => (
+    <div className="grid grid-cols-2 gap-4">
+      {themes.map((t) => (
         <button
-          key={item.name}
-          className={cn(
-            "rounded-full px-4 py-1.5 text-sm",
-            theme === item.name
-              ? "bg-[var(--color-primary)] text-white"
-              : "bg-[var(--color-accent)] text-[var(--color-text)]",
-          )}
-          onClick={() => setTheme(item.name)}
+          key={t.name}
+          onClick={() => setTheme(t.name)}
+          className={`flex h-20 items-center justify-center rounded-[var(--radius-lg)] border-2 transition-all ${
+            theme === t.name
+              ? "border-primary bg-primary/10 font-bold text-primary"
+              : "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          }`}
         >
-          {item.label}
+          {t.label}
         </button>
       ))}
     </div>
   );
-};
+}

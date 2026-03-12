@@ -1,15 +1,23 @@
-import { OrderStatus } from "../../types";
-import { Badge } from "../ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 
-const statusMap: Record<OrderStatus, { label: string; variant: "default" | "success" | "warning" }> = {
-  pending: { label: "待处理", variant: "warning" },
-  preparing: { label: "制作中", variant: "warning" },
-  ready: { label: "可取餐", variant: "success" },
-  completed: { label: "已完成", variant: "success" },
-  canceled: { label: "已取消", variant: "default" },
-};
+type OrderStatus = "pending" | "preparing" | "ready" | "completed" | "cancelled";
 
 export const OrderStatusTag = ({ status }: { status: OrderStatus }) => {
-  const config = statusMap[status];
-  return <Badge variant={config.variant}>{config.label}</Badge>;
+  const variants = {
+    pending: "secondary",
+    preparing: "default",
+    ready: "default",
+    completed: "outline",
+    cancelled: "destructive",
+  } as const;
+
+  const labels = {
+    pending: "等待接单",
+    preparing: "制作中",
+    ready: "做好了",
+    completed: "已完成",
+    cancelled: "已取消",
+  };
+
+  return <Badge variant={variants[status]}>{labels[status]}</Badge>;
 };

@@ -1,28 +1,32 @@
-import { PropsWithChildren } from "react";
-import { cn } from "../../utils/format";
+import { Button } from "@/components/ui/Button";
+import Link from "next/link";
+import { ReactNode } from "react";
 
-type EmptyStateProps = PropsWithChildren<{
+interface EmptyStateProps {
   title: string;
-  description?: string;
-  className?: string;
-}>;
+  description: string;
+  icon?: ReactNode;
+  actionLabel?: string;
+  actionHref?: string;
+}
 
-export const EmptyState = ({
+export default function EmptyState({
   title,
   description,
-  className,
-  children,
-}: EmptyStateProps) => (
-  <div
-    className={cn(
-      "flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] px-6 py-10 text-center",
-      className,
-    )}
-  >
-    <h3 className="text-lg font-semibold">{title}</h3>
-    {description ? (
-      <p className="text-sm text-[var(--color-muted)]">{description}</p>
-    ) : null}
-    {children}
-  </div>
-);
+  icon,
+  actionLabel,
+  actionHref,
+}: EmptyStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-center min-h-[50vh]">
+      <div className="mb-4 text-4xl text-muted-foreground">{icon || "🤔"}</div>
+      <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+      <p className="mb-6 text-muted-foreground">{description}</p>
+      {actionLabel && actionHref && (
+        <Link href={actionHref}>
+          <Button>{actionLabel}</Button>
+        </Link>
+      )}
+    </div>
+  );
+}

@@ -1,4 +1,4 @@
-import { ChatMessage, Dish, DishCategory, Order } from "../types";
+import { ChatMessage, Dish, DishCategory, Order } from "@/types";
 
 export const dishCategories: DishCategory[] = [
   { id: "c1", name: "甜品", sortOrder: 1 },
@@ -48,6 +48,7 @@ export const dishes: Dish[] = [
 export const orders: Order[] = [
   {
     id: "2025031201",
+    userId: "u1",
     status: "preparing",
     totalKiss: 5,
     totalHug: 3,
@@ -55,24 +56,19 @@ export const orders: Order[] = [
     items: [
       {
         id: "oi-1",
-        dishId: "d1",
-        name: "草莓松饼",
-        kissPrice: 2,
-        hugPrice: 1,
+        dish: dishes[0],
         quantity: 1,
       },
       {
         id: "oi-2",
-        dishId: "d2",
-        name: "番茄意面",
-        kissPrice: 3,
-        hugPrice: 2,
+        dish: dishes[1],
         quantity: 1,
       },
     ],
   },
   {
     id: "2025031202",
+    userId: "u1",
     status: "completed",
     totalKiss: 2,
     totalHug: 2,
@@ -80,10 +76,7 @@ export const orders: Order[] = [
     items: [
       {
         id: "oi-3",
-        dishId: "d3",
-        name: "香烤鸡翅",
-        kissPrice: 2,
-        hugPrice: 2,
+        dish: dishes[2],
         quantity: 1,
       },
     ],

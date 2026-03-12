@@ -1,34 +1,42 @@
-import { Order } from "../../types";
-import { Card } from "../ui/Card";
-import { OrderStatusTag } from "./OrderStatusTag";
-import { formatDate, formatPrice } from "../../utils/format";
+import { Order } from "@/types";
+import { Card } from "@/components/ui/Card";
+import { OrderStatusTag } from "@/components/order/OrderStatusTag";
+import { Heart, User } from "lucide-react";
 
-type OrderCardProps = {
+interface OrderCardProps {
   order: Order;
-};
+}
 
-export const OrderCard = ({ order }: OrderCardProps) => {
+export default function OrderCard({ order }: OrderCardProps) {
   return (
-    <Card className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="text-base font-semibold">订单 #{order.id}</h4>
-          <p className="text-xs text-[var(--color-muted)]">
-            {formatDate(order.createdAt)}
-          </p>
-        </div>
+    <Card className="flex flex-col gap-3 p-4">
+      <div className="flex justify-between items-center">
+        <span className="text-sm text-muted-foreground">
+          {new Date(order.createdAt).toLocaleString()}
+        </span>
         <OrderStatusTag status={order.status} />
       </div>
-      <div className="flex flex-wrap gap-2 text-sm text-[var(--color-muted)]">
+      
+      <div className="flex flex-col gap-1">
         {order.items.map((item) => (
-          <span key={item.id}>
-            {item.name} × {item.quantity}
-          </span>
+          <div key={item.id} className="flex justify-between text-sm">
+            <span>{item.dish.name} × {item.quantity}</span>
+            <div className="flex gap-2 text-muted-foreground text-xs">
+                {item.dish.kissPrice > 0 && <span>❤️ {item.dish.kissPrice * item.quantity}</span>}
+                {item.dish.hugPrice > 0 && <span>🤗 {item.dish.hugPrice * item.quantity}</span>}
+            </div>
+          </div>
         ))}
       </div>
-      <p className="text-sm font-medium">
-        {formatPrice(order.totalKiss, order.totalHug)}
-      </p>
+
+      <div className="flex justify-end gap-3 pt-2 border-t">
+        <span className="flex items-center gap-1 text-pink-500 font-medium">
+          <Heart size={16} fill="currentColor" /> {order.totalKiss}
+        </span>
+        <span className="flex items-center gap-1 text-orange-500 font-medium">
+          <User size={16} /> {order.totalHug}
+        </span>
+      </div>
     </Card>
   );
-};
+}

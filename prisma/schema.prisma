@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  avatar    String?
+  role      String
+  createdAt DateTime @default(now())
+  orders    Order[]
+  chat      ChatMessage[] @relation("ChatSender")
+}
+
+model DishCategory {
+  id        String  @id @default(cuid())
+  name      String
+  sortOrder Int
+  dishes    Dish[]
+}
+
+model Dish {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  categoryId      String
+  kissPrice       Int
+  hugPrice        Int
+  image           String?
+  popularity      Int      @default(0)
+  allowCook       Boolean  @default(true)
+  allowRestaurant Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  category        DishCategory @relation(fields: [categoryId], references: [id])
+  orderItems      OrderItem[]
+  cartItems       CartItem[]
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  userId    String
+  status    String
+  totalKiss Int
+  totalHug  Int
+  note      String?
+  createdAt DateTime @default(now())
+  items     OrderItem[]
+  feedback  OrderFeedback?
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  dishId   String
+  quantity Int
+  note     String?
+  order    Order @relation(fields: [orderId], references: [id])
+  dish     Dish  @relation(fields: [dishId], references: [id])
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  userId   String
+  dishId   String
+  quantity Int
+  user     User @relation(fields: [userId], references: [id])
+  dish     Dish @relation(fields: [dishId], references: [id])
+}
+
+model WishDish {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  createdAt DateTime @default(now())
+}
+
+model UrgentRequest {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model OrderFeedback {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  text      String
+  image     String?
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  senderId  String
+  type      String
+  content   String
+  createdAt DateTime @default(now())
+  sender    User     @relation("ChatSender", fields: [senderId], references: [id])
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

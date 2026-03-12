@@ -1,4 +1,4 @@
-import BottomTabBar from "@/components/mobile/BottomTabBar";
+import BottomTabBarWrapper from "@/components/mobile/BottomTabBarWrapper";
 
 export default function MobileLayout({
   children,
@@ -8,7 +8,7 @@ export default function MobileLayout({
   return (
     <div className="flex flex-col min-h-screen pb-24">
       <main className="flex-1">{children}</main>
-      <BottomTabBar />
+      <BottomTabBarWrapper />
     </div>
   );
 }

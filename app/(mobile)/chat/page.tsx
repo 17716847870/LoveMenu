@@ -1,75 +1,111 @@
 "use client";
 
-import { useState } from "react";
-import ChatBubble from "@/components/chat/ChatBubble";
-import MessageInput from "@/components/chat/MessageInput";
-import { chatMessages } from "@/lib/mock-data";
-import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
-import { Video, Phone } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import ChatHeader from "@/components/mobile/chat/ChatHeader";
+import ChatMessages from "@/components/mobile/chat/ChatMessages";
+import ChatInputBar from "@/components/mobile/chat/ChatInputBar";
+import { Message } from "@/components/mobile/chat/MessageBubble";
+import { useTheme } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
+import { ThemeName } from "@/types";
+
+const initialMessages: Message[] = [
+  {
+    id: "1",
+    type: "text",
+    content: "想要草莓松饼！🍓",
+    sender: "partner",
+    createdAt: "2024-03-12 12:30"
+  },
+  {
+    id: "2",
+    type: "text",
+    content: "今天想吃点什么呀？🤔",
+    sender: "me",
+    createdAt: "2024-03-12 12:31"
+  },
+  {
+    id: "3",
+    type: "love",
+    content: "kiss",
+    sender: "partner",
+    createdAt: "2024-03-12 12:32"
+  },
+  {
+    id: "4",
+    type: "text",
+    content: "我也想吃！既然你想吃，那我们就去吃吧~",
+    sender: "me",
+    createdAt: "2024-03-12 12:33"
+  }
+];
+
+const themeStyles: Record<ThemeName, {
+  bg: string;
+}> = {
+  couple: { bg: "bg-gradient-to-b from-pink-50/50 to-white" },
+  cute: { bg: "bg-gradient-to-b from-orange-50/50 to-white" },
+  minimal: { bg: "bg-gray-50/30" },
+  night: { bg: "bg-slate-900" },
+};
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState(chatMessages);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
+  const currentTheme = themeStyles[theme] || themeStyles.couple;
 
-  const handleSend = (content: string, type: "text" | "image" | "voice" | "emoji") => {
-    const newMessage = {
-      id: `m-${Date.now()}`,
-      senderId: "user-a", // Current user
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = (content: string, type: "text" | "love") => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
       type,
       content,
-      createdAt: new Date().toISOString(),
-      isSender: true,
+      sender: "me",
+      createdAt: new Date().toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' })
     };
-    setMessages([...messages, newMessage]);
     
-    // Auto reply mock
-    setTimeout(() => {
-        setMessages(prev => [...prev, {
-            id: `m-${Date.now() + 1}`,
-            senderId: "user-b",
-            type: "text",
-            content: "收到啦！❤️",
-            createdAt: new Date().toISOString(),
-            isSender: false,
-        }]);
-    }, 1000);
+    setMessages(prev => [...prev, newMessage]);
+
+    // Mock reply
+    if (type === "love") {
+      setTimeout(() => {
+        const reply: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "love",
+          content: content === "kiss" ? "kiss" : "hug",
+          sender: "partner",
+          createdAt: new Date().toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, reply]);
+      }, 1000);
+    }
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-muted/20">
+    <div className={cn("flex flex-col h-screen", currentTheme.bg)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 h-14 bg-background border-b shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9" />
-            <div className="flex flex-col">
-                <span className="font-semibold text-sm">亲爱的</span>
-                <span className="text-[10px] text-green-500">在线</span>
-            </div>
-        </div>
-        <div className="flex gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
-                <Phone size={20} />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-                <Video size={20} />
-            </Button>
-        </div>
+      <ChatHeader />
+
+      {/* Messages Area */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto scroll-smooth"
+      >
+        <ChatMessages messages={messages} />
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-        {messages.map((msg) => (
-          <ChatBubble 
-            key={msg.id} 
-            message={{...msg, isSender: msg.senderId === "user-a"}} 
-          />
-        ))}
-      </div>
-
-      {/* Input */}
-      <div className="shrink-0 mb-16">
-        <MessageInput onSend={handleSend} />
-      </div>
+      {/* Input Area */}
+      <ChatInputBar onSend={handleSend} />
     </div>
   );
 }

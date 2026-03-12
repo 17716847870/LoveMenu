@@ -1,401 +1,409 @@
-# LoveMenu 主题系统 UI 升级 Prompt
+# LoveMenu 聊天页面 UI 重构 Prompt
 
-当前页面是 **主题切换页面**，需要升级为更高级的 **主题控制中心**。
+当前聊天页面需要升级为 **沉浸式情侣聊天界面**。
 
-目标：
+设计目标：
 
-1. 用户可以在任何页面切换主题
-2. 每个主题有自己的视觉风格
-3. 用户可以实时预览主题效果
-4. 切换具有动画效果
+1. 移除电话和视频按钮
+2. 移除 BottomNavigationBar
+3. 移除主题切换按钮
+4. 优化聊天气泡
+5. 增加情侣互动元素
+6. 增加聊天动效
 
 ---
 
-# 一、全局主题系统
-
-主题必须是 **全局状态**。
-
-技术方案：
+# 一、页面路径
 
 ```text
-ThemeContext
+/app/(mobile)/chat/page.tsx
 ```
 
-目录：
+该页面属于 **沉浸式页面**。
+
+需要：
 
 ```text
-/context
- └ ThemeContext.tsx
+独立 layout
 ```
 
-支持主题：
+路径：
 
 ```text
+/app/(mobile)/chat/layout.tsx
+```
+
+此 layout **不包含 BottomNavigationBar**。
+
+---
+
+# 二、页面结构
+
+```text
+ChatPage
+ ├ ChatHeader
+ ├ ChatMessages
+ └ ChatInputBar
+```
+
+---
+
+# 三、顶部聊天栏
+
+UI：
+
+```
+[头像] 亲爱的
+      在线
+```
+
+结构：
+
+```text
+ChatHeader
+ ├ Avatar
+ ├ UserInfo
+ │   ├ Name
+ │   └ Status
+ └ MoreButton
+```
+
+说明：
+
+删除：
+
+```
+电话按钮
+视频按钮
+```
+
+只保留：
+
+```
+更多按钮 (...)
+```
+
+点击可以打开：
+
+```
+聊天设置
+```
+
+---
+
+# 四、聊天消息区域
+
+组件：
+
+```text
+ChatMessages
+```
+
+结构：
+
+```text
+ChatMessages
+ ├ DateDivider
+ ├ MessageBubble
+ ├ MessageBubble
+ └ MessageBubble
+```
+
+---
+
+# 五、消息气泡设计
+
+需要区分：
+
+```text
+自己消息
+对象消息
+```
+
+结构：
+
+```text
+MessageBubble
+ ├ Avatar
+ └ Bubble
+```
+
+UI示例：
+
+对象消息：
+
+```
+U   想要草莓松饼！
+```
+
+自己消息：
+
+```
+      今天想吃点什么呀？
+                       U
+```
+
+样式：
+
+对象消息：
+
+```
+左侧
+白色气泡
+```
+
+自己消息：
+
+```
+右侧
+粉色气泡
+```
+
+---
+
+# 六、情侣互动气泡
+
+增加特殊消息类型：
+
+```text
+LoveMessage
+```
+
+示例：
+
+```
+💗 发送了一个亲亲
+```
+
+或者：
+
+```
+🤗 发送了一个抱抱
+```
+
+UI：
+
+```
+[爱心卡片]
+亲亲 +1
+```
+
+---
+
+# 七、时间分隔线
+
+组件：
+
+```text
+DateDivider
+```
+
+示例：
+
+```
+———— 今天 ————
+```
+
+样式：
+
+```css
+font-size:12px
+opacity:0.6
+text-align:center
+```
+
+---
+
+# 八、聊天输入区
+
+当前输入区太简单，需要升级。
+
+结构：
+
+```text
+ChatInputBar
+ ├ ActionButtons
+ │   ├ VoiceButton
+ │   ├ ImageButton
+ │   └ EmojiButton
+ ├ InputField
+ └ SendButton
+```
+
+UI示例：
+
+```
+🎤  🖼  😊   [说点什么...]   ❤️
+```
+
+说明：
+
+发送按钮：
+
+```
+爱心按钮
+```
+
+---
+
+# 九、情侣快捷互动
+
+在输入框上方增加：
+
+```text
+QuickLoveActions
+```
+
+UI：
+
+```
+💋 亲亲
+🤗 抱抱
+🍰 想吃
+```
+
+点击会发送：
+
+```
+互动消息
+```
+
+示例：
+
+```
+💋 亲亲 +1
+```
+
+---
+
+# 十、空聊天状态
+
+如果没有聊天记录，需要显示：
+
+```
+LoveMenu AI
+```
+
+示例：
+
+```
+今天想吃点什么？
+```
+
+或者：
+
+```
+试试发送一个亲亲 💋
+```
+
+---
+
+# 十一、聊天动画
+
+使用：
+
+```
+framer-motion
+```
+
+动画：
+
+新消息：
+
+```
+fade in
+slide up
+```
+
+时间：
+
+```
+200ms
+```
+
+---
+
+# 十二、组件目录
+
+```text
+/components/mobile/chat
+
+ChatHeader.tsx
+ChatMessages.tsx
+MessageBubble.tsx
+DateDivider.tsx
+ChatInputBar.tsx
+QuickLoveActions.tsx
+LoveMessage.tsx
+```
+
+---
+
+# 十三、数据结构
+
+消息结构：
+
+```ts
+interface Message {
+ id: string
+ type: "text" | "love"
+ content: string
+ sender: "me" | "partner"
+ createdAt: string
+}
+```
+
+love消息：
+
+```json
+{
+ "type":"love",
+ "content":"kiss"
+}
+```
+
+---
+
+# 十四、主题适配
+
+聊天页面需要适配主题：
+
+```
 couple
 cute
 minimal
 night
 ```
 
-主题需要保存：
+但：
 
-```text
-localStorage
 ```
-
-刷新页面保持主题。
-
----
-
-# 二、任何页面都可以切换主题
-
-需要新增：
-
-```text
-FloatingThemeButton
-```
-
-组件路径：
-
-```text
-/components/mobile/FloatingThemeButton.tsx
-```
-
-UI：
-
-右下角浮动按钮：
-
-```text
-🎨
-```
-
-样式：
-
-```css
-position: fixed
-right: 16px
-bottom: 90px
-width: 48px
-height: 48px
-border-radius: 50%
-box-shadow
-```
-
-点击：
-
-```text
-打开 Theme Drawer
+不要出现主题切换按钮
 ```
 
 ---
 
-# 三、主题抽屉（Theme Drawer）
-
-UI：
-
-从底部滑出：
-
-```text
-ThemeDrawer
-```
-
-结构：
-
-```text
-ThemeDrawer
- ├ DrawerHeader
- ├ ThemeGrid
- │   ├ ThemeCard
- │   ├ ThemeCard
- │   ├ ThemeCard
- │   └ ThemeCard
- └ CloseButton
-```
-
-动画：
-
-```text
-slide up
-```
-
-使用：
-
-```text
-framer-motion
-```
-
----
-
-# 四、主题卡片升级
-
-当前主题卡片过于简单。
-
-需要增加：
-
-```text
-主题预览
-主题说明
-选中状态
-```
-
-新卡片结构：
-
-```text
-ThemeCard
- ├ ThemePreview
- ├ ThemeName
- ├ ThemeDescription
- └ ActiveIndicator
-```
-
----
-
-# 五、主题预览设计
-
-## 情侣风
-
-预览：
-
-```text
-粉色渐变
-爱心元素
-圆角卡片
-```
-
-卡片示例：
-
-```text
-┌─────────────┐
-💗 情侣风
-浪漫恋爱主题
-└─────────────┘
-```
-
----
-
-## 可爱风
-
-预览：
-
-```text
-糖果色
-卡通emoji
-圆形组件
-```
-
-示例：
-
-```text
-┌─────────────┐
-🍭 可爱风
-元气少女主题
-└─────────────┘
-```
-
----
-
-## 极简风
-
-预览：
-
-```text
-黑白
-细边框
-干净布局
-```
-
-示例：
-
-```text
-┌─────────────┐
-⬛ 极简风
-纯净极简设计
-└─────────────┘
-```
-
----
-
-## 夜间模式
-
-预览：
-
-```text
-深色背景
-霓虹色按钮
-发光元素
-```
-
-示例：
-
-```text
-┌─────────────┐
-🌙 夜间模式
-深色护眼主题
-└─────────────┘
-```
-
----
-
-# 六、当前主题提示
-
-当前主题卡片需要高亮：
-
-```text
-边框高亮
-选中标记
-```
-
-示例：
-
-```text
-✔ 当前使用
-```
-
-样式：
-
-```css
-border:2px solid
-```
-
----
-
-# 七、主题切换动效
-
-切换主题时需要动画：
-
-```text
-background fade
-```
-
-动画：
-
-```text
-300ms
-```
-
-使用：
-
-```text
-framer-motion
-```
-
----
-
-# 八、页面优化
-
-当前主题页面可以增加：
-
-## 1 主题介绍
-
-页面顶部增加：
-
-```text
-个性化你的 LoveMenu
-选择你喜欢的主题
-```
-
----
-
-## 2 今日推荐主题
-
-可以随机推荐：
-
-```text
-今日推荐主题
-```
-
-示例：
-
-```text
-🌙 今天适合夜间模式
-```
-
----
-
-## 3 主题自动切换
-
-夜间模式可以支持：
-
-```text
-自动跟随系统
-```
-
----
-
-# 九、组件结构
-
-需要生成组件：
-
-```text
-/components/mobile
-
-ThemeCard.tsx
-ThemeDrawer.tsx
-FloatingThemeButton.tsx
-```
-
----
-
-# 十、页面结构
-
-```text
-ThemePage
- ├ PageHeader
- ├ ThemeIntro
- ├ ThemeGrid
- │   ├ ThemeCard
- │   ├ ThemeCard
- │   ├ ThemeCard
- │   └ ThemeCard
-```
-
----
-
-# 十一、技术要求
-
-使用：
-
-```text
-Next.js
-React
-TypeScript
-TailwindCSS
-framer-motion
-Context API
-```
-
----
-
-# 十二、输出要求
+# 十五、输出要求
 
 生成：
 
-```text
-/context/ThemeContext.tsx
+```
+/app/(mobile)/chat/layout.tsx
+/app/(mobile)/chat/page.tsx
 
-/components/mobile
- ThemeCard.tsx
- ThemeDrawer.tsx
- FloatingThemeButton.tsx
+/components/mobile/chat
+ ChatHeader.tsx
+ ChatMessages.tsx
+ MessageBubble.tsx
+ ChatInputBar.tsx
+ QuickLoveActions.tsx
+ LoveMessage.tsx
 ```
 
-并修改：
+实现：
 
-```text
-/app/layout.tsx
+```
+沉浸式聊天页面
 ```
 
-加入：
-
-```text
-ThemeProvider
-FloatingThemeButton
-```
-
-确保：
-
-```text
-任何页面都可以切换主题
-```
-
-不要生成其它页面代码。
+不要生成 BottomNavigationBar。

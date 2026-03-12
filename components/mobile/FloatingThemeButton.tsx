@@ -7,6 +7,7 @@ import ThemeDrawer from "./ThemeDrawer";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { usePathname } from "next/navigation";
 
 const themeStyles: Record<ThemeName, {
   button: string;
@@ -34,6 +35,17 @@ export default function FloatingThemeButton() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
+  const pathname = usePathname();
+
+  // Define paths where the FloatingThemeButton should be hidden
+  const hiddenPaths = ["/chat", "/menu"];
+
+  // Check if current path starts with any of the hidden paths
+  const shouldHide = hiddenPaths.some((path) => pathname.startsWith(path));
+
+  if (shouldHide) {
+    return null;
+  }
 
   return (
     <>

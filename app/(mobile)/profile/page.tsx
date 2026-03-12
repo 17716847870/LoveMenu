@@ -1,4 +1,3 @@
-import ThemeSwitcher from "@/components/ui/ThemeSwitcher";
 import CoupleProfileCard from "@/components/mobile/CoupleProfileCard";
 import LoveBalanceCard from "@/components/mobile/LoveBalanceCard";
 import OrderPreviewCard from "@/components/mobile/OrderPreviewCard";
@@ -14,12 +13,6 @@ export default function ProfilePage() {
 
       {/* Order History Preview */}
       <OrderPreviewCard />
-
-      {/* Theme Switcher */}
-      <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">主题切换</h2>
-        <ThemeSwitcher />
-      </div>
     </div>
   );
 }

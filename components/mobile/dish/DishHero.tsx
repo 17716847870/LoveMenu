@@ -23,7 +23,8 @@ export default function DishHero({ image, name, theme }: DishHeroProps) {
       <Image
         src={image}
         alt={name}
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
       />
 
       {/* Gradient Overlay */}

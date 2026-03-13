@@ -26,7 +26,7 @@ export default function AddToMenuBar({ onAdd, theme }: AddToMenuBarProps) {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white/90 to-transparent z-50 pointer-events-none max-w-[480px] mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-white via-white/90 to-transparent z-50 pointer-events-none max-w-[480px] mx-auto">
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onAdd}

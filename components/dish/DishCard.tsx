@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Heart, User } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface DishCardProps {
   dish: Dish;
@@ -12,10 +13,10 @@ interface DishCardProps {
 export default function DishCard({ dish, onAddToCart }: DishCardProps) {
   return (
     <Card className="overflow-hidden flex flex-col h-full">
-      <Link href={`/menu/${dish.id}`} className="block relative aspect-[4/3] bg-muted w-full">
+      <Link href={`/menu/${dish.id}`} className="block relative aspect-4/3 bg-muted w-full">
         {/* Placeholder for image */}
         {dish.image ? (
-            <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
+            <Image src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
         ) : (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-secondary/30">
                 🍽️

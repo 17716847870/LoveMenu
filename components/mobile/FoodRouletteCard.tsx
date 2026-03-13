@@ -125,7 +125,7 @@ export default function FoodRouletteCard({ dishes = defaultDishes as Dish[] }: F
 
   return (
     <div className={cn(
-      "rounded-[2rem] p-6 shadow-sm border flex flex-col items-center gap-6 overflow-hidden relative",
+      "rounded-4xl p-6 shadow-sm border flex flex-col items-center gap-6 overflow-hidden relative",
       currentTheme.container
     )}>
       {/* Header */}
@@ -160,7 +160,7 @@ export default function FoodRouletteCard({ dishes = defaultDishes as Dish[] }: F
              {dishes.map((_, index) => (
                 <div 
                     key={index}
-                    className="absolute top-1/2 left-1/2 w-1/2 h-[1px] bg-gray-200/50 origin-left"
+                    className="absolute top-1/2 left-1/2 w-1/2 h-px bg-gray-200/50 origin-left"
                     style={{ transform: `rotate(${index * (360 / dishes.length)}deg)` }}
                 />
              ))}

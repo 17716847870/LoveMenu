@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ThemeName } from "@/types";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface DishHeroProps {
   image: string;
@@ -19,7 +20,7 @@ export default function DishHero({ image, name, theme }: DishHeroProps) {
       className="relative w-full aspect-video overflow-hidden"
     >
       {/* Image */}
-      <img
+      <Image
         src={image}
         alt={name}
         className="w-full h-full object-cover"
@@ -28,7 +29,7 @@ export default function DishHero({ image, name, theme }: DishHeroProps) {
       {/* Gradient Overlay */}
       <div
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6",
+          "absolute bottom-0 left-0 right-0 h-1/2 bg-linear-to-t from-black/80 to-transparent flex flex-col justify-end p-6",
           theme === "couple" && "from-pink-900/80",
           theme === "night" && "from-gray-900/90",
           theme === "cute" && "from-orange-900/60"

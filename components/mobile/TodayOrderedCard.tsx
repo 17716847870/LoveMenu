@@ -162,7 +162,7 @@ export default function TodayOrderedCard({ orders = defaultOrders }: TodayOrdere
 
   return (
     <div className={cn(
-      "rounded-[2rem] p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
+      "rounded-4xl p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
       {/* Header */}

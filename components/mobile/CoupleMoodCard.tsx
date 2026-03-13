@@ -88,7 +88,6 @@ const cardThemes: Record<ThemeName, {
 };
 
 export default function CoupleMoodCard({ 
-  username = "宝贝",
   mood = "😊 开心",
   craving = "🍗 炸鸡" 
 }: CoupleMoodCardProps) {
@@ -108,7 +107,7 @@ export default function CoupleMoodCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "relative overflow-hidden rounded-[2rem] p-6 shadow-xl w-full",
+        "relative overflow-hidden rounded-4xl p-6 shadow-xl w-full",
         currentTheme.container
       )}
     >

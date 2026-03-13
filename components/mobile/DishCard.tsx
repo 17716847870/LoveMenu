@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { 
   Heart, 
   Sparkles, 
-  ShoppingBag, 
   Zap, 
   Flame, 
   Plus
@@ -118,7 +117,7 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
 
       {/* Image */}
       <div className={cn(
-        "aspect-[4/3] relative w-full overflow-hidden",
+        "aspect-4/3 relative w-full overflow-hidden",
         currentTheme.imageContainer
       )}>
         {dish.image ? (

@@ -185,7 +185,7 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
              {profile.emotion}
            </span>
            <p className={cn("text-sm opacity-80", currentTheme.nameText)}>
-             "{profile.moodText}"
+             &quot;{profile.moodText}&quot;
            </p>
         </div>
       </div>

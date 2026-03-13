@@ -1,409 +1,399 @@
-# LoveMenu 聊天页面 UI 重构 Prompt
+# LoveMenu 菜单详情页面 UI 重设计
 
-当前聊天页面需要升级为 **沉浸式情侣聊天界面**。
+目标：
 
-设计目标：
+当前菜单详情页结构过于简单，需要重新设计。
 
-1. 移除电话和视频按钮
-2. 移除 BottomNavigationBar
-3. 移除主题切换按钮
-4. 优化聊天气泡
-5. 增加情侣互动元素
-6. 增加聊天动效
+新页面需要：
+
+1 提升视觉层级
+2 增加情侣互动感
+3 每个主题有不同设计风格
+4 页面更加像真实产品
 
 ---
 
-# 一、页面路径
+# 一、页面结构（新版）
 
-```text
-/app/(mobile)/chat/page.tsx
-```
+新的页面结构：
 
-该页面属于 **沉浸式页面**。
+DishDetailPage
+
+Header
+DishHero
+DishMainCard
+LoveInteraction
+IngredientCost
+MemoryTip
+AddToMenuBar
+
+---
+
+# 二、Header
+
+左侧：
+
+返回按钮
+
+右侧：
+
+收藏按钮 ❤️
+
+情侣风：
+
+爱心按钮动画
+
+可爱风：
+
+跳动表情按钮
+
+极简风：
+
+简单线性图标
+
+夜间模式：
+
+霓虹发光按钮
+
+---
+
+# 三、DishHero（菜品大图区域）
+
+尺寸：
+
+16:9
+
+图片底部增加渐变遮罩：
+
+dark gradient overlay
+
+用于提升文字可读性
+
+图片底部显示：
+
+菜名
+
+示例：
+
+日式炸猪排
+
+字体：
+
+大标题
+
+---
+
+# 四、DishMainCard（核心信息卡片）
+
+图片下方增加一张 **浮动卡片**
+
+卡片内容：
+
+菜品介绍
+点赞数据
+分享数据
+
+示例：
+
+外酥里嫩
+配特制酱汁
+
+❤️ 90 次
+👫 45 分享
+
+卡片设计：
+
+情侣风
+
+圆角大卡片
+粉色阴影
+
+可爱风
+
+气泡卡片
+彩色边框
+
+极简风
+
+白卡片
+细边框
+
+夜间模式
+
+深色卡片
+霓虹边框
+
+---
+
+# 五、LoveInteraction（情侣互动）
+
+新增模块：
+
+情侣互动统计
+
+示例：
+
+今天TA想吃 ❤️
+被点次数
+
+❤️ 被点 90 次
+💌 被分享 45 次
+
+情侣风：
+
+爱心图标动画
+
+可爱风：
+
+表情图标
+
+极简风：
+
+简单文本
+
+夜间模式：
+
+发光数字
+
+---
+
+# 六、IngredientCost（点菜消耗）
+
+新增模块：
+
+点菜需要消耗
+
+示例：
 
 需要：
 
-```text
-独立 layout
-```
+❤️ 爱心 3
+😊 贴贴 1
 
-路径：
+UI设计：
 
-```text
-/app/(mobile)/chat/layout.tsx
-```
+情侣风
 
-此 layout **不包含 BottomNavigationBar**。
+爱心徽章
 
----
+可爱风
 
-# 二、页面结构
+贴纸风格
 
-```text
-ChatPage
- ├ ChatHeader
- ├ ChatMessages
- └ ChatInputBar
-```
+极简风
+
+简单标签
+
+夜间模式
+
+发光标签
 
 ---
 
-# 三、顶部聊天栏
+# 七、MemoryTip（情侣小提示）
 
-UI：
+新增模块：
 
-```
-[头像] 亲爱的
-      在线
-```
-
-结构：
-
-```text
-ChatHeader
- ├ Avatar
- ├ UserInfo
- │   ├ Name
- │   └ Status
- └ MoreButton
-```
-
-说明：
-
-删除：
-
-```
-电话按钮
-视频按钮
-```
-
-只保留：
-
-```
-更多按钮 (...)
-```
-
-点击可以打开：
-
-```
-聊天设置
-```
-
----
-
-# 四、聊天消息区域
-
-组件：
-
-```text
-ChatMessages
-```
-
-结构：
-
-```text
-ChatMessages
- ├ DateDivider
- ├ MessageBubble
- ├ MessageBubble
- └ MessageBubble
-```
-
----
-
-# 五、消息气泡设计
-
-需要区分：
-
-```text
-自己消息
-对象消息
-```
-
-结构：
-
-```text
-MessageBubble
- ├ Avatar
- └ Bubble
-```
-
-UI示例：
-
-对象消息：
-
-```
-U   想要草莓松饼！
-```
-
-自己消息：
-
-```
-      今天想吃点什么呀？
-                       U
-```
-
-样式：
-
-对象消息：
-
-```
-左侧
-白色气泡
-```
-
-自己消息：
-
-```
-右侧
-粉色气泡
-```
-
----
-
-# 六、情侣互动气泡
-
-增加特殊消息类型：
-
-```text
-LoveMessage
-```
+情侣提示
 
 示例：
 
-```
-💗 发送了一个亲亲
-```
+💡 小提示
 
-或者：
+这道菜适合
+一起追剧的时候吃
 
-```
-🤗 发送了一个抱抱
-```
+或者
 
-UI：
+适合周末一起做
 
-```
-[爱心卡片]
-亲亲 +1
-```
+这个模块可以增加产品温度
 
 ---
 
-# 七、时间分隔线
+# 八、AddToMenuBar（底部按钮）
 
-组件：
+固定底部按钮
 
-```text
-DateDivider
-```
+按钮文案：
 
-示例：
+加入菜单
 
-```
-———— 今天 ————
-```
+按钮设计根据主题变化
 
-样式：
+情侣风
 
-```css
-font-size:12px
-opacity:0.6
-text-align:center
-```
+粉色渐变按钮
 
----
+可爱风
 
-# 八、聊天输入区
+糖果色按钮
 
-当前输入区太简单，需要升级。
+极简风
 
-结构：
+黑白按钮
 
-```text
-ChatInputBar
- ├ ActionButtons
- │   ├ VoiceButton
- │   ├ ImageButton
- │   └ EmojiButton
- ├ InputField
- └ SendButton
-```
+夜间模式
 
-UI示例：
-
-```
-🎤  🖼  😊   [说点什么...]   ❤️
-```
-
-说明：
-
-发送按钮：
-
-```
-爱心按钮
-```
+霓虹按钮
 
 ---
 
-# 九、情侣快捷互动
+# 九、主题设计（关键）
 
-在输入框上方增加：
-
-```text
-QuickLoveActions
-```
-
-UI：
-
-```
-💋 亲亲
-🤗 抱抱
-🍰 想吃
-```
-
-点击会发送：
-
-```
-互动消息
-```
-
-示例：
-
-```
-💋 亲亲 +1
-```
+四个主题不仅换颜色，还要换风格。
 
 ---
 
-# 十、空聊天状态
+## 情侣风（couple）
 
-如果没有聊天记录，需要显示：
+风格：
 
-```
-LoveMenu AI
-```
+浪漫
+柔和
+粉色
 
-示例：
+设计元素：
 
-```
-今天想吃点什么？
-```
+爱心
+渐变
+圆角
 
-或者：
+背景：
 
-```
-试试发送一个亲亲 💋
-```
+粉色渐变
+
+卡片：
+
+柔和阴影
+
+按钮：
+
+粉色渐变按钮
 
 ---
 
-# 十一、聊天动画
+## 可爱风（cute）
 
-使用：
+风格：
 
-```
-framer-motion
-```
+卡通
+活泼
+糖果色
 
-动画：
+设计元素：
 
-新消息：
+emoji
+贴纸
+气泡卡片
 
-```
+卡片：
+
+圆角气泡
+
+按钮：
+
+糖果按钮
+
+---
+
+## 极简风（minimal）
+
+风格：
+
+黑白
+简约
+
+设计元素：
+
+细线条
+留白
+
+卡片：
+
+白色边框卡片
+
+按钮：
+
+黑色按钮
+
+---
+
+## 夜间模式（night）
+
+风格：
+
+深色
+霓虹
+
+设计元素：
+
+霓虹边框
+发光按钮
+
+背景：
+
+深灰
+
+卡片：
+
+深色卡片
+
+按钮：
+
+紫色霓虹按钮
+
+---
+
+# 十、动画
+
+加入轻量动画：
+
+页面加载：
+
 fade in
-slide up
-```
 
-时间：
+按钮点击：
 
-```
-200ms
-```
+scale
 
----
+爱心点击：
 
-# 十二、组件目录
-
-```text
-/components/mobile/chat
-
-ChatHeader.tsx
-ChatMessages.tsx
-MessageBubble.tsx
-DateDivider.tsx
-ChatInputBar.tsx
-QuickLoveActions.tsx
-LoveMessage.tsx
-```
+bounce
 
 ---
 
-# 十三、数据结构
+# 十一、组件结构
 
-消息结构：
+/components/mobile/dish
 
-```ts
-interface Message {
- id: string
- type: "text" | "love"
- content: string
- sender: "me" | "partner"
- createdAt: string
-}
-```
+DishHero.tsx
 
-love消息：
+DishMainCard.tsx
 
-```json
-{
- "type":"love",
- "content":"kiss"
-}
-```
+LoveInteraction.tsx
+
+IngredientCost.tsx
+
+MemoryTip.tsx
+
+AddToMenuBar.tsx
 
 ---
 
-# 十四、主题适配
+# 十二、生成页面
 
-聊天页面需要适配主题：
+/app/(mobile)/menu/[id]/page.tsx
 
-```
+要求：
+
+使用 ThemeContext
+
+根据 theme 渲染不同 UI
+
+主题：
+
 couple
 cute
 minimal
 night
-```
-
-但：
-
-```
-不要出现主题切换按钮
-```
-
----
-
-# 十五、输出要求
-
-生成：
-
-```
-/app/(mobile)/chat/layout.tsx
-/app/(mobile)/chat/page.tsx
-
-/components/mobile/chat
- ChatHeader.tsx
- ChatMessages.tsx
- MessageBubble.tsx
- ChatInputBar.tsx
- QuickLoveActions.tsx
- LoveMessage.tsx
-```
-
-实现：
-
-```
-沉浸式聊天页面
-```
-
-不要生成 BottomNavigationBar。

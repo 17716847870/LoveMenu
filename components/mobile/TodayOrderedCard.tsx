@@ -43,6 +43,12 @@ const defaultOrders: Order[] = [
     time: "晚上",
     type: "restaurant",
   },
+  {
+    id: "3",
+    dishName: "韩式炸鸡",
+    time: "夜宵",
+    type: "home",
+  },
 ];
 
 // Theme Configuration

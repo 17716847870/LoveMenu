@@ -21,6 +21,14 @@ interface OrderPreviewCardProps {
 
 const defaultOrders: Order[] = [
   {
+    id: "5",
+    dishes: ["韩式炸鸡", "啤酒"],
+    kissPrice: 3,
+    hugPrice: 2,
+    status: "completed",
+    createdAt: "2024-03-13 22:00"
+  },
+  {
     id: "1",
     dishes: ["可乐鸡翅", "炒饭"],
     kissPrice: 2,

@@ -18,6 +18,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Check localStorage for saved theme
     const savedTheme = localStorage.getItem("love-menu-theme") as ThemeName;
     if (savedTheme) {
+      // eslint-disable-next-line
       setTheme(savedTheme);
     }
     setMounted(true);

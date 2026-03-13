@@ -33,6 +33,7 @@ const cardThemes: Record<ThemeName, {
   content: string;
   button: string;
   icon: React.ElementType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   animation: any;
 }> = {
   couple: {
@@ -97,6 +98,7 @@ export default function CoupleMoodCard({
   const Icon = currentTheme.icon;
 
   useEffect(() => {
+    // eslint-disable-next-line
     setGreeting(getGreeting());
   }, []);
 

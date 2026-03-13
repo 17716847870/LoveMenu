@@ -2,6 +2,7 @@ import { Dish } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Heart, User } from "lucide-react";
+import Link from "next/link";
 
 interface DishCardProps {
   dish: Dish;
@@ -10,8 +11,8 @@ interface DishCardProps {
 
 export default function DishCard({ dish, onAddToCart }: DishCardProps) {
   return (
-    <Card className="overflow-hidden">
-      <div className="aspect-[4/3] bg-muted w-full relative">
+    <Card className="overflow-hidden flex flex-col h-full">
+      <Link href={`/menu/${dish.id}`} className="block relative aspect-[4/3] bg-muted w-full">
         {/* Placeholder for image */}
         {dish.image ? (
             <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
@@ -20,9 +21,11 @@ export default function DishCard({ dish, onAddToCart }: DishCardProps) {
                 🍽️
             </div>
         )}
-      </div>
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="font-semibold text-lg">{dish.name}</h3>
+      </Link>
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <Link href={`/menu/${dish.id}`}>
+            <h3 className="font-semibold text-lg">{dish.name}</h3>
+        </Link>
         {dish.description && (
             <p className="text-xs text-muted-foreground line-clamp-2">{dish.description}</p>
         )}

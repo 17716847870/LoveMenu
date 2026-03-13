@@ -14,6 +14,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Image from "next/image";
+import Link from "next/link";
 
 export interface Dish {
   id: string;
@@ -102,6 +103,8 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
         currentTheme.card
       )}
     >
+      <Link href={`/menu/${dish.id}`} className="absolute inset-0 z-0" />
+      
       {/* Hot Badge */}
       {isHot && (
         <div className={cn(
@@ -133,7 +136,7 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       </div>
 
       {/* Info */}
-      <div className="p-3 flex flex-col flex-1 gap-2">
+      <div className="p-3 flex flex-col flex-1 gap-2 relative z-10 pointer-events-none">
         <div>
           <h3 className={cn("font-bold text-sm line-clamp-1", currentTheme.title)}>
             {dish.name}
@@ -161,9 +164,13 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
           {/* Add Button */}
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => onAdd?.(dish)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onAdd?.(dish);
+            }}
             className={cn(
-              "w-7 h-7 rounded-full flex items-center justify-center",
+              "w-7 h-7 rounded-full flex items-center justify-center pointer-events-auto",
               currentTheme.button
             )}
           >

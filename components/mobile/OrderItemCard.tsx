@@ -23,6 +23,7 @@ export interface Order {
   createdAt: string;
   memoryNote?: string;
   reason?: string;
+  isEmergency?: boolean;
 }
 
 interface OrderItemCardProps {
@@ -82,8 +83,13 @@ export default function OrderItemCard({ order, index = 0 }: OrderItemCardProps) 
       )}
     >
       <div className="flex justify-between items-start">
-        <div className="font-medium line-clamp-1 flex-1">
+        <div className="font-medium line-clamp-1 flex-1 flex items-center gap-2">
           {order.dishes.join(" + ")}
+          {order.isEmergency && (
+            <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full border border-red-200 font-bold">
+              ⚡ 紧急订单
+            </span>
+          )}
         </div>
         <div className={cn(
           "text-xs px-2 py-0.5 rounded-full font-medium ml-2",

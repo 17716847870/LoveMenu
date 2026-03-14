@@ -1,78 +1,68 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
   MessageSquare, 
   Heart, 
   Sparkles, 
   Zap, 
-  Quote
+  ChevronRight
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
-import Image from "next/image";
 
-interface Feedback {
-  dishName: string;
-  content: string;
-  image?: string;
+interface FeedbackPreview {
+  title: string;
+  type: string;
 }
 
-interface RecentFeedbackCardProps {
-  data?: Feedback;
-}
-
-const defaultData: Feedback = {
-  dishName: "豚骨拉面",
-  content: "很好吃！！",
-  // image: "/feedback/1.jpg" // Uncomment when real image is available
-};
+const mockFeedbacks: FeedbackPreview[] = [
+  { title: "页面加载有点慢", type: "bug" },
+  { title: "希望增加日料", type: "menu" },
+  { title: "夜间模式很好看", type: "experience" }
+];
 
 const themeStyles: Record<ThemeName, {
   container: string;
   header: string;
-  dish: string;
-  content: string;
-  quote: string;
+  item: string;
+  viewAll: string;
   icon: React.ElementType;
 }> = {
   couple: {
-    container: "bg-blue-50 border-blue-100 shadow-sm",
-    header: "text-blue-600",
-    dish: "text-blue-700 font-bold",
-    content: "text-blue-600 bg-white/60 p-3 rounded-xl border border-blue-100",
-    quote: "text-blue-300",
+    container: "bg-white border-pink-100 shadow-sm hover:shadow-md",
+    header: "text-pink-900",
+    item: "bg-pink-50 text-pink-700",
+    viewAll: "text-pink-400 hover:text-pink-600",
     icon: Heart,
   },
   cute: {
-    container: "bg-green-50 border-green-100 shadow-[4px_4px_0px_0px_rgba(34,197,94,0.2)]",
-    header: "text-green-600",
-    dish: "text-green-700 font-bold",
-    content: "text-green-600 bg-white p-3 rounded-xl border-2 border-green-200 shadow-sm",
-    quote: "text-green-300",
+    container: "bg-white border-2 border-orange-100 shadow-[4px_4px_0px_0px_rgba(255,237,213,1)]",
+    header: "text-orange-900",
+    item: "bg-orange-50 text-orange-700 border border-orange-100",
+    viewAll: "text-orange-400 hover:text-orange-600",
     icon: Sparkles,
   },
   minimal: {
-    container: "bg-white border-gray-200",
+    container: "bg-white border border-gray-200",
     header: "text-gray-900",
-    dish: "text-gray-900 font-bold",
-    content: "text-gray-600 italic bg-gray-50 p-3 border-l-2 border-gray-300",
-    quote: "text-gray-300",
+    item: "bg-gray-50 text-gray-700 border border-gray-100",
+    viewAll: "text-gray-400 hover:text-gray-600",
     icon: MessageSquare,
   },
   night: {
-    container: "bg-slate-900 border-slate-800 shadow-[0_0_15px_rgba(34,197,94,0.15)]",
-    header: "text-green-400",
-    dish: "text-green-300 font-bold",
-    content: "text-green-400 bg-slate-800/50 p-3 rounded-xl border border-green-500/30",
-    quote: "text-green-500/30",
+    container: "bg-slate-800 border-slate-700 shadow-lg",
+    header: "text-white",
+    item: "bg-slate-700/50 text-slate-300 border border-slate-600",
+    viewAll: "text-slate-500 hover:text-slate-300",
     icon: Zap,
   },
 };
 
-export default function RecentFeedbackCard({ data = defaultData }: RecentFeedbackCardProps) {
+export default function RecentFeedbackCard() {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
@@ -82,49 +72,65 @@ export default function RecentFeedbackCard({ data = defaultData }: RecentFeedbac
       case 'cute': return "🍓 最近反馈";
       case 'minimal': return "Recent Feedback";
       case 'night': return "⚡ Feedback";
-      default: return "❤️ 最近反馈";
+      default: return "❤️ 宝贝的反馈";
     }
   };
 
   return (
     <div className={cn(
-      "rounded-[2rem] p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
+      "rounded-[2rem] p-6 flex flex-col gap-4 overflow-hidden relative transition-all duration-300",
       currentTheme.container
     )}>
       {/* Header */}
-      <div className="flex items-center gap-2 font-bold text-lg">
-        <Icon className={cn("w-5 h-5", currentTheme.header)} />
-        <span className={currentTheme.header}>{getTitle()}</span>
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col gap-3">
-        <div className={cn("text-lg", currentTheme.dish)}>
-          {data.dishName}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 font-bold text-lg">
+          <Icon className={cn("w-5 h-5", currentTheme.header)} />
+          <span className={currentTheme.header}>{getTitle()}</span>
         </div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative"
+        <Link 
+          href="/feedback" 
+          className={cn(
+            "text-xs font-medium flex items-center gap-1 transition-colors",
+            currentTheme.viewAll
+          )}
         >
-          <Quote className={cn("absolute -top-2 -left-1 w-4 h-4 rotate-180", currentTheme.quote)} />
-          <div className={cn("text-sm leading-relaxed pl-4", currentTheme.content)}>
-            {data.content}
-          </div>
-        </motion.div>
-
-        {data.image && (
-          <div className="relative w-full h-32 rounded-xl overflow-hidden mt-2">
-            <Image 
-              src={data.image} 
-              alt="Feedback" 
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
+          查看全部
+          <ChevronRight className="w-3 h-3" />
+        </Link>
       </div>
+
+      {/* List */}
+      <div className="flex flex-col gap-2">
+        {mockFeedbacks.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={cn(
+              "p-3 text-sm font-medium transition-all flex items-center justify-between rounded-xl",
+              currentTheme.item
+            )}
+          >
+            <span>{item.title}</span>
+          </motion.div>
+        ))}
+      </div>
+      
+      <Link href="/feedback" className="mt-1">
+        <motion.div
+            whileTap={{ scale: 0.98 }}
+            className={cn(
+              "p-3 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl opacity-80 hover:opacity-100",
+              theme === 'couple' ? "bg-pink-100 text-pink-600" : "",
+              theme === 'cute' ? "bg-orange-100 text-orange-600" : "",
+              theme === 'minimal' ? "bg-gray-100 text-gray-900" : "",
+              theme === 'night' ? "bg-purple-900/30 text-purple-300 border border-purple-500/30" : ""
+            )}
+        >
+            <span>＋ 提交反馈</span>
+        </motion.div>
+      </Link>
     </div>
   );
 }

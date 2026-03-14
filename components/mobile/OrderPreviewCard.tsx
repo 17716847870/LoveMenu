@@ -27,7 +27,8 @@ const defaultOrders: Order[] = [
     hugPrice: 2,
     status: "completed",
     createdAt: "2024-03-13 22:00",
-    reason: "夜宵"
+    reason: "夜宵",
+    isEmergency: true
   },
   {
     id: "1",

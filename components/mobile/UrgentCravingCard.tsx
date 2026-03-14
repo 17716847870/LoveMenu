@@ -11,6 +11,7 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import Link from "next/link";
 
 interface Craving {
   dishName: string;
@@ -99,17 +100,19 @@ export default function UrgentCravingCard({ data = defaultData }: UrgentCravingC
           {data.dishName}
         </motion.div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={cn(
-            "w-full py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all",
-            currentTheme.button
-          )}
-        >
-          立即下单
-          <ArrowRight className="w-4 h-4" />
-        </motion.button>
+        <Link href="/emergency" className="w-full block">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={cn(
+              "w-full py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all",
+              currentTheme.button
+            )}
+          >
+            立即下单
+            <ArrowRight className="w-4 h-4" />
+          </motion.button>
+        </Link>
       </div>
     </div>
   );

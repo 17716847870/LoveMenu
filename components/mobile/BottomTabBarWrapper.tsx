@@ -9,7 +9,7 @@ export default function BottomTabBarWrapper() {
   // Define paths where the BottomTabBar should be hidden
   // Hide on detail pages (e.g., /menu/[id]), but show on /menu
   // Hide on chat detail if needed, but show on /chat list
-  const hiddenPaths = ["/orders", "/menu/", "/chat", "/cart", "/wishlist"];
+  const hiddenPaths = ["/orders", "/menu/", "/chat", "/cart", "/wishlist", "/feedback", "/emergency"];
 
   // Check if current path starts with any of the hidden paths
   const shouldHide = hiddenPaths.some((path) => pathname.startsWith(path) && path !== "/menu");

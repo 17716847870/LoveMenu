@@ -34,6 +34,7 @@ export interface Order {
   totalHug: number;
   items: CartItem[];
   reason?: string;
+  isEmergency?: boolean;
   createdAt: string;
 }
 
@@ -58,5 +59,18 @@ export interface FoodRequest {
   description: string;
   image?: string;
   status: "pending" | "approved" | "rejected";
+  createdAt: string;
+}
+
+export type FeedbackType = "bug" | "feature" | "menu" | "experience";
+export type FeedbackStatus = "open" | "processing" | "resolved";
+
+export interface Feedback {
+  id: string;
+  type: FeedbackType;
+  title: string;
+  content: string;
+  image?: string;
+  status: FeedbackStatus;
   createdAt: string;
 }

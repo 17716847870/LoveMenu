@@ -100,9 +100,16 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
       >
         {/* Header */}
         <div className="flex justify-between items-start">
-          <h3 className={cn("text-lg font-bold line-clamp-1", currentTheme.dish)}>
-            {order.dishes.join(" + ")}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className={cn("text-lg font-bold line-clamp-1", currentTheme.dish)}>
+              {order.dishes.join(" + ")}
+            </h3>
+            {order.isEmergency && (
+              <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full border border-red-200 font-bold whitespace-nowrap">
+                ⚡ 紧急想吃
+              </span>
+            )}
+          </div>
           <span className={cn("text-xs font-medium", currentTheme.time)}>
             {order.createdAt.split(' ')[1]}
           </span>

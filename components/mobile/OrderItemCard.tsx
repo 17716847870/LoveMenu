@@ -22,6 +22,7 @@ export interface Order {
   status: string;
   createdAt: string;
   memoryNote?: string;
+  reason?: string;
 }
 
 interface OrderItemCardProps {
@@ -91,6 +92,13 @@ export default function OrderItemCard({ order, index = 0 }: OrderItemCardProps) 
           {order.status === "completed" ? "已完成" : "进行中"}
         </div>
       </div>
+
+      {order.reason && (
+        <div className="text-xs opacity-70 mt-1">
+          <span className="mr-1">原因:</span>
+          {order.reason}
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-sm mt-1">
         <div className={cn("flex items-center gap-1 text-xs", currentTheme.timeText)}>

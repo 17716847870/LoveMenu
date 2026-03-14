@@ -33,6 +33,7 @@ export interface Order {
   totalKiss: number;
   totalHug: number;
   items: CartItem[];
+  reason?: string;
   createdAt: string;
 }
 

@@ -122,8 +122,8 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
           )}
         </div>
 
-        {/* Memory Note */}
-        {order.memoryNote && (
+        {/* Reason / Memory Note */}
+        {(order.reason || order.memoryNote) && (
           <div className={cn(
             "mt-1 p-3 rounded-xl text-sm relative border",
             currentTheme.note
@@ -132,7 +132,19 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
               "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-[2px]",
               currentTheme.noteIcon
             )} />
-            {order.memoryNote}
+            <div className="flex flex-col gap-1">
+              {order.reason && (
+                <div className="font-medium opacity-90">
+                  <span className="text-xs opacity-70 mr-1">原因:</span>
+                  {order.reason}
+                </div>
+              )}
+              {order.memoryNote && (
+                <div className={order.reason ? "mt-1 pt-1 border-t border-current/10" : ""}>
+                  {order.memoryNote}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </motion.div>

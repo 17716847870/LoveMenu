@@ -14,6 +14,7 @@ import CartList from "@/components/mobile/cart/CartList";
 import CartSummary from "@/components/mobile/cart/CartSummary";
 import CheckoutBar from "@/components/mobile/cart/CheckoutBar";
 import EmptyCart from "@/components/mobile/cart/EmptyCart";
+import OrderReasonSelector from "@/components/mobile/cart/OrderReasonSelector";
 
 const pageStyles: Record<ThemeName, string> = {
   couple: "bg-linear-to-b from-pink-50 to-white",
@@ -27,10 +28,19 @@ export default function CartPage() {
   const { theme } = useTheme();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReasonSelectorOpen, setIsReasonSelectorOpen] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckoutClick = () => {
+    setIsReasonSelectorOpen(true);
+  };
+
+  const handleConfirmOrder = async (reason: string) => {
+    setIsReasonSelectorOpen(false);
     setIsSubmitting(true);
-    // Simulate API call
+    
+    // Simulate API call to create order with reason
+    console.log("Creating order with reason:", reason);
+    
     setTimeout(() => {
       clearCart();
       setIsSubmitting(false);
@@ -49,7 +59,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className={cn("min-h-screen pb-32 transition-colors duration-300", pageStyles[theme])}>
+    <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
       <CartHeader />
       <CartLoveTip />
       
@@ -62,8 +72,14 @@ export default function CartPage() {
       <CartSummary totals={totals} />
       
       <CheckoutBar 
-        onCheckout={handleCheckout} 
+        onCheckout={handleCheckoutClick} 
         totals={totals} 
+      />
+
+      <OrderReasonSelector
+        isOpen={isReasonSelectorOpen}
+        onClose={() => setIsReasonSelectorOpen(false)}
+        onConfirm={handleConfirmOrder}
       />
     </div>
   );

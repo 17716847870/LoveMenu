@@ -26,7 +26,8 @@ const defaultOrders: Order[] = [
     kissPrice: 3,
     hugPrice: 2,
     status: "completed",
-    createdAt: "2024-03-13 22:00"
+    createdAt: "2024-03-13 22:00",
+    reason: "夜宵"
   },
   {
     id: "1",
@@ -34,7 +35,8 @@ const defaultOrders: Order[] = [
     kissPrice: 2,
     hugPrice: 1,
     status: "completed",
-    createdAt: "2024-03-12 18:30"
+    createdAt: "2024-03-12 18:30",
+    reason: "今天宝贝想吃"
   },
   {
     id: "2",
@@ -42,7 +44,8 @@ const defaultOrders: Order[] = [
     kissPrice: 1,
     hugPrice: 0,
     status: "completed",
-    createdAt: "2024-03-11 19:00"
+    createdAt: "2024-03-11 19:00",
+    reason: "随便吃点"
   },
   {
     id: "3",
@@ -50,7 +53,8 @@ const defaultOrders: Order[] = [
     kissPrice: 2,
     hugPrice: 1,
     status: "completed",
-    createdAt: "2024-03-10 14:20"
+    createdAt: "2024-03-10 14:20",
+    reason: "今天想吃点甜的"
   }
 ];
 

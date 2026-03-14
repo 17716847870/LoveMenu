@@ -17,6 +17,7 @@ const orders: Order[] = [
     hugPrice: 2,
     status: "completed",
     createdAt: "2024-03-13 22:00",
+    reason: "夜宵",
     memoryNote: "来自星星的炸鸡啤酒 🍗🍺"
   },
   {
@@ -26,6 +27,7 @@ const orders: Order[] = [
     hugPrice: 1,
     status: "completed",
     createdAt: "2024-03-12 18:30",
+    reason: "今天宝贝想吃",
     memoryNote: "一起追剧的时候吃的，鸡翅有点焦但是很香"
   },
   {
@@ -35,6 +37,7 @@ const orders: Order[] = [
     hugPrice: 0,
     status: "completed",
     createdAt: "2024-03-11 19:00",
+    reason: "随便吃点",
     memoryNote: "下雨天的晚饭，暖暖的"
   },
   {
@@ -44,6 +47,7 @@ const orders: Order[] = [
     hugPrice: 0,
     status: "completed",
     createdAt: "2024-03-10 14:20",
+    reason: "今天想吃点甜的",
     memoryNote: "第一次做甜点，卖相不错！"
   },
   {
@@ -53,6 +57,7 @@ const orders: Order[] = [
     hugPrice: 5,
     status: "completed",
     createdAt: "2024-03-08 20:00",
+    reason: "纪念日",
     memoryNote: "纪念日大餐 🎉"
   }
 ];

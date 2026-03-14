@@ -33,7 +33,7 @@ export default function CartSummary({ totals }: CartSummaryProps) {
   const styles = themeStyles[theme];
 
   return (
-    <div className={cn("px-4 py-4 pb-24", styles.container)}>
+    <div className={cn("px-4 py-4 pb-28", styles.container)}>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center text-sm">
           <span className="text-gray-500">商品小计</span>

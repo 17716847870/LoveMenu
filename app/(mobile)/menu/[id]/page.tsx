@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { dishes } from "@/lib/mock-data";
 import { ThemeName } from "@/types";
 import { useCart } from "@/hooks/useCart";
+import { useFlyToCart } from "@/context/FlyToCartContext";
 import NotFound from "./not-found";
 
 // Import new components
@@ -33,7 +34,9 @@ export default function DishDetailPage() {
   const router = useRouter();
   const { theme } = useTheme();
   const { addItem } = useCart();
+  const { addToCartWithAnimation } = useFlyToCart();
   const [isFavorite, setIsFavorite] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
   
   const dish = dishes.find(d => d.id === id);
 
@@ -42,8 +45,16 @@ export default function DishDetailPage() {
   }
 
   const handleAddToCart = () => {
-    addItem(dish);
-    router.back();
+    if (imageRef.current) {
+        const rect = imageRef.current.getBoundingClientRect();
+        addToCartWithAnimation(rect, dish.image || "", () => {
+            addItem(dish);
+            router.back();
+        });
+    } else {
+        addItem(dish);
+        router.back();
+    }
   };
 
   const toggleFavorite = () => {
@@ -63,6 +74,7 @@ export default function DishDetailPage() {
         image={dish.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"} 
         name={dish.name} 
         theme={theme} 
+        imageRef={imageRef}
       />
 
       <div className="flex flex-col gap-6 pb-24">

@@ -4,16 +4,19 @@ import { motion } from "framer-motion";
 import { ThemeName } from "@/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import React from "react";
 
 interface DishHeroProps {
   image: string;
   name: string;
   theme: ThemeName;
+  imageRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function DishHero({ image, name, theme }: DishHeroProps) {
+export default function DishHero({ image, name, theme, imageRef }: DishHeroProps) {
   return (
     <motion.div
+      ref={imageRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}

@@ -10,6 +10,7 @@ import {
   Plus
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useFlyToCart } from "@/context/FlyToCartContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Image from "next/image";
@@ -85,6 +86,8 @@ const themeStyles: Record<ThemeName, {
 
 export default function DishCard({ dish, onAdd }: DishCardProps) {
   const { theme } = useTheme();
+  const { addToCartWithAnimation } = useFlyToCart();
+  const imageRef = React.useRef<HTMLDivElement>(null);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const ButtonIcon = currentTheme.icon;
 
@@ -116,7 +119,9 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       )}
 
       {/* Image */}
-      <div className={cn(
+      <div 
+        ref={imageRef}
+        className={cn(
         "aspect-4/3 relative w-full overflow-hidden",
         currentTheme.imageContainer
       )}>
@@ -166,7 +171,15 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              onAdd?.(dish);
+              
+              if (imageRef.current) {
+                const rect = imageRef.current.getBoundingClientRect();
+                addToCartWithAnimation(rect, dish.image || "", () => {
+                   onAdd?.(dish);
+                });
+              } else {
+                 onAdd?.(dish);
+              }
             }}
             className={cn(
               "w-7 h-7 rounded-full flex items-center justify-center pointer-events-auto",

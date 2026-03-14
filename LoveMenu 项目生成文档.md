@@ -1,398 +1,373 @@
-# LoveMenu 加入购物车动画重构任务（商品 → 底部购物车动画）
+# LoveMenu 购物车页面重新设计任务（Cart Page Redesign）
 
 ## 一、任务目标
 
-当前项目存在的问题：
+当前项目的 **购物车页面（Cart Page）** 需要重新设计。
 
-当用户点击 **加入购物车** 时，会弹出一个 **右下角浮动购物车组件**（图中圈出的组件）。
+目标：
 
-该组件需要 **删除**。
+1. 页面 **视觉更精致**
+2. 页面 **结构更完整**
+3. **顶部增加返回按钮**
+4. **支持四种主题风格**
+5. 页面具有 **情侣产品氛围**
+6. 提升 **购物车操作体验**
 
-新的交互目标：
-
-当用户点击 **加入购物车** 时：
-
-商品图片需要 **飞入底部导航栏的购物车按钮**，形成一个 **Add To Cart 动画效果**。
-
-这种交互在很多 App 中使用，例如：
-
-* 外卖 App
-* 电商 App
-* Food App
-
-效果：
+该页面路径：
 
 ```text
-商品卡片
-   ↓
-商品图标飞出
-   ↓
-沿曲线飞向
-   ↓
-底部导航栏购物车
-   ↓
-购物车产生心跳动画
-```
-
-这样可以大幅提升 **产品体验和趣味性**。
-
----
-
-# 二、需要删除的旧功能
-
-删除以下组件：
-
-```text
-FloatingCartButton
-MiniCart
-右下角悬浮购物车
-```
-
-如果项目存在类似组件：
-
-```text
-/components/mobile/FloatingCart.tsx
-/components/mobile/CartFloatButton.tsx
-```
-
-需要：
-
-```text
-完全删除
-```
-
-页面中也需要移除引用。
-
----
-
-# 三、新的交互流程
-
-新的 **加入购物车流程**：
-
-```text
-点击加入购物车
-        ↓
-获取商品图片位置
-        ↓
-创建一个飞行动画元素
-        ↓
-飞向底部导航栏购物车
-        ↓
-购物车触发心跳动画
-        ↓
-更新购物车数量
+/app/(mobile)/cart/page.tsx
 ```
 
 ---
 
-# 四、动画设计
+# 二、页面整体结构
 
-动画名称：
+新的购物车页面结构：
 
 ```text
-FlyToCart Animation
+CartPage
+ ├ CartHeader
+ ├ CartList
+ │   └ CartItem
+ ├ CartSummary
+ └ CheckoutBar
 ```
 
-动画过程：
-
-### 第一阶段
-
-复制商品图片。
-
-尺寸：
+页面结构示意：
 
 ```text
-40px
-```
+┌──────────────────────┐
+← 返回        购物车
+──────────────────────
+情侣提示语 / 今日菜单
 
-位置：
+商品列表
+商品列表
+商品列表
 
-```text
-商品图片中心
-```
+──────────────
+小计
+亲亲余额抵扣
+贴贴余额抵扣
 
----
-
-### 第二阶段
-
-商品图标开始移动。
-
-移动路径：
-
-```text
-贝塞尔曲线
-```
-
-视觉效果：
-
-```text
-抛物线
-```
-
-持续时间：
-
-```text
-600ms
+──────────────
+立即下单按钮
+└──────────────────────┘
 ```
 
 ---
 
-### 第三阶段
+# 三、顶部导航（CartHeader）
 
-商品飞到：
+页面顶部需要增加 **返回按钮**。
+
+设计：
 
 ```text
-BottomTabBar 购物车按钮
+← 返回      购物车
 ```
 
-然后：
+组件：
 
 ```text
-购物车按钮心跳
+CartHeader
 ```
 
-动画：
+路径：
 
 ```text
-scale: 1 → 1.2 → 1
+/components/mobile/cart/CartHeader.tsx
+```
+
+功能：
+
+```text
+返回上一页
+```
+
+实现：
+
+```ts
+router.back()
+```
+
+按钮位置：
+
+```text
+左侧
+```
+
+标题：
+
+```text
+购物车
 ```
 
 ---
 
-# 五、动画技术方案
+# 四、情侣提示模块
 
-推荐使用：
+购物车页面增加一个 **情侣提示模块**。
+
+作用：
 
 ```text
-framer-motion
+增强情侣产品氛围
+```
+
+示例：
+
+```text
+今天一起吃点什么呢？
 ```
 
 或：
 
 ```text
-requestAnimationFrame
+给宝贝准备一顿好吃的 ❤️
 ```
 
-但推荐：
+组件：
 
 ```text
-framer-motion
+CartLoveTip
 ```
 
-因为项目已经在使用它。
+路径：
 
-安装：
+```text
+/components/mobile/cart/CartLoveTip.tsx
+```
 
-```bash
-npm install framer-motion
+显示位置：
+
+```text
+CartHeader 下方
 ```
 
 ---
 
-# 六、需要修改的组件
+# 五、购物车商品列表
 
-涉及组件：
+组件：
 
 ```text
-/components/mobile/FoodCard.tsx
-/components/mobile/BottomTabBar.tsx
+CartList
 ```
 
-新增组件：
+路径：
 
 ```text
-/components/animation/FlyToCart.tsx
+/components/mobile/cart/CartList.tsx
+```
+
+结构：
+
+```text
+CartItem
+CartItem
+CartItem
 ```
 
 ---
 
-# 七、FlyToCart 动画组件
+# 六、CartItem 设计
 
-新建组件：
-
-```text
-/components/animation/FlyToCart.tsx
-```
-
-作用：
+每个商品结构：
 
 ```text
-控制商品飞向购物车动画
+商品图片
+商品名称
+商品描述
+
+数量控制
+删除按钮
 ```
 
-Props：
-
-```ts
-startX
-startY
-endX
-endY
-image
-```
-
-逻辑：
+视觉示意：
 
 ```text
-1 创建一个 fixed 图层
-2 显示商品图片
-3 执行动画
-4 动画结束后删除
+┌───────────────────┐
+🍰 草莓松饼
+微甜松软 配草莓酱
+
+ -  1  +
+删除
+└───────────────────┘
+```
+
+组件：
+
+```text
+CartItem
+```
+
+路径：
+
+```text
+/components/mobile/cart/CartItem.tsx
+```
+
+功能：
+
+```text
+增加数量
+减少数量
+删除商品
 ```
 
 ---
 
-# 八、获取动画起点
+# 七、数量控制
 
-点击商品时获取：
+数量控制器：
 
-```ts
-element.getBoundingClientRect()
+```text
+[-]   1   [+]
+```
+
+点击：
+
+```text
+增加数量
+减少数量
+```
+
+组件：
+
+```text
+QuantitySelector
+```
+
+路径：
+
+```text
+/components/mobile/cart/QuantitySelector.tsx
+```
+
+---
+
+# 八、购物车统计
+
+购物车底部需要一个 **统计模块**。
+
+组件：
+
+```text
+CartSummary
+```
+
+路径：
+
+```text
+/components/mobile/cart/CartSummary.tsx
+```
+
+显示：
+
+```text
+商品小计
+亲亲余额
+贴贴余额
 ```
 
 示例：
 
-```ts
-const rect = e.currentTarget.getBoundingClientRect()
+```text
+商品小计 ¥38
+亲亲抵扣 -2
+贴贴抵扣 -1
 ```
 
-得到：
+最终：
 
 ```text
-startX
-startY
+总价 ¥35
 ```
 
 ---
 
-# 九、获取购物车位置
+# 九、结算按钮
 
-在：
+页面底部需要一个 **结算按钮**。
+
+组件：
 
 ```text
-BottomTabBar
+CheckoutBar
 ```
 
-中给购物车按钮增加：
+路径：
 
-```ts
-ref
+```text
+/components/mobile/cart/CheckoutBar.tsx
+```
+
+按钮：
+
+```text
+立即下单
+```
+
+按钮需要：
+
+```text
+固定底部
 ```
 
 示例：
 
-```ts
-const cartRef = useRef()
-```
-
-获取：
-
-```ts
-cartRef.current.getBoundingClientRect()
-```
-
-得到：
-
 ```text
-endX
-endY
+┌──────────────────────┐
+总价 ¥35     立即下单
+└──────────────────────┘
 ```
 
 ---
 
-# 十、FoodCard 修改
+# 十、空购物车页面
 
-当前：
+如果购物车为空，需要显示 **EmptyCart 页面**。
 
-```text
-点击按钮 → 直接加入购物车
-```
-
-修改为：
+组件：
 
 ```text
-点击按钮
- ↓
-触发飞行动画
- ↓
-动画结束
- ↓
-加入购物车
+EmptyCart
 ```
 
-逻辑：
+路径：
 
-```ts
-handleAddToCart()
+```text
+/components/mobile/cart/EmptyCart.tsx
 ```
 
-流程：
+示例：
 
-```ts
-1 获取商品位置
-2 获取购物车位置
-3 启动 FlyToCart
-4 更新 CartStore
+```text
+🛒
+购物车还是空的
+
+快去选点好吃的吧
+```
+
+按钮：
+
+```text
+去菜单
+```
+
+点击：
+
+```text
+跳转 /menu
 ```
 
 ---
 
-# 十一、购物车按钮动画
+# 十一、主题系统
 
-当商品飞入购物车时：
-
-购物车按钮需要：
-
-```text
-心跳动画
-```
-
-动画：
-
-```text
-scale 1 → 1.2 → 1
-```
-
-持续：
-
-```text
-0.4s
-```
-
-实现方式：
-
-```text
-framer-motion
-```
-
----
-
-# 十二、购物车数量更新
-
-飞入动画结束后：
-
-更新：
-
-```text
-CartStore
-```
-
-例如：
-
-```ts
-addToCart(product)
-```
-
-然后：
-
-```text
-CartBadge 自动更新
-```
-
----
-
-# 十三、四种主题动画
-
-动画颜色必须适配主题：
+购物车页面必须支持四种主题。
 
 主题来自：
 
@@ -400,7 +375,7 @@ CartBadge 自动更新
 ThemeContext
 ```
 
-支持主题：
+支持：
 
 ```text
 couple
@@ -411,133 +386,234 @@ night
 
 ---
 
-## 情侣主题
+# 十二、情侣主题（couple）
 
-飞行动画：
+设计：
 
 ```text
+浪漫
 粉色
+温柔
 ```
 
-购物车心跳：
+页面背景：
 
 ```text
-爱心动画
+粉色渐变
+```
+
+示例：
+
+```css
+linear-gradient(180deg,#ffe4ec,#ffd1e0)
+```
+
+按钮：
+
+```text
+爱心渐变
+```
+
+商品卡片：
+
+```text
+圆角卡片
+柔和阴影
+```
+
+情侣提示：
+
+```text
+今天也要喂饱宝贝 ❤️
 ```
 
 ---
 
-## 可爱主题
+# 十三、可爱主题（cute）
 
-飞行动画：
+设计：
 
 ```text
+卡通
 糖果色
+活泼
 ```
 
-购物车：
+背景：
 
 ```text
-气泡弹跳
+浅粉色
+```
+
+示例：
+
+```css
+#fff5fb
+```
+
+商品卡片：
+
+```text
+气泡卡片
+```
+
+按钮：
+
+```text
+橙色糖果按钮
+```
+
+提示：
+
+```text
+今天吃点甜甜的 🍓
 ```
 
 ---
 
-## 极简主题
+# 十四、极简主题（minimal）
 
-飞行动画：
+设计：
 
 ```text
-灰色
+简洁
+黑白
+留白
 ```
 
-购物车：
+背景：
 
 ```text
-轻微缩放
+纯白
 ```
 
----
-
-## 夜间主题
-
-飞行动画：
+商品卡片：
 
 ```text
-紫色霓虹
+细边框
 ```
 
-购物车：
+按钮：
 
 ```text
-发光动画
+黑色按钮
 ```
 
----
-
-# 十四、最终效果
-
-用户点击：
+提示：
 
 ```text
-加入购物车
-```
-
-看到：
-
-```text
-商品图标飞向购物车
-```
-
-购物车：
-
-```text
-跳动
-```
-
-购物车数量：
-
-```text
-+1
-```
-
-整个交互：
-
-```text
-非常流畅
-非常高级
-非常有产品感
+简单吃点就好
 ```
 
 ---
 
-# 十五、最终文件结构
+# 十五、夜间主题（night）
+
+设计：
 
 ```text
-/components
+深色
+科技感
+```
 
-animation
- FlyToCart.tsx
+背景：
 
-mobile
- FoodCard.tsx
- BottomTabBar.tsx
- CartBadge.tsx
+```text
+#1f1f1f
+```
+
+商品卡片：
+
+```text
+深灰
+```
+
+按钮：
+
+```text
+霓虹紫
+```
+
+提示：
+
+```text
+夜宵时间 🌙
 ```
 
 ---
 
-# 十六、生成代码要求
+# 十六、动画效果
+
+购物车页面需要轻量动画。
+
+CartItem：
+
+```text
+进入动画
+```
+
+动画：
+
+```text
+opacity 0 → 1
+y 20 → 0
+```
+
+数量变化：
+
+```text
+scale 1 → 1.1 → 1
+```
+
+删除商品：
+
+```text
+滑出动画
+```
+
+---
+
+# 十七、文件结构
+
+新增目录：
+
+```text
+/components/mobile/cart
+```
+
+组件结构：
+
+```text
+cart
+ CartHeader.tsx
+ CartLoveTip.tsx
+ CartList.tsx
+ CartItem.tsx
+ QuantitySelector.tsx
+ CartSummary.tsx
+ CheckoutBar.tsx
+ EmptyCart.tsx
+```
+
+页面：
+
+```text
+/app/(mobile)/cart/page.tsx
+```
+
+---
+
+# 十八、生成代码要求
 
 AI 生成代码必须：
 
 1 使用 **Next.js App Router**
-2 使用 **framer-motion**
-3 删除 **旧浮动购物车组件**
-4 新增 **FlyToCart 动画**
-5 支持 **四种主题**
-6 动画 **流畅不卡顿**
-7 购物车按钮 **触发心跳动画**
+2 使用 **ThemeContext**
+3 支持 **四种主题**
+4 页面 **移动端优先**
+5 组件 **模块化**
+6 支持 **购物车动画**
+7 购物车 **空状态页面**
 
 主题：
 
@@ -550,18 +626,30 @@ night
 
 ---
 
-# 十七、产品效果
+# 十九、最终效果
 
-最终体验：
+新的购物车页面应该具备：
+
+视觉：
 
 ```text
-点击商品
-      ↓
-商品飞向购物车
-      ↓
-购物车跳动
-      ↓
-数量+1
+精致
+温馨
+情侣感
 ```
 
-这是 **电商级别的交互体验**。
+交互：
+
+```text
+流畅
+易用
+清晰
+```
+
+产品体验：
+
+```text
+比普通购物车更有情感氛围
+```
+
+最终购物车将成为 **LoveMenu 产品体验的重要页面**。

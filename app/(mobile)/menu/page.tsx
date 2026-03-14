@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import DishCard, { Dish } from "@/components/mobile/DishCard";
+import DishCard from "@/components/mobile/DishCard";
 import CategoryTabs from "@/components/mobile/CategoryTabs";
-import FloatingCartButton from "@/components/mobile/FloatingCartButton";
+import { Dish } from "@/types";
+import { useCart } from "@/hooks/useCart";
 
 // Mock Data
 const dishes: Dish[] = [
@@ -59,15 +60,14 @@ const categories = ["全部", "甜品", "主食", "小食", "饮品"];
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState("全部");
-  const [cartCount, setCartCount] = useState(0);
+  const { addItem } = useCart();
 
   const filteredDishes = activeCategory === "全部" 
     ? dishes 
     : dishes.filter(d => d.category === activeCategory);
 
   const handleAddToCart = (dish: Dish) => {
-    setCartCount(prev => prev + 1);
-    // Here you would typically add to actual cart state/context
+    addItem(dish);
   };
 
   return (
@@ -100,9 +100,6 @@ export default function MenuPage() {
             />
           ))}
         </div>
-
-        {/* Floating Cart Button */}
-        <FloatingCartButton count={cartCount} />
       </div>
     </div>
   );

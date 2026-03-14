@@ -1,4 +1,6 @@
 import { ThemeProvider } from "@/context/ThemeContext";
+import { FlyToCartProvider } from "@/context/FlyToCartContext";
+import { CartProvider } from "@/hooks/useCart";
 import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -28,10 +30,14 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-screen`}>
         <ThemeProvider>
-          <div id="app-root" className="relative w-full">
-            {children}
-            <FloatingThemeButton />
-          </div>
+          <FlyToCartProvider>
+            <CartProvider>
+              <div id="app-root" className="relative w-full">
+                {children}
+                <FloatingThemeButton />
+              </div>
+            </CartProvider>
+          </FlyToCartProvider>
         </ThemeProvider>
       </body>
     </html>

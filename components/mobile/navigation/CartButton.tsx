@@ -6,6 +6,7 @@ import { ShoppingCart } from "lucide-react";
 import { ThemeName } from "@/types";
 import { cn } from "@/lib/utils";
 import CartBadge from "./CartBadge";
+import { useFlyToCart } from "@/context/FlyToCartContext";
 
 interface CartButtonProps {
   isActive: boolean;
@@ -14,6 +15,8 @@ interface CartButtonProps {
 }
 
 export default function CartButton({ isActive, theme, cartCount }: CartButtonProps) {
+  const { cartRef, isCartAnimating } = useFlyToCart();
+
   const getButtonStyles = () => {
     const baseStyles = "relative -top-5 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-300";
     
@@ -47,23 +50,39 @@ export default function CartButton({ isActive, theme, cartCount }: CartButtonPro
   };
 
   const getAnimation = (): TargetAndTransition => {
-    // Heartbeat animation
-    return {
-      scale: [1, 1.1, 1],
-      transition: {
-        repeat: Infinity,
-        duration: 1.2,
-        ease: "easeInOut",
-      },
-    };
+    if (isCartAnimating) {
+      return {
+        scale: [1, 1.25, 1],
+        rotate: [0, -10, 10, 0],
+        transition: {
+          duration: 0.4,
+          ease: "easeInOut",
+        },
+      };
+    }
+    
+    // Heartbeat animation when has items
+    if (cartCount > 0) {
+      return {
+        scale: [1, 1.05, 1],
+        transition: {
+          repeat: Infinity,
+          duration: 1.5,
+          ease: "easeInOut",
+        },
+      };
+    }
+
+    return {};
   };
 
   return (
     <Link href="/cart" className="relative z-10">
       <motion.div
+        ref={cartRef}
         className={getButtonStyles()}
         whileTap={{ scale: 0.9 }}
-        animate={cartCount > 0 ? getAnimation() : {}}
+        animate={getAnimation()}
       >
         <ShoppingCart 
           size={28} 

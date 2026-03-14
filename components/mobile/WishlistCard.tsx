@@ -110,27 +110,40 @@ export default function WishlistCard({ items = defaultItems }: WishlistCardProps
       </div>
 
       {/* Wish List */}
-      <div className={cn(
-        "flex flex-col",
-        theme === 'minimal' ? "gap-0" : "gap-3"
-      )}>
-        {items.slice(0, 3).map((item, index) => (
+      <div className="flex flex-col gap-2">
+        {items.map((item, index) => (
           <motion.div
-            key={item.dishName}
+            key={index}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
             className={cn(
-              "p-3 font-medium flex items-center justify-between transition-all",
+              "p-3 text-sm font-medium transition-all flex items-center justify-between",
+              theme === 'minimal' ? "" : "rounded-lg",
               currentTheme.item,
-              currentTheme.itemBorder,
-              theme !== 'minimal' && "rounded-xl"
+              currentTheme.itemBorder
             )}
           >
             <span>{item.dishName}</span>
-            <Plus className="w-4 h-4 opacity-50" />
           </motion.div>
         ))}
+        
+        {/* Add Button Link */}
+        <Link href="/wishlist">
+          <motion.div
+            whileTap={{ scale: 0.98 }}
+            className={cn(
+              "p-3 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer mt-1 opacity-70 hover:opacity-100",
+              theme === 'minimal' ? "bg-gray-100 rounded-lg text-gray-600" : "",
+              theme === 'couple' ? "bg-pink-100/50 rounded-lg text-pink-600" : "",
+              theme === 'cute' ? "bg-purple-100/50 rounded-xl text-purple-600" : "",
+              theme === 'night' ? "bg-slate-800 rounded-lg text-pink-400 border border-pink-500/20" : ""
+            )}
+          >
+            <Plus className="w-4 h-4" />
+            <span>提议新食物</span>
+          </motion.div>
+        </Link>
         
         {items.length === 0 && (
           <div className={cn("text-center py-8 text-sm opacity-60", currentTheme.header)}>

@@ -51,3 +51,12 @@ export interface ChatMessage {
   createdAt: string;
   isSender?: boolean;
 }
+
+export interface FoodRequest {
+  id: string;
+  name: string;
+  description: string;
+  image?: string;
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
+}

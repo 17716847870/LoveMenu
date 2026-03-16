@@ -17,6 +17,7 @@ export const dishes: Dish[] = [
     popularity: 86,
     allowCook: true,
     allowRestaurant: true,
+    createdAt: "2024-03-10",
     image: "/next.svg",
   },
   {
@@ -29,6 +30,7 @@ export const dishes: Dish[] = [
     popularity: 92,
     allowCook: true,
     allowRestaurant: true,
+    createdAt: "2024-03-12",
     image: "/vercel.svg",
   },
   {
@@ -41,6 +43,7 @@ export const dishes: Dish[] = [
     popularity: 76,
     allowCook: true,
     allowRestaurant: false,
+    createdAt: "2024-03-08",
     image: "/file.svg",
   },
   {
@@ -53,6 +56,7 @@ export const dishes: Dish[] = [
     popularity: 82,
     allowCook: true,
     allowRestaurant: true,
+    createdAt: "2024-03-11",
   },
   {
     id: "2",
@@ -64,6 +68,7 @@ export const dishes: Dish[] = [
     popularity: 90,
     allowCook: true,
     allowRestaurant: true,
+    createdAt: "2024-03-13",
   },
   {
     id: "3",
@@ -75,6 +80,7 @@ export const dishes: Dish[] = [
     popularity: 65,
     allowCook: false,
     allowRestaurant: true,
+    createdAt: "2024-03-09",
   },
   {
     id: "4",
@@ -86,6 +92,7 @@ export const dishes: Dish[] = [
     popularity: 45,
     allowCook: false,
     allowRestaurant: true,
+    createdAt: "2024-03-07",
   },
   {
     id: "5",
@@ -97,6 +104,7 @@ export const dishes: Dish[] = [
     popularity: 78,
     allowCook: true,
     allowRestaurant: true,
+    createdAt: "2024-03-14",
   },
 ];
 

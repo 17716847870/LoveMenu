@@ -11,7 +11,7 @@ export default function AdminSidebar() {
   const menuItems = [
     {
       label: "菜单管理",
-      href: "/admin/dishes",
+      href: "/admin/menu",
       icon: Menu
     },
     {

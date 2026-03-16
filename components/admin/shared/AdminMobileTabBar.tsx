@@ -11,7 +11,7 @@ export default function AdminMobileTabBar() {
   const menuItems = [
     {
       label: "菜单",
-      href: "/admin/dishes",
+      href: "/admin/menu",
       icon: Menu
     },
     {

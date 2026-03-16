@@ -17,6 +17,7 @@ export interface Dish {
   popularity?: number;
   allowCook?: boolean;
   allowRestaurant?: boolean;
+  createdAt?: string;
 }
 
 export interface CartItem {

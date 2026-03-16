@@ -38,7 +38,7 @@ export default function FloatingThemeButton() {
   const pathname = usePathname();
 
   // Define paths where the FloatingThemeButton should be hidden
-  const hiddenPaths = ["/chat"];
+  const hiddenPaths = ["/chat", "/admin"];
 
   // Check if current path starts with any of the hidden paths
   const shouldHide = hiddenPaths.some((path) => pathname.startsWith(path));

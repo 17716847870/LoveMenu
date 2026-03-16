@@ -42,11 +42,19 @@ const rightTabs = [
   }
 ];
 
+const visiblePaths = ["/", "/menu", "/profile"];
+
 export default function BottomTabBar() {
   const pathname = usePathname();
   const { theme } = useTheme();
   const { items } = useCart();
   
+  const shouldShow = visiblePaths.includes(pathname);
+
+  if (!shouldShow) {
+    return null;
+  }
+
   const getContainerStyles = () => {
     switch (theme) {
       case "couple":

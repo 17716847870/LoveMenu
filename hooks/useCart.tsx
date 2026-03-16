@@ -33,8 +33,11 @@ export function CartProvider({ children }: { children: React.ReactNode }): React
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-    setItems(loadItems());
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+      setItems(loadItems());
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

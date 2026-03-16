@@ -3,8 +3,10 @@
 import { useState } from "react";
 import DishCard from "@/components/mobile/DishCard";
 import CategoryTabs from "@/components/mobile/CategoryTabs";
-import { Dish } from "@/types";
+import { Dish, ThemeName } from "@/types";
 import { useCart } from "@/hooks/useCart";
+import { useTheme } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
 
 // Mock Data
 const dishes: Dish[] = [
@@ -58,9 +60,17 @@ const dishes: Dish[] = [
 
 const categories = ["全部", "甜品", "主食", "小食", "饮品"];
 
+const pageStyles: Record<ThemeName, string> = {
+  couple: "bg-pink-50",
+  cute: "bg-[#fff5fb]",
+  minimal: "bg-white",
+  night: "bg-[#1f1f1f]",
+};
+
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState("全部");
   const { addItem } = useCart();
+  const { theme } = useTheme();
 
   const filteredDishes = activeCategory === "全部" 
     ? dishes 
@@ -71,7 +81,7 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-[90px]">
+    <div className={cn("min-h-screen pb-[90px] transition-colors duration-300", pageStyles[theme])}>
       <div className="max-w-[480px] mx-auto relative">
         {/* Header */}
         <div className="px-4 py-6">

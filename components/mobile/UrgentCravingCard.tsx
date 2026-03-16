@@ -6,114 +6,118 @@ import {
   Zap, 
   Flame, 
   AlertCircle, 
-  ArrowRight
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
 
-interface Craving {
-  dishName: string;
-}
-
-interface UrgentCravingCardProps {
-  data?: Craving;
-}
-
-const defaultData: Craving = {
-  dishName: "炸鸡"
-};
-
 const themeStyles: Record<ThemeName, {
   container: string;
   header: string;
-  dish: string;
+  list: string;
+  item: string;
   button: string;
   icon: React.ElementType;
 }> = {
   couple: {
     container: "bg-red-50 border-red-100 shadow-sm",
     header: "text-red-600",
-    dish: "text-red-700 bg-red-100/50",
+    list: "bg-white/60 backdrop-blur-sm border border-red-100",
+    item: "text-gray-700",
     button: "bg-red-500 text-white hover:bg-red-600 shadow-red-200",
     icon: Flame,
   },
   cute: {
-    container: "bg-red-50 border-red-100 shadow-[4px_4px_0px_0px_rgba(239,68,68,0.2)]",
-    header: "text-red-500",
-    dish: "text-red-700 bg-white border-2 border-red-200 shadow-sm",
-    button: "bg-red-400 text-white hover:bg-red-500 shadow-red-200",
+    container: "bg-pink-50 border-pink-100 shadow-[4px_4px_0px_0px_rgba(236,72,153,0.2)]",
+    header: "text-pink-500",
+    list: "bg-white border-2 border-pink-100",
+    item: "text-gray-600",
+    button: "bg-pink-400 text-white hover:bg-pink-500 shadow-pink-200",
     icon: Zap,
   },
   minimal: {
     container: "bg-white border-gray-200",
     header: "text-gray-900",
-    dish: "text-gray-900 bg-gray-50 border border-gray-200",
+    list: "bg-gray-50 border border-gray-100",
+    item: "text-gray-800",
     button: "bg-black text-white hover:bg-gray-800",
     icon: AlertCircle,
   },
   night: {
     container: "bg-slate-900 border-red-900/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]",
     header: "text-red-500",
-    dish: "text-red-400 bg-red-900/10 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]",
+    list: "bg-white/5 border border-white/10",
+    item: "text-gray-300",
     button: "bg-red-600 text-white hover:bg-red-500 shadow-red-900/50",
     icon: Zap,
   },
 };
 
-export default function UrgentCravingCard({ data = defaultData }: UrgentCravingCardProps) {
+const HOT_ITEMS = [
+  { icon: "🍔", name: "汉堡" },
+  { icon: "🍟", name: "薯条" },
+  { icon: "🍜", name: "拉面" },
+];
+
+export default function UrgentCravingCard() {
   const { theme } = useTheme();
+  // Fallback to couple theme if current theme is not found
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
   const getTitle = () => {
     switch (theme) {
-      case 'cute': return "⚡ 紧急想吃";
+      case 'cute': return "紧急想吃";
       case 'minimal': return "Urgent Craving";
-      case 'night': return "⚡ Urgent";
-      default: return "⚡ 紧急想吃";
+      case 'night': return "Urgent";
+      default: return "紧急想吃";
     }
   };
 
   return (
     <div className={cn(
-      "rounded-[2rem] p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
+      "rounded-3xl p-5 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
       {/* Header */}
-      <div className="flex items-center gap-2 font-bold text-lg">
-        <Icon className={cn("w-5 h-5", currentTheme.header)} />
-        <span className={currentTheme.header}>{getTitle()}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 font-bold text-lg">
+          <Icon className={cn("w-5 h-5", currentTheme.header)} />
+          <span className={currentTheme.header}>{getTitle()}</span>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col gap-4">
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+      {/* Content: List of Hot Items */}
+      <div className={cn("rounded-xl p-3 flex flex-col gap-2", currentTheme.list)}>
+        {HOT_ITEMS.map((item, index) => (
+          <motion.div 
+            key={item.name}
+            initial={{ x: -10, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: index * 0.1 }}
+            className={cn("flex items-center gap-3 font-medium text-base py-1 px-2", currentTheme.item)}
+          >
+            <span className="text-xl">{item.icon}</span>
+            <span>{item.name}</span>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Action Button */}
+      <Link href="/emergency" className="w-full block">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           className={cn(
-            "p-4 rounded-xl text-center font-bold text-xl",
-            currentTheme.dish
+            "w-full py-3 rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all",
+            currentTheme.button
           )}
         >
-          {data.dishName}
-        </motion.div>
-
-        <Link href="/emergency" className="w-full block">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={cn(
-              "w-full py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all",
-              currentTheme.button
-            )}
-          >
-            立即下单
-            <ArrowRight className="w-4 h-4" />
-          </motion.button>
-        </Link>
-      </div>
+          <Zap className="w-4 h-4 fill-current" />
+          立即点单
+        </motion.button>
+      </Link>
     </div>
   );
 }

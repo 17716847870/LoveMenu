@@ -13,48 +13,42 @@ const dishes: Dish[] = [
   {
     id: "1",
     name: "草莓松饼",
-    desc: "微甜松软，配草莓酱",
+    description: "微甜松软，配草莓酱",
     kissPrice: 2,
     hugPrice: 1,
-    hotScore: 82,
-    image: "/dish1.jpg",
-    category: "甜品"
+    popularity: 82,
+    categoryId: "甜品",
+    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&auto=format&fit=crop&q=60"
   },
   {
     id: "2",
     name: "日式炸猪排",
-    desc: "外酥里嫩，配特制酱汁",
+    description: "外酥里嫩，配特制酱汁",
     kissPrice: 3,
-    hugPrice: 0,
-    hotScore: 90,
-    category: "主食"
+    hugPrice: 2,
+    popularity: 95,
+    categoryId: "主食",
+    image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=800&auto=format&fit=crop&q=60"
   },
   {
     id: "3",
-    name: "珍珠奶茶",
-    desc: "Q弹珍珠，香浓奶茶",
-    kissPrice: 1,
-    hugPrice: 1,
-    hotScore: 65,
-    category: "饮品"
+    name: "芝士热狗",
+    description: "满满芝士，快乐源泉",
+    kissPrice: 2,
+    hugPrice: 0,
+    popularity: 78,
+    categoryId: "小食",
+    image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=800&auto=format&fit=crop&q=60"
   },
   {
     id: "4",
-    name: "章鱼小丸子",
-    desc: "满满木鱼花",
-    kissPrice: 2,
-    hugPrice: 0,
-    hotScore: 45,
-    category: "小食"
-  },
-  {
-    id: "5",
-    name: "提拉米苏",
-    desc: "带我走~",
-    kissPrice: 2,
-    hugPrice: 2,
-    hotScore: 78,
-    category: "甜品"
+    name: "焦糖布丁",
+    description: "入口即化，甜蜜加倍",
+    kissPrice: 1,
+    hugPrice: 1,
+    popularity: 88,
+    categoryId: "甜品",
+    image: "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=800&auto=format&fit=crop&q=60"
   }
 ];
 
@@ -74,7 +68,7 @@ export default function MenuPage() {
 
   const filteredDishes = activeCategory === "全部" 
     ? dishes 
-    : dishes.filter(d => d.category === activeCategory);
+    : dishes.filter(d => d.categoryId === activeCategory);
 
   const handleAddToCart = (dish: Dish) => {
     addItem(dish);

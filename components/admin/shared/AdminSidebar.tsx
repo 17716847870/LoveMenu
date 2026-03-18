@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, Users, MessageSquare, LogOut } from "lucide-react";
+import { Menu, ShoppingBag, Users, MessageSquare, LogOut, LayoutDashboard } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   const menuItems = [
+    {
+      label: "数据看板",
+      href: "/admin",
+      icon: LayoutDashboard
+    },
     {
       label: "菜单管理",
       href: "/admin/menu",
@@ -42,7 +47,7 @@ export default function AdminSidebar() {
       {/* Menu Items */}
       <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
           const Icon = item.icon;
           
           return (

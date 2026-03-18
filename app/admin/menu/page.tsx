@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import PageHeader from '@/components/admin/menu/PageHeader';
+import PageHeader from '@/components/admin/shared/PageHeader';
 import FilterBar from '@/components/admin/menu/FilterBar';
 import MenuDataTable from '@/components/admin/menu/MenuDataTable';
 import LovePagination from '@/components/admin/ui/LovePagination/LovePagination';
 import ConfirmDialog from '@/components/admin/common/ConfirmDialog';
 import { dishes } from '@/lib/mock-data'; // 使用 mock 数据作为初始数据
 import { Dish } from '@/types';
+import { PageContainer } from "@/components/ui/PageContainer";
+
+
 
 type SortField = 'price' | 'popularity' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -116,9 +119,17 @@ export default function AdminMenuPage() {
   );
 
   return (
-    <div className="p-8 bg-[#fff7fa] min-h-screen">
-      <div className="max-w-[1400px] mx-auto">
-        <PageHeader />
+    <PageContainer>
+      <div className="mx-auto">
+        <PageHeader 
+          title="菜单管理" 
+          subtitle="管理所有菜单数据"
+          action={
+            <button className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg shadow transition-colors font-medium flex items-center gap-2">
+              <span className="text-lg leading-none">+</span> 添加新菜品
+            </button>
+          }
+        />
         
         <FilterBar 
           onSearch={(term) => {
@@ -187,6 +198,6 @@ export default function AdminMenuPage() {
         onClose={handleCloseDialog}
         onConfirm={handleConfirmDelete}
       />
-    </div>
+    </PageContainer>
   );
 }

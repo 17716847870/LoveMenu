@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, Users, MessageSquare } from "lucide-react";
+import { Menu, ShoppingBag, Users, MessageSquare, LayoutDashboard } from "lucide-react";
 
 export default function AdminMobileTabBar() {
   const pathname = usePathname();
 
   const menuItems = [
+    {
+      label: "看板",
+      href: "/admin",
+      icon: LayoutDashboard
+    },
     {
       label: "菜单",
       href: "/admin/menu",
@@ -34,7 +39,7 @@ export default function AdminMobileTabBar() {
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-100 flex items-center justify-around z-50 shadow-lg">
       {menuItems.map((item) => {
-        const isActive = pathname.startsWith(item.href);
+        const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
         const Icon = item.icon;
         
         return (

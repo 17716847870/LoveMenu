@@ -5,6 +5,7 @@ import { Search, Check, X, Trash2, Clock, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FoodRequest } from "@/types";
 import Image from "next/image";
+import PageHeader from "@/components/admin/shared/PageHeader";
 
 // Mock Data
 const requests: FoodRequest[] = [
@@ -52,12 +53,7 @@ export default function AdminRequestsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">食物请求</h1>
-          <p className="text-sm text-gray-500 mt-1">处理用户的点餐心愿</p>
-        </div>
-      </div>
+      <PageHeader title="食物请求" subtitle="处理用户的点餐心愿" />
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">

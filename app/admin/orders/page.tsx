@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, Filter, Eye, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Order } from "@/types";
+import PageHeader from "@/components/admin/shared/PageHeader";
 
 // Mock Data
 const orders: Order[] = [
@@ -69,12 +70,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">订单管理</h1>
-          <p className="text-sm text-gray-500 mt-1">查看和处理所有订单</p>
-        </div>
-      </div>
+      <PageHeader title="订单管理" subtitle="查看和处理所有订单" />
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">

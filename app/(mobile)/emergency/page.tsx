@@ -17,30 +17,30 @@ const emergencyDishes: Dish[] = [
   {
     id: "101",
     name: "巨无霸汉堡套餐",
-    desc: "双层牛肉，现炸薯条",
+    description: "双层牛肉，现炸薯条",
     kissPrice: 2,
     hugPrice: 1,
-    hotScore: 99,
+    popularity: 99,
     categoryId: "c1",
     image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=60"
   },
   {
     id: "102",
     name: "豚骨拉面",
-    desc: "浓郁骨汤，大片叉烧",
+    description: "浓郁骨汤，大片叉烧",
     kissPrice: 1,
     hugPrice: 1,
-    hotScore: 95,
+    popularity: 95,
     categoryId: "c2",
     image: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&auto=format&fit=crop&q=60"
   },
   {
     id: "103",
     name: "韩式炸鸡 (甜辣)",
-    desc: "外酥里嫩，配快乐水绝佳",
+    description: "外酥里嫩，配快乐水绝佳",
     kissPrice: 3,
     hugPrice: 0,
-    hotScore: 92,
+    popularity: 92,
     categoryId: "c3",
     image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=60"
   }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, User as UserIcon, Heart, Calendar, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { User } from "@/types";
+import PageHeader from "@/components/admin/shared/PageHeader";
 
 // Mock Data
 const users: (User & { role: string; lastActive: string; totalOrders: number })[] = [
@@ -35,12 +36,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">用户管理</h1>
-          <p className="text-sm text-gray-500 mt-1">管理用户信息和权限</p>
-        </div>
-      </div>
+      <PageHeader title="用户管理" subtitle="管理用户信息和权限" />
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">

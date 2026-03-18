@@ -1,11 +1,12 @@
 import { PageContainer } from "../../../components/ui/PageContainer";
 import { Card } from "../../../components/ui/Card";
 import { dishCategories } from "../../../lib/mock-data";
+import PageHeader from "@/components/admin/shared/PageHeader";
 
 export default function AdminCategoriesPage() {
   return (
     <PageContainer>
-      <h1 className="text-2xl font-semibold">分类管理</h1>
+      <PageHeader title="分类管理" subtitle="管理菜品和菜单分类" />
       <div className="mt-6 space-y-3">
         {dishCategories.map((category) => (
           <Card key={category.id} className="flex items-center justify-between">

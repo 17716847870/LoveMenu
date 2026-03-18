@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import { 
   Heart, 
   Sparkles, 
-  Zap, 
-  Flame, 
+  Zap,  
   Plus
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -15,17 +14,7 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
-
-export interface Dish {
-  id: string;
-  name: string;
-  desc: string;
-  kissPrice: number;
-  hugPrice: number;
-  hotScore: number;
-  image?: string;
-  category?: string;
-}
+import { Dish } from "@/types";
 
 interface DishCardProps {
   dish: Dish;
@@ -91,8 +80,8 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const ButtonIcon = currentTheme.icon;
 
-  const isHot = dish.hotScore > 50;
-  const isSuperHot = dish.hotScore > 80;
+  const isHot = (dish.popularity || 0) > 50;
+  const isSuperHot = (dish.popularity || 0) > 80;
 
   return (
     <motion.div
@@ -108,15 +97,13 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       <Link href={`/menu/${dish.id}`} className="absolute inset-0 z-0" />
       
       {/* Hot Badge */}
-      {isHot && (
-        <div className={cn(
-          "absolute top-2 left-2 z-10 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1",
-          currentTheme.hotBadge
-        )}>
-          <Flame className="w-3 h-3 fill-current" />
-          {isSuperHot ? "本周最火" : "热门"}
-        </div>
-      )}
+      <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
+        {dish.popularity && dish.popularity > 80 && (
+          <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-md bg-opacity-90 flex items-center gap-1", currentTheme.hotBadge)}>
+            🔥 热销
+          </span>
+        )}
+      </div>
 
       {/* Image */}
       <div 
@@ -146,7 +133,7 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
             {dish.name}
           </h3>
           <p className={cn("text-xs line-clamp-1 mt-0.5", currentTheme.desc)}>
-            {dish.desc}
+            {dish.description}
           </p>
         </div>
 

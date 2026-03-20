@@ -90,7 +90,7 @@ const themeStyles: Record<ThemeName, {
   },
   cute: {
     bg: "bg-orange-50/30",
-    headerBg: "bg-[#fff4fb]/90 border-orange-100",
+    headerBg: "bg-[#fffdf5] border-orange-100",
     text: "text-orange-900",
     subText: "text-orange-600/60",
     icon: Sparkles,
@@ -182,7 +182,7 @@ export default function OrdersPage() {
     <div className={cn("h-screen overflow-auto", currentTheme.bg)}>
       {/* Header */}
       <header className={cn(
-        "sticky top-0 z-40 backdrop-blur-md border-b pt-5",
+        "sticky top-0 z-40 backdrop-blur-md border-b pt-4",
         currentTheme.headerBg
       )}>
         {/* Search Bar & Filters */}

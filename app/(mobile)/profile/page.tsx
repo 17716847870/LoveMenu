@@ -1,6 +1,7 @@
 import CoupleProfileCard from "@/components/mobile/CoupleProfileCard";
 import LoveBalanceCard from "@/components/mobile/LoveBalanceCard";
 import OrderPreviewCard from "@/components/mobile/OrderPreviewCard";
+import ChatEntryCard from "@/components/mobile/ChatEntryCard";
 
 export default function ProfilePage() {
   return (
@@ -10,6 +11,9 @@ export default function ProfilePage() {
 
       {/* Love Balance Card */}
       <LoveBalanceCard />
+
+      {/* Chat Entry Card */}
+      <ChatEntryCard />
 
       {/* Order History Preview */}
       <OrderPreviewCard />

@@ -56,7 +56,7 @@ const categories = ["全部", "甜品", "主食", "小食", "饮品"];
 
 const pageStyles: Record<ThemeName, string> = {
   couple: "bg-pink-50",
-  cute: "bg-[#fff5fb]",
+  cute: "bg-[#fffcf3]",
   minimal: "bg-white",
   night: "bg-[#1f1f1f]",
 };

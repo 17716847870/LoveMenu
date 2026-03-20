@@ -60,7 +60,7 @@ export default function BottomTabBar() {
       case "couple":
         return "bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-100/50 shadow-[0_8px_30px_rgba(255,182,193,0.4)]";
       case "cute":
-        return "bg-[#fff4fb] border-2 border-orange-100 shadow-[0_8px_30px_rgba(255,200,100,0.2)]";
+        return "bg-[#fffcf3] border-2 border-orange-100 shadow-[0_8px_30px_rgba(255,200,100,0.2)]";
       case "night":
         return "bg-[#1f1f1f]/90 backdrop-blur-md border border-gray-700 shadow-[0_8px_30px_rgba(0,0,0,0.6)]";
       case "minimal":

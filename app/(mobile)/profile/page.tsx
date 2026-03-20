@@ -2,6 +2,7 @@ import CoupleProfileCard from "@/components/mobile/CoupleProfileCard";
 import LoveBalanceCard from "@/components/mobile/LoveBalanceCard";
 import OrderPreviewCard from "@/components/mobile/OrderPreviewCard";
 import ChatEntryCard from "@/components/mobile/ChatEntryCard";
+import LogoutButton from "@/components/mobile/LogoutButton";
 
 export default function ProfilePage() {
   return (
@@ -17,6 +18,9 @@ export default function ProfilePage() {
 
       {/* Order History Preview */}
       <OrderPreviewCard />
+
+      {/* Logout Button */}
+      <LogoutButton />
     </div>
   );
 }

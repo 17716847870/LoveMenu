@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+import { useRouter } from "next/navigation";
 
 export type FloatingButtonPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
@@ -15,7 +17,17 @@ export default function AdminMobileTabBar({
   buttonPosition?: FloatingButtonPosition
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
 
   const menuItems = [
     {
@@ -47,6 +59,11 @@ export default function AdminMobileTabBar({
       label: "消息聊天",
       href: "/admin/chat",
       icon: MessageCircle
+    },
+    {
+      label: "账号管理",
+      href: "/admin/accounts",
+      icon: Users
     }
   ];
 
@@ -139,7 +156,10 @@ export default function AdminMobileTabBar({
 
               {/* Footer / Logout */}
               <div className="p-4 border-t border-gray-50">
-                <button className="flex items-center gap-3 px-4 py-3 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium">
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium"
+                >
                   <LogOut className="w-5 h-5" />
                   <span>退出登录</span>
                 </button>

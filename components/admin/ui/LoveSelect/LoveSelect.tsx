@@ -14,6 +14,7 @@ export type LoveSelectProps = {
   onChange?: (value: string | string[]) => void;
   className?: string;
   allowClear?: boolean;
+  disabled?: boolean;
 };
 
 export default function LoveSelect({
@@ -25,6 +26,7 @@ export default function LoveSelect({
   onChange,
   className = '',
   allowClear = false,
+  disabled = false,
 }: LoveSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -99,16 +101,17 @@ export default function LoveSelect({
   };
 
   return (
-    <div className={`relative w-full ${className}`} ref={containerRef}>
+    <div className={`relative w-full ${className} ${disabled ? 'cursor-not-allowed' : ''}`} ref={containerRef}>
       {/* 触发器 / 输入框 */}
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`
-          min-h-[40px] px-3 py-1.5 bg-white border rounded-xl cursor-pointer flex items-center justify-between
+          min-h-[40px] px-3 py-1.5 border rounded-xl flex items-center justify-between
           transition-all duration-200
-          ${isOpen 
+          ${disabled ? 'bg-[#fff5f8] border-[#fce7f3]' : 'bg-white cursor-pointer'}
+          ${isOpen && !disabled
             ? 'border-pink-300 ring-2 ring-pink-500/20' 
-            : 'border-[#f3d6e4] hover:border-[#ff6fa5]'}
+            : !disabled ? 'border-[#f3d6e4] hover:border-[#ff6fa5]' : ''}
         `}
       >
         <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
@@ -120,15 +123,15 @@ export default function LoveSelect({
               >
                 {option.label}
                 <span
-                  onClick={(e) => handleRemoveTag(e, option.value)}
-                  className="cursor-pointer hover:bg-pink-200 rounded-full w-3.5 h-3.5 flex items-center justify-center text-[10px] leading-none"
+                  onClick={(e) => !disabled && handleRemoveTag(e, option.value)}
+                  className={`rounded-full w-3.5 h-3.5 flex items-center justify-center text-[10px] leading-none ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-pink-200'}`}
                 >
                   ×
                 </span>
               </span>
             ))
           ) : !multiple && displayValue ? (
-            <span className="text-gray-700 text-sm ml-1 truncate">
+            <span className={`text-sm ml-1 truncate ${disabled ? 'text-[#cfa4b4]' : 'text-gray-700'}`}>
               {(displayValue as Option).label}
             </span>
           ) : (
@@ -137,7 +140,7 @@ export default function LoveSelect({
         </div>
 
         <div className="flex items-center gap-1 ml-2 shrink-0">
-          {((multiple && Array.isArray(value) && value.length > 0) || (!multiple && value)) && allowClear && (
+          {((multiple && Array.isArray(value) && value.length > 0) || (!multiple && value)) && allowClear && !disabled && (
             <span
               onClick={handleClear}
               className="text-gray-300 hover:text-pink-500 cursor-pointer p-1 rounded-full hover:bg-pink-50 transition-all"
@@ -148,7 +151,7 @@ export default function LoveSelect({
               </svg>
             </span>
           )}
-          <span className={`text-gray-400 transition-transform duration-200 flex items-center justify-center ${isOpen ? 'rotate-180 text-pink-500' : ''}`}>
+          <span className={`transition-transform duration-200 flex items-center justify-center ${disabled ? 'text-[#e5c5d1]' : 'text-gray-400'} ${isOpen ? 'rotate-180 text-pink-500' : ''}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 9l6 6 6-6"/>
             </svg>

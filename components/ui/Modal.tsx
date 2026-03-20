@@ -7,7 +7,7 @@ type ModalProps = PropsWithChildren<{
   onClose?: () => void;
 }>;
 
-export const Modal = ({ open, title, children, onClose }: ModalProps) => {
+export default function Modal({ open, title, children, onClose }: ModalProps) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">

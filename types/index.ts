@@ -2,6 +2,9 @@ export type ThemeName = "couple" | "cute" | "minimal" | "night";
 
 export interface User {
   id: string;
+  username?: string;
+  password?: string;
+  role?: "admin" | "user";
   name: string;
   avatar?: string;
 }

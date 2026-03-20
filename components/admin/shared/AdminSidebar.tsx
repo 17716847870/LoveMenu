@@ -3,10 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users } from "lucide-react";
+
+import { useRouter } from "next/navigation";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
 
   const menuItems = [
     {
@@ -38,6 +50,11 @@ export default function AdminSidebar() {
       label: "消息聊天",
       href: "/admin/chat",
       icon: MessageCircle
+    },
+    {
+      label: "账号管理",
+      href: "/admin/accounts",
+      icon: Users
     }
   ];
 
@@ -75,7 +92,10 @@ export default function AdminSidebar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-pink-100">
-        <button className="flex items-center gap-2 px-4 py-2 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+        >
           <LogOut className="w-5 h-5" />
           <span>退出登录</span>
         </button>

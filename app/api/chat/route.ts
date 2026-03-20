@@ -8,7 +8,7 @@ export const GET = async () => {
       include: { sender: { select: { id: true, name: true, role: true } } },
     });
     
-    const formattedMessages = messages.map(msg => ({
+    const formattedMessages = messages.map((msg: any) => ({
       id: msg.id,
       senderId: msg.senderId,
       type: msg.type,

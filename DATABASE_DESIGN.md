@@ -62,6 +62,8 @@
     *   `feedback`: 关联 `OrderFeedback` (一对一)
     *   `user`: 关联 `User` (多对一)
 
+
+
 ### OrderItem (订单明细表)
 记录每个订单中的具体菜品及数量。
 *   `id` (String): 主键

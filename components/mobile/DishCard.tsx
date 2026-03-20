@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { 
   Heart, 
   Sparkles, 
-  Zap,  
+  Zap, 
+  Flame, 
   Plus
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";

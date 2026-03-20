@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import PageHeader from '@/components/admin/shared/PageHeader';
 import FilterBar from '@/components/admin/menu/FilterBar';
 import MobileMenuFilterBar from '@/components/admin/menu/MobileMenuFilterBar';
@@ -9,12 +9,9 @@ import MobileMenuListView from '@/components/admin/menu/MobileMenuListView';
 import LovePagination from '@/components/admin/ui/LovePagination/LovePagination';
 import ConfirmDialog from '@/components/admin/common/ConfirmDialog';
 import DishFormModal from '@/components/admin/menu/DishFormModal';
-import { dishes } from '@/lib/mock-data'; // 使用 mock 数据作为初始数据
 import { Dish } from '@/types';
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Plus } from 'lucide-react';
-
-
 
 type SortField = 'price' | 'popularity' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -27,7 +24,7 @@ export default function AdminMenuPage() {
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   
   // 状态管理
-  const [allDishes, setAllDishes] = useState<Dish[]>(dishes);
+  const [allDishes, setAllDishes] = useState<Dish[]>([]);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,6 +33,20 @@ export default function AdminMenuPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const fetchDishes = async () => {
+    try {
+      const res = await fetch('/api/dishes');
+      const data = await res.json();
+      if (data.data) setAllDishes(data.data);
+    } catch (error) {
+      console.error('Failed to fetch dishes');
+    }
+  };
+
+  useEffect(() => {
+    fetchDishes();
+  }, []);
 
   const handleDeleteClick = (id: string) => {
     setSelectedMenuId(id);
@@ -52,24 +63,38 @@ export default function AdminMenuPage() {
     setIsFormModalOpen(true);
   };
 
-  const handleSaveDish = (dishData: Partial<Dish>) => {
-    if (editingDish) {
-      setAllDishes(prev => prev.map(item => item.id === editingDish.id ? { ...item, ...dishData } as Dish : item));
-    } else {
-      const newDish: Dish = {
-        ...(dishData as Dish),
-        id: `dish_${Date.now()}`,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setAllDishes(prev => [newDish, ...prev]);
+  const handleSaveDish = async (dishData: Partial<Dish>) => {
+    try {
+      if (editingDish) {
+        await fetch(`/api/dishes/${editingDish.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dishData),
+        });
+      } else {
+        await fetch('/api/dishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dishData),
+        });
+      }
+      fetchDishes();
+      setIsFormModalOpen(false);
+    } catch (error) {
+      alert('保存失败');
     }
-    setIsFormModalOpen(false);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedMenuId) {
-      setAllDishes(prev => prev.filter(item => item.id !== selectedMenuId));
-      console.log('Deleted menu item with ID:', selectedMenuId);
+      try {
+        const res = await fetch(`/api/dishes/${selectedMenuId}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || '删除失败');
+        fetchDishes();
+      } catch (error: any) {
+        alert(error.message);
+      }
     }
     setIsConfirmOpen(false);
     setSelectedMenuId(null);

@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageContainer } from "@/components/ui/PageContainer";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import CategoryDataTable from "@/components/admin/categories/CategoryDataTable";
 import MobileCategoryListView from "@/components/admin/categories/MobileCategoryListView";
 import CategoryFormModal from "@/components/admin/categories/CategoryFormModal";
 import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
-import { dishCategories, dishes } from "@/lib/mock-data";
-import { DishCategory } from "@/types";
+import { DishCategory, Dish } from "@/types";
 import { Plus } from "lucide-react";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<DishCategory[]>(dishCategories);
+  const [categories, setCategories] = useState<DishCategory[]>([]);
+  const [dishes, setDishes] = useState<Dish[]>([]);
   
   // 弹窗状态
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -22,13 +22,32 @@ export default function AdminCategoriesPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
+  const fetchData = async () => {
+    try {
+      const [catRes, dishRes] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/dishes')
+      ]);
+      const catData = await catRes.json();
+      const dishData = await dishRes.json();
+      if (catData.data) setCategories(catData.data);
+      if (dishData.data) setDishes(dishData.data);
+    } catch (error) {
+      console.error('Failed to fetch data', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   // 计算每个分类下的菜品数量并排序
   const processedData = useMemo(() => {
     return categories.map(cat => {
       const dishCount = dishes.filter(d => d.categoryId === cat.id).length;
       return { ...cat, dishCount };
     }).sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [categories]);
+  }, [categories, dishes]);
 
   const handleAddClick = () => {
     setEditingCategory(null);
@@ -52,25 +71,39 @@ export default function AdminCategoriesPage() {
     setIsConfirmOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedCategoryId) {
-      setCategories(prev => prev.filter(item => item.id !== selectedCategoryId));
+      try {
+        await fetch(`/api/categories/${selectedCategoryId}`, { method: 'DELETE' });
+        fetchData();
+      } catch (error) {
+        alert('删除失败');
+      }
     }
     setIsConfirmOpen(false);
     setSelectedCategoryId(null);
   };
 
-  const handleSaveCategory = (categoryData: Partial<DishCategory>) => {
-    if (editingCategory) {
-      setCategories(prev => prev.map(item => item.id === editingCategory.id ? { ...item, ...categoryData } as DishCategory : item));
-    } else {
-      const newCategory: DishCategory = {
-        ...(categoryData as DishCategory),
-        id: `c_${Date.now()}`,
-      };
-      setCategories(prev => [...prev, newCategory]);
+  const handleSaveCategory = async (categoryData: Partial<DishCategory>) => {
+    try {
+      if (editingCategory) {
+        await fetch(`/api/categories/${editingCategory.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryData),
+        });
+      } else {
+        await fetch('/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoryData),
+        });
+      }
+      fetchData();
+      setIsFormModalOpen(false);
+    } catch (error) {
+      alert('保存失败');
     }
-    setIsFormModalOpen(false);
   };
 
   return (

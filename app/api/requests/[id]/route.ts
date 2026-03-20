@@ -7,23 +7,18 @@ export async function PUT(
 ) {
   try {
     const id = (await params).id;
-    const data = await req.json();
+    const body = await req.json();
     
-    const updatedUser = await prisma.user.update({
+    const updatedRequest = await prisma.foodRequest.update({
       where: { id },
-      data,
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        role: true,
-        avatar: true,
-      }
+      data: {
+        status: body.status,
+      },
     });
 
-    return NextResponse.json({ success: true, data: updatedUser });
+    return NextResponse.json({ success: true, data: updatedRequest });
   } catch (error) {
-    return NextResponse.json({ message: '更新失败' }, { status: 500 });
+    return NextResponse.json({ message: '更新请求失败' }, { status: 500 });
   }
 }
 
@@ -34,12 +29,12 @@ export async function DELETE(
   try {
     const id = (await params).id;
     
-    await prisma.user.delete({
+    await prisma.foodRequest.delete({
       where: { id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ message: '删除失败' }, { status: 500 });
+    return NextResponse.json({ message: '删除请求失败' }, { status: 500 });
   }
 }

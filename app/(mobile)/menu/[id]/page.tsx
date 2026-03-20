@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import { dishes } from "@/lib/mock-data";
-import { ThemeName } from "@/types";
+import { ThemeName, Dish } from "@/types";
 import { useCart } from "@/hooks/useCart";
 import { useFlyToCart } from "@/context/FlyToCartContext";
 import NotFound from "./not-found";
@@ -38,7 +37,28 @@ export default function DishDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
   
-  const dish = dishes.find(d => d.id === id);
+  const [dish, setDish] = useState<Dish | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDish = async () => {
+      try {
+        const res = await fetch('/api/dishes');
+        const data = await res.json();
+        const foundDish = data.data?.find((d: Dish) => d.id === id);
+        setDish(foundDish || null);
+      } catch (error) {
+        console.error('Failed to fetch dish');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDish();
+  }, [id]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">加载中...</div>;
+  }
 
   if (!dish) {
     return <NotFound />;

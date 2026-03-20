@@ -8,63 +8,66 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
+  id        String        @id @default(cuid())
+  username  String        @unique
   password  String
   name      String
-  email     String?  @unique
+  email     String?       @unique
   avatar    String?
-  role      String   @default("user")
-  createdAt DateTime @default(now())
+  role      String        @default("user")
+  createdAt DateTime      @default(now())
   orders    Order[]
   chat      ChatMessage[] @relation("ChatSender")
+  cartItems CartItem[]
 }
 
 model DishCategory {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   name      String
   sortOrder Int
   dishes    Dish[]
 }
 
 model Dish {
-  id              String   @id @default(cuid())
+  id              String       @id @default(cuid())
   name            String
   description     String
   categoryId      String
   kissPrice       Int
   hugPrice        Int
   image           String?
-  popularity      Int      @default(0)
-  allowCook       Boolean  @default(true)
-  allowRestaurant Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  popularity      Int          @default(0)
+  allowCook       Boolean      @default(true)
+  allowRestaurant Boolean      @default(true)
+  createdAt       DateTime     @default(now())
   category        DishCategory @relation(fields: [categoryId], references: [id])
   orderItems      OrderItem[]
   cartItems       CartItem[]
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  userId    String
-  status    String
-  totalKiss Int
-  totalHug  Int
-  note      String?
-  createdAt DateTime @default(now())
-  items     OrderItem[]
-  feedback  OrderFeedback?
-  user      User     @relation(fields: [userId], references: [id])
+  id          String         @id @default(cuid())
+  userId      String
+  status      String
+  totalKiss   Int
+  totalHug    Int
+  note        String?
+  reason      String?
+  isEmergency Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  items       OrderItem[]
+  feedback    OrderFeedback?
+  user        User           @relation(fields: [userId], references: [id])
 }
 
 model OrderItem {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   orderId  String
   dishId   String
   quantity Int
   note     String?
-  order    Order @relation(fields: [orderId], references: [id])
-  dish     Dish  @relation(fields: [dishId], references: [id])
+  order    Order   @relation(fields: [orderId], references: [id])
+  dish     Dish    @relation(fields: [dishId], references: [id])
 }
 
 model CartItem {
@@ -72,20 +75,32 @@ model CartItem {
   userId   String
   dishId   String
   quantity Int
-  user     User @relation(fields: [userId], references: [id])
-  dish     Dish @relation(fields: [dishId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  dish     Dish   @relation(fields: [dishId], references: [id])
 }
 
-model WishDish {
-  id        String   @id @default(cuid())
-  name      String
-  description String?
-  createdAt DateTime @default(now())
+model FoodRequest {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  image       String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
 }
 
 model UrgentRequest {
   id        String   @id @default(cuid())
   content   String
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  content   String
+  image     String?
+  status    String   @default("open")
   createdAt DateTime @default(now())
 }
 

@@ -7,7 +7,6 @@ import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 import { ThemeName, Dish } from "@/types";
-import { dishes } from "@/lib/mock-data";
 import FoodRecommendationItem from "./FoodRecommendationItem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -77,28 +76,30 @@ export default function DailyRecommendation({ compact = false }: DailyRecommenda
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
-  const generateRecommendations = useCallback(() => {
-    setIsLoading(prev => {
-      if (prev) return prev;
-      return true;
-    });
+  const generateRecommendations = useCallback(async () => {
+    setIsLoading(true);
     
-    // Simulate API delay
-    setTimeout(() => {
-      // Randomly select dishes
+    try {
+      const res = await fetch('/api/dishes');
+      const data = await res.json();
+      const allDishes = data.data || [];
+      
       const count = compact ? 3 : 6;
-      const shuffled = [...dishes].sort(() => 0.5 - Math.random());
+      const shuffled = [...allDishes].sort(() => 0.5 - Math.random());
       const selected = shuffled.slice(0, count);
       
       const newRecommendations = selected.map(dish => ({
         ...dish,
         reason: REASONS[Math.floor(Math.random() * REASONS.length)],
-        isFavorite: Math.random() > 0.8 // Random initial favorite state
+        isFavorite: Math.random() > 0.8 
       }));
       
       setRecommendations(newRecommendations);
+    } catch (error) {
+      console.error('Failed to fetch recommendations', error);
+    } finally {
       setIsLoading(false);
-    }, 600);
+    }
   }, [compact]);
 
   useEffect(() => {

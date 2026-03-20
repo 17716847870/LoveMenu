@@ -1,34 +1,53 @@
 import { NextResponse } from 'next/server';
-import { getUsers, saveUsers } from '@/lib/users-db';
-import { User } from '@/types';
+import { prisma } from '@/lib/db';
 
 export async function GET() {
-  const users = getUsers();
-  // 不返回密码
-  const safeUsers = users.map(({ password, ...user }) => user);
-  return NextResponse.json({ data: safeUsers });
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        role: true,
+        avatar: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+    return NextResponse.json({ data: users });
+  } catch (error) {
+    return NextResponse.json({ message: '获取失败' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const users = getUsers();
     
-    if (users.find(u => u.username === data.username)) {
+    const existingUser = await prisma.user.findUnique({
+      where: { username: data.username },
+    });
+
+    if (existingUser) {
       return NextResponse.json({ message: '账号已存在' }, { status: 400 });
     }
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      username: data.username,
-      password: data.password,
-      role: data.role || 'user',
-      name: data.name || data.username,
-      avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,
-    };
-
-    users.push(newUser);
-    saveUsers(users);
+    const newUser = await prisma.user.create({
+      data: {
+        username: data.username,
+        password: data.password,
+        role: data.role || 'user',
+        name: data.name || data.username,
+        avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        role: true,
+        avatar: true,
+      }
+    });
 
     return NextResponse.json({ success: true, data: newUser });
   } catch (error) {

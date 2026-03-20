@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUsers } from '@/lib/users-db';
+import { prisma } from '@/lib/db';
 import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
@@ -7,12 +7,11 @@ export async function POST(req: Request) {
   try {
     const { username, password } = await req.json();
 
-    const users = getUsers();
-    const user = users.find(
-      (u) => u.username === username && u.password === password
-    );
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
 
-    if (!user) {
+    if (!user || user.password !== password) {
       return NextResponse.json(
         { message: '用户名或密码错误' },
         { status: 401 }

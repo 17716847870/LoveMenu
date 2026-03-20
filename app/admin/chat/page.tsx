@@ -73,7 +73,7 @@ export default function AdminChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-[#f8f9fa] md:bg-transparent">
+    <div className="flex flex-col h-full w-full bg-[#f8f9fa] md:bg-transparent">
       {/* Mobile Header (Hidden on PC) */}
       <div className="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">

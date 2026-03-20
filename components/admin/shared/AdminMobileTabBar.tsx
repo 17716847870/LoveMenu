@@ -7,7 +7,13 @@ import { cn } from "@/lib/utils";
 import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AdminMobileTabBar() {
+export type FloatingButtonPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+export default function AdminMobileTabBar({
+  buttonPosition = "bottom-left"
+}: {
+  buttonPosition?: FloatingButtonPosition
+}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -44,12 +50,29 @@ export default function AdminMobileTabBar() {
     }
   ];
 
+  const getPositionClasses = () => {
+    switch (buttonPosition) {
+      case "top-left":
+        return "top-4 left-4";
+      case "top-right":
+        return "top-4 right-4";
+      case "bottom-right":
+        return "bottom-6 right-4";
+      case "bottom-left":
+      default:
+        return "bottom-6 left-4";
+    }
+  };
+
   return (
     <>
       {/* 悬浮菜单按钮 */}
       <button 
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed bottom-6 left-4 z-40 w-12 h-12 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors"
+        className={cn(
+          "md:hidden fixed z-40 w-12 h-12 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors",
+          getPositionClasses()
+        )}
       >
         <MenuIcon size={24} />
       </button>

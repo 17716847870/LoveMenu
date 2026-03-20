@@ -54,7 +54,7 @@ export default function CategoryFormModal({ isOpen, onClose, onSave, editingCate
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-pink-50 flex flex-col">
         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-pink-50/30">
           <h2 className="text-xl font-bold text-gray-800">

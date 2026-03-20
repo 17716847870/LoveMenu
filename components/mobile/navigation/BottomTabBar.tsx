@@ -75,7 +75,7 @@ export default function BottomTabBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
       className={cn(
-        "fixed bottom-5 left-4 right-4 z-50 h-[64px] rounded-[24px] max-w-[480px] mx-auto",
+        "fixed bottom-5 left-4 right-4 z-50 h-16 rounded-3xl max-w-120 mx-auto",
         getContainerStyles()
       )}
     >

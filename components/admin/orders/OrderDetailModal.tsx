@@ -24,7 +24,7 @@ export default function OrderDetailModal({ order, isOpen, onClose, onUpdateStatu
   const StatusIcon = statusConfig[order.status as keyof typeof statusConfig]?.icon || Clock;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-pink-50 flex flex-col max-h-[90vh] md:max-h-[85vh]">
         {/* Header */}
         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-pink-50/30 shrink-0">

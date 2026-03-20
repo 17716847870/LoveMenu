@@ -93,13 +93,13 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
     <div className="relative pl-8 pb-8 last:pb-0">
       {/* Timeline Line */}
       <div className={cn(
-        "absolute left-[11px] top-2 bottom-0 w-[2px]",
+        "absolute left-2.75 top-2 bottom-0 w-0.5",
         currentTheme.line
       )} />
       
       {/* Timeline Dot */}
       <div className={cn(
-        "absolute left-[6px] top-2 w-3 h-3 rounded-full border-2 box-content z-10",
+        "absolute left-1.5 top-2 w-3 h-3 rounded-full border-2 box-content z-10",
         currentTheme.dot
       )} />
 
@@ -150,7 +150,7 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
             currentTheme.note
           )}>
             <Quote className={cn(
-              "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-[2px]",
+              "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-0.5",
               currentTheme.noteIcon
             )} />
             <div className="flex flex-col gap-2">

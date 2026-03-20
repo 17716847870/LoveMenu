@@ -75,8 +75,8 @@ export default function MenuPage() {
   };
 
   return (
-    <div className={cn("min-h-screen pb-[90px] transition-colors duration-300", pageStyles[theme])}>
-      <div className="max-w-[480px] mx-auto relative">
+    <div className={cn("min-h-screen pb-22.5 transition-colors duration-300", pageStyles[theme])}>
+      <div className="max-w-120 mx-auto relative">
         {/* Header */}
         <div className="px-4 py-6">
           <h1 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">

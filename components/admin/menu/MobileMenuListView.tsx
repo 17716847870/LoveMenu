@@ -13,7 +13,7 @@ export default function MobileMenuListView({ data, onDelete, onEdit }: MobileMen
     <div className="flex flex-col gap-3 mb-6 md:hidden">
       {data.map((item) => (
         <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-pink-50/50 p-3 flex gap-3">
-          <div className="w-[88px] h-[88px] rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 relative border border-gray-50">
+          <div className="w-22 h-22 rounded-xl overflow-hidden shrink-0 bg-gray-50 relative border border-gray-50">
             {item.image ? (
               <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
             ) : (

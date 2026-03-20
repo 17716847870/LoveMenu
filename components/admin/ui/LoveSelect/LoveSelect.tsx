@@ -106,7 +106,7 @@ export default function LoveSelect({
       <div
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`
-          min-h-[40px] px-3 py-1.5 border rounded-xl flex items-center justify-between
+          min-h-10 px-3 py-1.5 border rounded-xl flex items-center justify-between
           transition-all duration-200
           ${disabled ? 'bg-[#fff5f8] border-[#fce7f3]' : 'bg-white cursor-pointer'}
           ${isOpen && !disabled
@@ -178,7 +178,7 @@ export default function LoveSelect({
             </div>
           )}
           
-          <div className="max-h-[240px] overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-pink-100 scrollbar-track-transparent">
+          <div className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-pink-100 scrollbar-track-transparent">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => {
                 const selected = isSelected(option.value);

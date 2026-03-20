@@ -30,7 +30,7 @@ export default function OrderFilterBar({
 
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm mb-6 flex flex-wrap gap-4 items-end border border-pink-50">
-      <div className="flex-1 min-w-[240px]">
+      <div className="flex-1 min-w-60">
         <label className="block text-sm font-medium text-gray-700 mb-1.5">搜索订单</label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -44,7 +44,7 @@ export default function OrderFilterBar({
               onSearch?.(e.target.value);
             }}
             placeholder="搜索订单号或备注..." 
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300 transition-colors h-[40px]"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300 transition-colors h-10"
           />
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function OrderFilterBar({
         />
       </div>
 
-      <div className="flex gap-2 h-[40px]">
+      <div className="flex gap-2 h-10">
         <button 
           onClick={handleReset}
           className="px-6 h-full border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors font-medium"

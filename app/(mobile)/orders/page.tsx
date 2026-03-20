@@ -276,13 +276,13 @@ export default function OrdersPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setRecordingOrderId(null)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100"
             />
             <motion.div
               initial={{ opacity: 0, y: 100, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 100, scale: 0.95 }}
-              className="fixed bottom-0 left-0 right-0 z-[100] p-4 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md w-full"
+              className="fixed bottom-0 left-0 right-0 z-100 p-4 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md w-full"
             >
               <div className={cn(
                 "rounded-3xl p-5 md:p-6 shadow-2xl border flex flex-col gap-4",

@@ -98,7 +98,7 @@ export default function OrderPreviewCard({ orders = defaultOrders }: OrderPrevie
 
   return (
     <div className={cn(
-      "rounded-[24px] p-5 flex flex-col gap-4 overflow-hidden relative transition-colors duration-300 border",
+      "rounded-3xl p-5 flex flex-col gap-4 overflow-hidden relative transition-colors duration-300 border",
       currentTheme.container
     )}>
       {/* Header */}

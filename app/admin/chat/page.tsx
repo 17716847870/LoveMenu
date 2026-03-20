@@ -157,7 +157,7 @@ export default function AdminChatPage() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="发送消息..."
-              className="flex-1 max-h-24 min-h-[40px] bg-transparent border-none outline-none resize-none py-2.5 px-1 text-[15px] md:text-base custom-scrollbar"
+              className="flex-1 max-h-24 min-h-10 bg-transparent border-none outline-none resize-none py-2.5 px-1 text-[15px] md:text-base custom-scrollbar"
               rows={1}
             />
             

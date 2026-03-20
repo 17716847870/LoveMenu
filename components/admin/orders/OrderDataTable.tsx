@@ -43,7 +43,7 @@ export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDa
                 </td>
                 <td className="py-4 px-6 text-sm text-gray-500">{order.createdAt}</td>
                 <td className="py-4 px-6 text-sm text-gray-600">
-                  <div className="max-w-[200px] truncate">
+                  <div className="max-w-50 truncate">
                     {order.items.map(item => item.dish.name).join(", ")}
                   </div>
                   {order.reason && <div className="text-xs text-gray-400 mt-1">备注: {order.reason}</div>}

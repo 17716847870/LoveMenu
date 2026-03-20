@@ -67,7 +67,7 @@ export default function ChatEntryCard() {
       <motion.div
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "rounded-[24px] p-5 flex items-center gap-4 relative overflow-hidden transition-all duration-300 border group",
+          "rounded-3xl p-5 flex items-center gap-4 relative overflow-hidden transition-all duration-300 border group",
           currentTheme.container
         )}
       >

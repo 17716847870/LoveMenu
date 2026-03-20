@@ -1,5 +1,6 @@
 import AdminSidebar from "@/components/admin/shared/AdminSidebar";
 import AdminMobileTabBar from "@/components/admin/shared/AdminMobileTabBar";
+import AdminContentWrapper from "@/components/admin/shared/AdminContentWrapper";
 
 export default function AdminLayout({
   children,
@@ -7,14 +8,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-pink-50/30">
+    <div className="flex flex-col md:flex-row h-screen overflow-auto bg-pink-50/30">
       {/* Desktop Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 md:ml-64 pb-20 md:pb-4 p-4 md:p-8">
+      {/* Main Content with smart padding based on route */}
+      <AdminContentWrapper>
         {children}
-      </div>
+      </AdminContentWrapper>
 
       {/* Mobile Tab Bar */}
       <AdminMobileTabBar />

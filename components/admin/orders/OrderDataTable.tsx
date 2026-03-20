@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 interface OrderDataTableProps {
   data: Order[];
   onView?: (order: Order) => void;
+  onUpdateStatus?: (orderId: string, newStatus: Order['status']) => void;
 }
 
 const statusConfig = {
@@ -15,7 +16,7 @@ const statusConfig = {
   cancelled: { label: "已取消", color: "text-gray-500 bg-gray-50", icon: XCircle },
 };
 
-export default function OrderDataTable({ data, onView }: OrderDataTableProps) {
+export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDataTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6">
       <table className="w-full text-left border-collapse">
@@ -60,13 +61,31 @@ export default function OrderDataTable({ data, onView }: OrderDataTableProps) {
                   </div>
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button 
-                    onClick={() => onView?.(order)}
-                    className="text-gray-400 hover:text-pink-500 transition-colors p-2"
-                    title="查看详情"
-                  >
-                    <Eye className="w-5 h-5" />
-                  </button>
+                  <div className="flex justify-end items-center gap-2">
+                    {order.status === 'pending' && (
+                      <button 
+                        onClick={() => onUpdateStatus?.(order.id, 'preparing')}
+                        className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border border-blue-100"
+                      >
+                        开始制作
+                      </button>
+                    )}
+                    {order.status === 'preparing' && (
+                      <button 
+                        onClick={() => onUpdateStatus?.(order.id, 'completed')}
+                        className="text-green-500 hover:text-green-600 hover:bg-green-50 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border border-green-100"
+                      >
+                        标记完成
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => onView?.(order)}
+                      className="text-gray-400 hover:text-pink-500 transition-colors p-2"
+                      title="查看详情"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             );

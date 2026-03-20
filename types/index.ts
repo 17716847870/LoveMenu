@@ -37,6 +37,10 @@ export interface Order {
   reason?: string;
   isEmergency?: boolean;
   createdAt: string;
+  memory?: {
+    text: string;
+    image?: string | string[];
+  };
 }
 
 export interface DishCategory {

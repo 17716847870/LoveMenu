@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, Users, MessageSquare, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -13,6 +13,11 @@ export default function AdminSidebar() {
       label: "数据看板",
       href: "/admin",
       icon: LayoutDashboard
+    },
+    {
+      label: "分类管理",
+      href: "/admin/categories",
+      icon: List
     },
     {
       label: "菜单管理",
@@ -25,14 +30,14 @@ export default function AdminSidebar() {
       icon: ShoppingBag
     },
     {
-      label: "用户管理",
-      href: "/admin/users",
-      icon: Users
-    },
-    {
       label: "食物请求",
       href: "/admin/requests",
       icon: MessageSquare
+    },
+    {
+      label: "消息聊天",
+      href: "/admin/chat",
+      icon: MessageCircle
     }
   ];
 

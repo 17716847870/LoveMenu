@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 interface MobileOrderListViewProps {
   data: Order[];
   onView?: (order: Order) => void;
+  onUpdateStatus?: (orderId: string, newStatus: Order['status']) => void;
 }
 
 const statusConfig = {
@@ -15,7 +16,7 @@ const statusConfig = {
   cancelled: { label: "已取消", color: "text-gray-500 bg-gray-50", icon: XCircle },
 };
 
-export default function MobileOrderListView({ data, onView }: MobileOrderListViewProps) {
+export default function MobileOrderListView({ data, onView, onUpdateStatus }: MobileOrderListViewProps) {
   return (
     <div className="flex flex-col gap-3 mb-6 md:hidden">
       {data.map((order) => {
@@ -50,12 +51,30 @@ export default function MobileOrderListView({ data, onView }: MobileOrderListVie
                 <span className="text-pink-500">💋 {order.totalKiss}</span>
                 <span className="text-blue-500">🤗 {order.totalHug}</span>
               </div>
-              <button 
-                onClick={() => onView?.(order)}
-                className="px-4 py-1.5 text-sm bg-pink-50 text-pink-600 font-medium rounded-xl hover:bg-pink-100 transition-colors"
-              >
-                查看详情
-              </button>
+              <div className="flex items-center gap-2">
+                {order.status === 'pending' && (
+                  <button 
+                    onClick={() => onUpdateStatus?.(order.id, 'preparing')}
+                    className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 font-medium rounded-xl hover:bg-blue-100 transition-colors"
+                  >
+                    开始制作
+                  </button>
+                )}
+                {order.status === 'preparing' && (
+                  <button 
+                    onClick={() => onUpdateStatus?.(order.id, 'completed')}
+                    className="px-3 py-1.5 text-xs bg-green-50 text-green-600 font-medium rounded-xl hover:bg-green-100 transition-colors"
+                  >
+                    标记完成
+                  </button>
+                )}
+                <button 
+                  onClick={() => onView?.(order)}
+                  className="px-4 py-1.5 text-sm bg-pink-50 text-pink-600 font-medium rounded-xl hover:bg-pink-100 transition-colors"
+                >
+                  查看详情
+                </button>
+              </div>
             </div>
           </div>
         );

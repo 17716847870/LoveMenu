@@ -9,9 +9,10 @@ import MobileOrderFilterBar from "@/components/admin/orders/MobileOrderFilterBar
 import OrderDataTable from "@/components/admin/orders/OrderDataTable";
 import MobileOrderListView from "@/components/admin/orders/MobileOrderListView";
 import LovePagination from "@/components/admin/ui/LovePagination/LovePagination";
+import OrderDetailModal from "@/components/admin/orders/OrderDetailModal";
 
 // Mock Data
-const orders: Order[] = [
+const initialOrders: Order[] = [
   {
     id: "ORD-001",
     userId: "u1",
@@ -50,15 +51,31 @@ const orders: Order[] = [
     ],
     createdAt: "2024-03-15 18:20",
     reason: "夜宵走起",
-    isEmergency: true
+    isEmergency: true,
+    memory: {
+      text: "今天的章鱼小丸子特别好吃！木鱼花给得超多～",
+      image: [
+        "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop&q=60"
+      ]
+    }
   }
 ];
 
 export default function AdminOrdersPage() {
+  const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  
+  // 详情弹窗状态
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  const handleUpdateStatus = (orderId: string, newStatus: Order['status']) => {
+    setOrders(prev => prev.map(order => 
+      order.id === orderId ? { ...order, status: newStatus } : order
+    ));
+  };
 
   const processedData = useMemo(() => {
     return orders.filter(order => 
@@ -114,13 +131,15 @@ export default function AdminOrdersPage() {
         <div className="hidden md:block">
           <OrderDataTable 
             data={currentData}
-            onView={(order) => console.log('View order:', order)}
+            onView={(order) => setSelectedOrder(order)}
+            onUpdateStatus={handleUpdateStatus}
           />
         </div>
 
         <MobileOrderListView 
           data={currentData}
-          onView={(order) => console.log('View order:', order)}
+          onView={(order) => setSelectedOrder(order)}
+          onUpdateStatus={handleUpdateStatus}
         />
 
         <LovePagination 
@@ -135,6 +154,15 @@ export default function AdminOrdersPage() {
           }}
         />
       </div>
+
+      {selectedOrder && (
+        <OrderDetailModal 
+          order={selectedOrder} 
+          isOpen={!!selectedOrder} 
+          onClose={() => setSelectedOrder(null)} 
+          onUpdateStatus={(newStatus) => handleUpdateStatus(selectedOrder.id, newStatus)}
+        />
+      )}
     </PageContainer>
   );
 }

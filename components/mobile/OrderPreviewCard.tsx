@@ -105,11 +105,11 @@ export default function OrderPreviewCard({ orders = defaultOrders }: OrderPrevie
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
-          <span className={currentTheme.header}>历史订单</span>
+          <span className={currentTheme.header}>回忆相册</span>
         </div>
         
         <Link 
-          href="/orders" 
+          href="/memories" 
           className={cn(
             "text-xs font-medium flex items-center gap-1 transition-colors",
             currentTheme.viewAll

@@ -3,12 +3,16 @@
 import React, { useState, useMemo } from 'react';
 import PageHeader from '@/components/admin/shared/PageHeader';
 import FilterBar from '@/components/admin/menu/FilterBar';
+import MobileMenuFilterBar from '@/components/admin/menu/MobileMenuFilterBar';
 import MenuDataTable from '@/components/admin/menu/MenuDataTable';
+import MobileMenuListView from '@/components/admin/menu/MobileMenuListView';
 import LovePagination from '@/components/admin/ui/LovePagination/LovePagination';
 import ConfirmDialog from '@/components/admin/common/ConfirmDialog';
+import DishFormModal from '@/components/admin/menu/DishFormModal';
 import { dishes } from '@/lib/mock-data'; // 使用 mock 数据作为初始数据
 import { Dish } from '@/types';
 import { PageContainer } from "@/components/ui/PageContainer";
+import { Plus } from 'lucide-react';
 
 
 
@@ -18,6 +22,9 @@ type SortOrder = 'asc' | 'desc';
 export default function AdminMenuPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null);
+  
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState<Dish | null>(null);
   
   // 状态管理
   const [allDishes, setAllDishes] = useState<Dish[]>(dishes);
@@ -35,9 +42,28 @@ export default function AdminMenuPage() {
     setIsConfirmOpen(true);
   };
 
+  const handleAddClick = () => {
+    setEditingDish(null);
+    setIsFormModalOpen(true);
+  };
+
   const handleEditClick = (dish: Dish) => {
-    console.log('Edit dish:', dish);
-    // TODO: 实现编辑弹窗逻辑
+    setEditingDish(dish);
+    setIsFormModalOpen(true);
+  };
+
+  const handleSaveDish = (dishData: Partial<Dish>) => {
+    if (editingDish) {
+      setAllDishes(prev => prev.map(item => item.id === editingDish.id ? { ...item, ...dishData } as Dish : item));
+    } else {
+      const newDish: Dish = {
+        ...(dishData as Dish),
+        id: `dish_${Date.now()}`,
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+      setAllDishes(prev => [newDish, ...prev]);
+    }
+    setIsFormModalOpen(false);
   };
 
   const handleConfirmDelete = () => {
@@ -120,18 +146,62 @@ export default function AdminMenuPage() {
 
   return (
     <PageContainer>
-      <div className="mx-auto">
+      <div className="mx-auto pb-20 md:pb-0">
         <PageHeader 
           title="菜单管理" 
           subtitle="管理所有菜单数据"
           action={
-            <button className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg shadow transition-colors font-medium flex items-center gap-2">
+            <button 
+              onClick={handleAddClick}
+              className="hidden md:flex bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg shadow transition-colors font-medium items-center gap-2"
+            >
               <span className="text-lg leading-none">+</span> 添加新菜品
             </button>
           }
         />
         
-        <FilterBar 
+        <div className="hidden md:block">
+          <FilterBar 
+            onSearch={(term) => {
+              setSearchTerm(term);
+              setCurrentPage(1);
+            }}
+            onCategoryChange={(val) => {
+              setCategoryFilter(val as string);
+              setCurrentPage(1);
+            }}
+            onStatusChange={(val) => {
+              setStatusFilter(val as string);
+              setCurrentPage(1);
+            }}
+            onSortChange={(val) => {
+              // 这里 FilterBar 的排序主要是业务排序（如最新、热度），
+              // 如果和表格表头排序有冲突，需要协调。
+              // 暂时简单映射：
+              if (val === 'newest') {
+                setSortField('createdAt');
+                setSortOrder('desc');
+              } else if (val === 'popular') {
+                setSortField('popularity');
+                setSortOrder('desc');
+              } else if (val === 'price') {
+                setSortField('price');
+                setSortOrder('asc');
+              }
+              setCurrentPage(1);
+            }}
+            onReset={() => {
+              setSearchTerm('');
+              setCategoryFilter('');
+              setStatusFilter('');
+              setSortField(null);
+              setSortOrder('desc');
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        <MobileMenuFilterBar 
           onSearch={(term) => {
             setSearchTerm(term);
             setCurrentPage(1);
@@ -140,14 +210,7 @@ export default function AdminMenuPage() {
             setCategoryFilter(val as string);
             setCurrentPage(1);
           }}
-          onStatusChange={(val) => {
-            setStatusFilter(val as string);
-            setCurrentPage(1);
-          }}
           onSortChange={(val) => {
-            // 这里 FilterBar 的排序主要是业务排序（如最新、热度），
-            // 如果和表格表头排序有冲突，需要协调。
-            // 暂时简单映射：
             if (val === 'newest') {
               setSortField('createdAt');
               setSortOrder('desc');
@@ -160,21 +223,21 @@ export default function AdminMenuPage() {
             }
             setCurrentPage(1);
           }}
-          onReset={() => {
-            setSearchTerm('');
-            setCategoryFilter('');
-            setStatusFilter('');
-            setSortField(null);
-            setSortOrder('desc');
-            setCurrentPage(1);
-          }}
         />
         
-        <MenuDataTable 
+        <div className="hidden md:block">
+          <MenuDataTable 
+            data={currentData}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+            onDelete={handleDeleteClick}
+            onEdit={handleEditClick}
+          />
+        </div>
+
+        <MobileMenuListView 
           data={currentData}
-          sortField={sortField}
-          sortOrder={sortOrder}
-          onSort={handleSort}
           onDelete={handleDeleteClick}
           onEdit={handleEditClick}
         />
@@ -191,7 +254,22 @@ export default function AdminMenuPage() {
           }}
         />
 
+        {/* 移动端悬浮添加按钮 */}
+        <button 
+          onClick={handleAddClick}
+          className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors z-50"
+        >
+          <Plus size={24} />
+        </button>
+
       </div>
+
+      <DishFormModal 
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        onSave={handleSaveDish}
+        editingDish={editingDish}
+      />
 
       <ConfirmDialog 
         isOpen={isConfirmOpen} 

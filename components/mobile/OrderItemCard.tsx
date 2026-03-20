@@ -24,11 +24,17 @@ export interface Order {
   memoryNote?: string;
   reason?: string;
   isEmergency?: boolean;
+  hasMemory?: boolean; // 是否已记录回忆
+  memory?: {
+    text: string;
+    image?: string | string[];
+  };
 }
 
 interface OrderItemCardProps {
   order: Order;
   index?: number;
+  onRecordMemory?: (orderId: string) => void;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -68,7 +74,7 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function OrderItemCard({ order, index = 0 }: OrderItemCardProps) {
+export default function OrderItemCard({ order, index = 0, onRecordMemory }: OrderItemCardProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
@@ -112,17 +118,47 @@ export default function OrderItemCard({ order, index = 0 }: OrderItemCardProps) 
           {order.createdAt}
         </div>
         
-        <div className={cn("flex items-center gap-2 font-medium", currentTheme.priceText)}>
-          {order.kissPrice > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Heart className="w-3 h-3" /> {order.kissPrice}
+        <div className="flex items-center gap-3">
+          {order.status === "completed" && onRecordMemory && !order.hasMemory && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRecordMemory(order.id);
+              }}
+              className={cn(
+                "text-[10px] px-2 py-1 rounded-full font-medium transition-colors border",
+                theme === 'night' 
+                  ? "bg-slate-700/50 text-blue-300 border-slate-600 hover:bg-slate-700" 
+                  : theme === 'minimal'
+                    ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                    : theme === 'cute'
+                      ? "bg-orange-50 text-orange-500 border-orange-100 hover:bg-orange-100"
+                      : "bg-pink-50 text-pink-500 border-pink-100 hover:bg-pink-100"
+              )}
+            >
+              ✍️ 记录回忆
+            </button>
+          )}
+          {order.hasMemory && (
+            <span className={cn(
+              "text-[10px] flex items-center gap-1",
+              theme === 'night' ? 'text-slate-400' : 'text-gray-400'
+            )}>
+              <Heart className="w-3 h-3 fill-current" /> 已记录
             </span>
           )}
-          {order.hugPrice > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Smile className="w-3 h-3" /> {order.hugPrice}
-            </span>
-          )}
+          <div className={cn("flex items-center gap-2 font-medium", currentTheme.priceText)}>
+            {order.kissPrice > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Heart className="w-3 h-3" /> {order.kissPrice}
+              </span>
+            )}
+            {order.hugPrice > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Smile className="w-3 h-3" /> {order.hugPrice}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

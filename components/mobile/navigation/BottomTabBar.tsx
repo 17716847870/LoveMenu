@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { 
   Home, 
   Menu, 
-  MessageCircle, 
+  Receipt, 
   User 
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -31,9 +31,9 @@ const leftTabs = [
 // Right tabs (after cart)
 const rightTabs = [
   {
-    label: "聊天",
-    path: "/chat",
-    icon: MessageCircle
+    label: "订单",
+    path: "/orders",
+    icon: Receipt
   },
   {
     label: "我的",
@@ -42,7 +42,7 @@ const rightTabs = [
   }
 ];
 
-const visiblePaths = ["/", "/menu", "/profile"];
+const visiblePaths = ["/", "/menu", "/orders", "/profile"];
 
 export default function BottomTabBar() {
   const pathname = usePathname();

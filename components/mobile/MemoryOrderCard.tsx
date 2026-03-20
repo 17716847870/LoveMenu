@@ -12,7 +12,21 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
-import { Order } from "./OrderItemCard";
+export interface Order {
+  id: string;
+  dishes: string[];
+  kissPrice: number;
+  hugPrice: number;
+  status: string;
+  createdAt: string;
+  memoryNote?: string;
+  reason?: string;
+  isEmergency?: boolean;
+  memory?: {
+    text: string;
+    image?: string | string[];
+  };
+}
 
 interface MemoryOrderCardProps {
   order: Order;
@@ -130,7 +144,7 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
         </div>
 
         {/* Reason / Memory Note */}
-        {(order.reason || order.memoryNote) && (
+        {(order.reason || order.memoryNote || order.memory) && (
           <div className={cn(
             "mt-1 p-3 rounded-xl text-sm relative border",
             currentTheme.note
@@ -139,16 +153,54 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
               "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-[2px]",
               currentTheme.noteIcon
             )} />
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {order.reason && (
                 <div className="font-medium opacity-90">
                   <span className="text-xs opacity-70 mr-1">原因:</span>
                   {order.reason}
                 </div>
               )}
-              {order.memoryNote && (
-                <div className={order.reason ? "mt-1 pt-1 border-t border-current/10" : ""}>
-                  {order.memoryNote}
+              
+              {/* 图片展示 */}
+              {order.memory?.image && (
+                <div className={cn(
+                  "mt-1",
+                  Array.isArray(order.memory.image) && order.memory.image.length > 1
+                    ? "grid grid-cols-2 gap-2"
+                    : ""
+                )}>
+                  {Array.isArray(order.memory.image) ? (
+                    order.memory.image.map((img, idx) => (
+                      <div key={idx} className={cn(
+                        "rounded-lg overflow-hidden relative",
+                        order.memory!.image!.length === 1 ? "w-full h-32" : "w-full aspect-square"
+                      )}>
+                        <img 
+                          src={img} 
+                          alt={`回忆照片 ${idx + 1}`} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="w-full h-32 rounded-lg overflow-hidden relative">
+                      <img 
+                        src={order.memory.image} 
+                        alt="回忆照片" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 回忆文字 */}
+              {(order.memoryNote || order.memory?.text) && (
+                <div className={cn(
+                  "text-sm leading-relaxed",
+                  (order.reason || order.memory?.image) ? "mt-1 pt-2 border-t border-current/10" : ""
+                )}>
+                  {order.memory?.text || order.memoryNote}
                 </div>
               )}
             </div>

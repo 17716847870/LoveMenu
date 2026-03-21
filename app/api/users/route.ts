@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import bcrypt from 'bcryptjs';
+
+const SALT_ROUNDS = 10;
 
 export async function GET() {
   try {
@@ -32,10 +35,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: '账号已存在' }, { status: 400 });
     }
 
+    const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
+
     const newUser = await prisma.user.create({
       data: {
         username: data.username,
-        password: data.password,
+        password: hashedPassword,
         role: data.role || 'user',
         name: data.name || data.username,
         avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,

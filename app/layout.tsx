@@ -1,6 +1,8 @@
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FlyToCartProvider } from "@/context/FlyToCartContext";
 import { CartProvider } from "@/hooks/useCart";
+import { MessageProvider } from "@/components/ui/Message";
+import QueryProvider from "@/components/providers/QueryProvider";
 import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -32,10 +34,14 @@ export default function RootLayout({
         <ThemeProvider>
           <FlyToCartProvider>
             <CartProvider>
-              <div id="app-root" className="relative w-full">
-                {children}
-                <FloatingThemeButton />
-              </div>
+              <MessageProvider>
+              <QueryProvider>
+                <div id="app-root" className="relative w-full">
+                  {children}
+                  <FloatingThemeButton />
+                </div>
+              </QueryProvider>
+            </MessageProvider>
             </CartProvider>
           </FlyToCartProvider>
         </ThemeProvider>

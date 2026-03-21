@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +12,16 @@ export async function POST(req: Request) {
       where: { username },
     });
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      return NextResponse.json(
+        { message: '用户名或密码错误' },
+        { status: 401 }
+      );
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
       return NextResponse.json(
         { message: '用户名或密码错误' },
         { status: 401 }
@@ -33,7 +43,7 @@ export async function POST(req: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24,
     });
 
     return NextResponse.json({

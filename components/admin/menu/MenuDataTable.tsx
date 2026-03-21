@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dish } from '@/types';
+import { Search } from 'lucide-react';
 
 type SortField = 'price' | 'popularity' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -11,6 +12,7 @@ interface MenuDataTableProps {
   onSort: (field: SortField) => void;
   onDelete?: (id: string) => void;
   onEdit?: (dish: Dish) => void;
+  onPreviewImage?: (src: string) => void;
 }
 
 export default function MenuDataTable({ 
@@ -19,7 +21,8 @@ export default function MenuDataTable({
   sortOrder, 
   onSort, 
   onDelete,
-  onEdit 
+  onEdit,
+  onPreviewImage
 }: MenuDataTableProps) {
 
   const renderSortIcon = (field: SortField) => {
@@ -62,13 +65,24 @@ export default function MenuDataTable({
             <tr key={item.id} className="hover:bg-pink-50/30 transition-colors group">
               <td className="py-4 px-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0 border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center text-2xl">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0 border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center text-2xl group">
                     {item.image ? (
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="object-cover w-full h-full"
-                      />
+                      <>
+                        <img 
+                          src={item.image} 
+                          alt={item.name}
+                          className="object-cover w-full h-full"
+                        />
+                        <div 
+                          className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center cursor-pointer"
+                          onClick={() => onPreviewImage?.(item.image!)}
+                        >
+                          <Search 
+                            size={20} 
+                            className="text-white opacity-0 group-hover:opacity-100 transition-opacity" 
+                          />
+                        </div>
+                      </>
                     ) : (
                       <span>🥘</span>
                     )}

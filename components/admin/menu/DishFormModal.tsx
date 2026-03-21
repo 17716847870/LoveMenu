@@ -2,22 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Dish } from '@/types';
 import { X } from 'lucide-react';
 import LoveSelect from '@/components/admin/ui/LoveSelect/LoveSelect';
+import MultiImageUploader from '@/components/common/MultiImageUploader';
 
 interface DishFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (dish: Omit<Dish, 'id' | 'createdAt'> | Dish) => void;
   editingDish: Dish | null;
+  categories?: Array<{ label: string; value: string }>;
 }
 
-const CATEGORIES = [
-  { label: '甜品', value: 'c1' },
-  { label: '主食', value: 'c2' },
-  { label: '小食', value: 'c3' },
-  { label: '饮品', value: 'c4' },
-];
-
-export default function DishFormModal({ isOpen, onClose, onSave, editingDish }: DishFormModalProps) {
+export default function DishFormModal({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  editingDish,
+  categories = [
+    { label: '甜品', value: 'c1' },
+    { label: '主食', value: 'c2' },
+    { label: '小食', value: 'c3' },
+    { label: '饮品', value: 'c4' },
+  ]
+}: DishFormModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -121,7 +127,7 @@ export default function DishFormModal({ isOpen, onClose, onSave, editingDish }: 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">分类 *</label>
               <LoveSelect 
-                options={CATEGORIES}
+                options={categories}
                 value={formData.categoryId}
                 onChange={(val) => {
                   setFormData(prev => ({ ...prev, categoryId: val as string }));
@@ -170,14 +176,14 @@ export default function DishFormModal({ isOpen, onClose, onSave, editingDish }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">图片 URL</label>
-              <input 
-                type="text" 
-                name="image"
+              <label className="block text-sm font-medium text-gray-700 mb-1">菜品图片</label>
+              <MultiImageUploader
                 value={formData.image}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300 transition-colors"
-                placeholder="https://example.com/image.jpg"
+                onChange={(urls) => setFormData(prev => ({ ...prev, image: urls as string }))}
+                mode="single"
+                path="dishes"
+                maxSize={5}
+                showTitle={false}
               />
             </div>
           </form>

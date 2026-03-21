@@ -40,11 +40,11 @@ export function useUser(id: string) {
   return useQuery({
     queryKey: userKeys.detail(id),
     queryFn: async (): Promise<User> => {
-      const response = await http.get<{ data: User }>(`/api/users/${id}`);
-      if (!response.data?.data) {
+      const response = await http.get<User>(`/api/users/${id}`);
+      if (!response.data) {
         throw new Error("用户不存在");
       }
-      return response.data.data;
+      return response.data;
     },
     enabled: !!id,
   });

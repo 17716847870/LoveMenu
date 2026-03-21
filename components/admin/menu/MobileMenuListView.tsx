@@ -1,21 +1,33 @@
 import React from 'react';
 import { Dish } from '@/types';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Search } from 'lucide-react';
 
 interface MobileMenuListViewProps {
   data: Dish[];
   onDelete?: (id: string) => void;
   onEdit?: (dish: Dish) => void;
+  onPreviewImage?: (src: string) => void;
 }
 
-export default function MobileMenuListView({ data, onDelete, onEdit }: MobileMenuListViewProps) {
+export default function MobileMenuListView({ data, onDelete, onEdit, onPreviewImage }: MobileMenuListViewProps) {
   return (
     <div className="flex flex-col gap-3 mb-6 md:hidden">
       {data.map((item) => (
         <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-pink-50/50 p-3 flex gap-3">
-          <div className="w-22 h-22 rounded-xl overflow-hidden shrink-0 bg-gray-50 relative border border-gray-50">
+          <div className="w-22 h-22 rounded-xl overflow-hidden shrink-0 bg-gray-50 relative border border-gray-50 group">
             {item.image ? (
-              <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
+              <>
+                <img src={item.image} alt={item.name} className="object-cover w-full h-full" />
+                <div 
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center cursor-pointer"
+                  onClick={() => onPreviewImage?.(item.image!)}
+                >
+                  <Search 
+                    size={18} 
+                    className="text-white opacity-0 group-hover:opacity-100 transition-opacity" 
+                  />
+                </div>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-3xl bg-pink-50/30">🥘</div>
             )}

@@ -1,47 +1,41 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PageContainer } from "@/components/ui/PageContainer";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import CategoryDataTable from "@/components/admin/categories/CategoryDataTable";
 import MobileCategoryListView from "@/components/admin/categories/MobileCategoryListView";
 import CategoryFormModal from "@/components/admin/categories/CategoryFormModal";
 import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
-import { DishCategory, Dish } from "@/types";
+import { DishCategory } from "@/types";
 import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/Loading";
+import { useMessage } from "@/components/ui/Message";
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from "@/apis/category";
+import { useDishes } from "@/apis/dishes";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<DishCategory[]>([]);
-  const [dishes, setDishes] = useState<Dish[]>([]);
-  
-  // 弹窗状态
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<DishCategory | null>(null);
   
-  // 删除确认状态
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    try {
-      const [catRes, dishRes] = await Promise.all([
-        fetch('/api/categories'),
-        fetch('/api/dishes')
-      ]);
-      const catData = await catRes.json();
-      const dishData = await dishRes.json();
-      if (catData.data) setCategories(catData.data);
-      if (dishData.data) setDishes(dishData.data);
-    } catch (error) {
-      console.error('Failed to fetch data', error);
-    }
-  };
+  const message = useMessage();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data: categories = [], isLoading, error } = useCategories();
+  const { data: dishes = [] } = useDishes();
 
-  // 计算每个分类下的菜品数量并排序
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
+
   const processedData = useMemo(() => {
     return categories.map(cat => {
       const dishCount = dishes.filter(d => d.categoryId === cat.id).length;
@@ -60,10 +54,9 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDeleteClick = (id: string) => {
-    // 检查是否有菜品关联
     const dishCount = dishes.filter(d => d.categoryId === id).length;
     if (dishCount > 0) {
-      alert(`该分类下还有 ${dishCount} 道菜品，请先删除或转移菜品后再删除分类！`);
+      message.warning(`该分类下还有 ${dishCount} 道菜品，请先删除或转移菜品后再删除分类！`);
       return;
     }
     
@@ -74,10 +67,10 @@ export default function AdminCategoriesPage() {
   const handleConfirmDelete = async () => {
     if (selectedCategoryId) {
       try {
-        await fetch(`/api/categories/${selectedCategoryId}`, { method: 'DELETE' });
-        fetchData();
+        await deleteCategory.mutateAsync(selectedCategoryId);
+        message.success("分类删除成功");
       } catch (error) {
-        alert('删除失败');
+        message.error(error instanceof Error ? error.message : "删除失败");
       }
     }
     setIsConfirmOpen(false);
@@ -87,24 +80,49 @@ export default function AdminCategoriesPage() {
   const handleSaveCategory = async (categoryData: Partial<DishCategory>) => {
     try {
       if (editingCategory) {
-        await fetch(`/api/categories/${editingCategory.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(categoryData),
+        await updateCategory.mutateAsync({
+          id: editingCategory.id,
+          data: categoryData,
         });
+        message.success("分类更新成功");
       } else {
-        await fetch('/api/categories', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(categoryData),
-        });
+        await createCategory.mutateAsync(categoryData as any);
+        message.success("分类创建成功");
       }
-      fetchData();
       setIsFormModalOpen(false);
     } catch (error) {
-      alert('保存失败');
+      message.error(error instanceof Error ? error.message : "保存失败");
     }
   };
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageHeader title="分类管理" subtitle="管理菜品和菜单分类" />
+        <PageLoading text="加载分类列表" />
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <PageHeader title="分类管理" subtitle="管理菜品和菜单分类" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-500">加载失败: {error.message}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="mt-4"
+              variant="outline"
+            >
+              刷新重试
+            </Button>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -113,12 +131,12 @@ export default function AdminCategoriesPage() {
           title="分类管理" 
           subtitle="管理菜品和菜单分类" 
           action={
-            <button 
+            <Button
               onClick={handleAddClick}
-              className="hidden md:flex bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg shadow transition-colors font-medium items-center gap-2"
+              className="bg-pink-500 hover:bg-pink-600 text-white"
             >
-              <span className="text-lg leading-none">+</span> 添加新分类
-            </button>
+              <Plus className="w-4 h-4 mr-2" /> 添加新分类
+            </Button>
           }
         />
 
@@ -134,7 +152,6 @@ export default function AdminCategoriesPage() {
           onDelete={handleDeleteClick}
         />
 
-        {/* 移动端悬浮添加按钮 */}
         <button 
           onClick={handleAddClick}
           className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors z-50"
@@ -148,12 +165,15 @@ export default function AdminCategoriesPage() {
         onClose={() => setIsFormModalOpen(false)}
         onSave={handleSaveCategory}
         editingCategory={editingCategory}
+        isSubmitting={createCategory.isPending || updateCategory.isPending}
       />
 
       <ConfirmDialog 
         isOpen={isConfirmOpen} 
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
+        title="确认删除"
+        message={`确定要删除该分类吗？此操作不可撤销。`}
       />
     </PageContainer>
   );

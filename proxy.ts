@@ -6,10 +6,9 @@ const publicPaths = ['/login', '/403'];
 const authApiPaths = ['/api/auth/login', '/api/auth/logout'];
 const staticPaths = ['/_next', '/favicon.ico', '/logo.png', '/api/auth'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 放行静态资源和认证API
   if (
     staticPaths.some((path) => pathname.startsWith(path)) ||
     authApiPaths.includes(pathname)
@@ -34,11 +33,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 如果已登录，处理角色访问权限
   if (payload) {
     const { role } = payload as { role: string };
 
-    // 已登录状态下访问 /login，根据角色重定向
     if (pathname === '/login') {
       if (role === 'admin') {
         return NextResponse.redirect(new URL('/admin', request.url));
@@ -47,12 +44,10 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // 普通用户访问 /admin 页面，跳转到 /403
     if (pathname.startsWith('/admin') && role !== 'admin') {
       return NextResponse.redirect(new URL('/403', request.url));
     }
 
-    // 根目录重定向
     if (pathname === '/') {
         if (role === 'admin') {
             return NextResponse.redirect(new URL('/admin', request.url));
@@ -65,13 +60,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

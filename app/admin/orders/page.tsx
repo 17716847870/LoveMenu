@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Order } from "@/types";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import { PageContainer } from "@/components/ui/PageContainer";
@@ -10,46 +10,26 @@ import OrderDataTable from "@/components/admin/orders/OrderDataTable";
 import MobileOrderListView from "@/components/admin/orders/MobileOrderListView";
 import LovePagination from "@/components/admin/ui/LovePagination/LovePagination";
 import OrderDetailModal from "@/components/admin/orders/OrderDetailModal";
+import { useOrders, useUpdateOrder } from "@/apis/orders";
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  
-  // 详情弹窗状态
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch('/api/orders');
-      const data = await res.json();
-      if (data.data) {
-        setOrders(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch orders');
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  const { data: orders = [] } = useOrders();
+  const updateOrder = useUpdateOrder();
 
   const handleUpdateStatus = async (orderId: string, newStatus: Order['status']) => {
     try {
-      await fetch(`/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      fetchOrders();
+      await updateOrder.mutateAsync({ id: orderId, status: newStatus });
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
     } catch (error) {
-      alert('更新状态失败');
+      console.error('更新状态失败', error);
     }
   };
 
@@ -59,7 +39,7 @@ export default function AdminOrdersPage() {
        order.reason?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (filterStatus === "all" || order.status === filterStatus)
     );
-  }, [searchTerm, filterStatus]);
+  }, [orders, searchTerm, filterStatus]);
 
   const totalItems = processedData.length;
   const totalPages = Math.ceil(totalItems / pageSize);

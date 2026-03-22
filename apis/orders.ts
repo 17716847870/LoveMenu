@@ -2,22 +2,19 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@/lib/api";
+import { Dish } from "@/types";
 
 export interface OrderItem {
   id: string;
   quantity: number;
   note?: string;
-  dish: {
-    id: string;
-    name: string;
-    image?: string;
-  };
+  dish: Dish;
 }
 
 export interface Order {
   id: string;
   userId: string;
-  status: string;
+  status: "pending" | "preparing" | "completed" | "cancelled";
   totalKiss: number;
   totalHug: number;
   note?: string;
@@ -99,8 +96,8 @@ export function useUpdateOrder() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; status?: string; note?: string }) => {
-      const response = await http.patch<Order>(`/api/orders/${id}`, data);
+    mutationFn: async ({ id, ...data }: { id: string; status?: Order['status']; note?: string }) => {
+      const response = await http.put<Order>(`/api/orders/${id}`, data);
       return response.data;
     },
     onSuccess: () => {

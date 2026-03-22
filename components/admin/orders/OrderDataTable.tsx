@@ -2,6 +2,8 @@ import React from 'react';
 import { Order } from '@/types';
 import { Clock, AlertCircle, CheckCircle2, XCircle, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/utils/format';
+
 
 interface OrderDataTableProps {
   data: Order[];
@@ -41,7 +43,7 @@ export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDa
                     <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-500 rounded-full">紧急</span>
                   )}
                 </td>
-                <td className="py-4 px-6 text-sm text-gray-500">{order.createdAt}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{formatDateTime(order.createdAt)}</td>
                 <td className="py-4 px-6 text-sm text-gray-600">
                   <div className="max-w-50 truncate">
                     {order.items.map(item => item.dish.name).join(", ")}

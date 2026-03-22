@@ -27,6 +27,8 @@ export async function PUT(
         name: true,
         role: true,
         avatar: true,
+        kissBalance: true,
+        hugBalance: true,
       }
     });
 

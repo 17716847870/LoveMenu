@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { User } from "@/types";
-import { Plus, Edit2, Trash2, Shield, User as UserIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, Shield, User as UserIcon, Coins } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import LoveSelect from "@/components/admin/ui/LoveSelect/LoveSelect";
 import { PageLoading } from "@/components/ui/Loading";
@@ -17,17 +17,25 @@ import {
   useCreateUser,
   useUpdateUser,
   useDeleteUser,
+  useTopUpBalance,
 } from "@/apis/user";
 
 export default function AccountsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
+  const [balanceUser, setBalanceUser] = useState<User | null>(null);
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     name: "",
     role: "user" as "user" | "admin",
+  });
+
+  const [balanceData, setBalanceData] = useState({
+    kissAmount: 0,
+    hugAmount: 0,
   });
 
   const message = useMessage();
@@ -37,6 +45,7 @@ export default function AccountsPage() {
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
+  const topUpBalance = useTopUpBalance();
 
   const handleOpenModal = (user?: User) => {
     if (user) {
@@ -57,6 +66,12 @@ export default function AccountsPage() {
       });
     }
     setIsModalOpen(true);
+  };
+
+  const handleOpenBalanceModal = (user: User) => {
+    setBalanceUser(user);
+    setBalanceData({ kissAmount: 0, hugAmount: 0 });
+    setIsBalanceModalOpen(true);
   };
 
   const handleSave = async () => {
@@ -83,6 +98,27 @@ export default function AccountsPage() {
       setIsModalOpen(false);
     } catch (error) {
       message.error(error instanceof Error ? error.message : "保存失败");
+    }
+  };
+
+  const handleBalanceSave = async () => {
+    if (!balanceUser) return;
+    
+    if (balanceData.kissAmount === 0 && balanceData.hugAmount === 0) {
+      message.warning("请输入要充值的金额");
+      return;
+    }
+
+    try {
+      await topUpBalance.mutateAsync({
+        id: balanceUser.id,
+        kissAmount: balanceData.kissAmount,
+        hugAmount: balanceData.hugAmount,
+      });
+      message.success("余额更新成功");
+      setIsBalanceModalOpen(false);
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : "更新失败");
     }
   };
 
@@ -148,6 +184,7 @@ export default function AccountsPage() {
                 <th className="p-4 font-medium">账号</th>
                 <th className="p-4 font-medium">昵称</th>
                 <th className="p-4 font-medium">角色</th>
+                <th className="p-4 font-medium">余额</th>
                 <th className="p-4 font-medium text-right">操作</th>
               </tr>
             </thead>
@@ -177,7 +214,28 @@ export default function AccountsPage() {
                       {user.role === "admin" ? "管理员" : "前台用户"}
                     </span>
                   </td>
+                  <td className="p-4">
+                    {user.role !== "admin" && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-pink-500">
+                          ❤️ {user.kissBalance ?? 0}
+                        </span>
+                        <span className="text-sm text-orange-500">
+                          🤗 {user.hugBalance ?? 0}
+                        </span>
+                      </div>
+                    )}
+                  </td>
                   <td className="p-4 flex justify-end gap-2">
+                    {user.role !== "admin" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenBalanceModal(user)}
+                      >
+                        <Coins className="w-4 h-4 mr-1" /> 充值
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -234,14 +292,30 @@ export default function AccountsPage() {
                   {user.role === "admin" ? "管理员" : "前台用户"}
                 </span>
               </div>
+              {user.role !== "admin" && (
+                <div className="flex items-center gap-3 mb-3 text-sm">
+                  <span className="text-pink-500">❤️ {user.kissBalance ?? 0}</span>
+                  <span className="text-orange-500">🤗 {user.hugBalance ?? 0}</span>
+                </div>
+              )}
               <div className="flex gap-2 justify-end border-t border-gray-100 pt-3">
+                {user.role !== "admin" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenBalanceModal(user)}
+                    className="flex-1"
+                  >
+                    <Coins className="w-4 h-4 mr-1" /> 充值
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenModal(user)}
                   className="flex-1"
                 >
-                  <Edit2 className="w-4 h-4 mr-1" /> 修改密码/编辑
+                  <Edit2 className="w-4 h-4 mr-1" /> 编辑
                 </Button>
                 {user.role !== "admin" && (
                   <Button
@@ -292,40 +366,43 @@ export default function AccountsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 登录密码{" "}
-                {editingUser && (
-                  <span className="text-gray-400 font-normal">
-                    (不修改请留空)
-                  </span>
-                )}
+                {!editingUser && <span className="text-red-500">*</span>}
               </label>
               <Input
-                type="text"
+                type="password"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                placeholder={editingUser ? "输入新密码" : "请输入密码"}
+                placeholder={
+                  editingUser ? "不修改请留空" : "请输入登录密码"
+                }
                 className="w-full"
               />
+              {editingUser && (
+                <p className="text-xs text-gray-400 mt-1">
+                  不修改请留空，修改则输入新密码
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                用户昵称
+                昵称
               </label>
               <Input
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="请输入昵称"
+                placeholder="请输入用户昵称"
                 className="w-full"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                角色权限
+                角色
               </label>
               <LoveSelect
                 value={formData.role}
@@ -333,33 +410,118 @@ export default function AccountsPage() {
                   setFormData({ ...formData, role: val as "user" | "admin" })
                 }
                 options={[
-                  { value: "user", label: "前台用户" },
-                  { value: "admin", label: "管理员" },
+                  { label: "前台用户", value: "user" },
+                  { label: "管理员", value: "admin" },
                 ]}
-                disabled={editingUser?.role === "admin"}
-                placeholder="请选择角色"
+                className="w-full"
               />
             </div>
-          </div>
 
-          <div className="flex gap-3 mt-6">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setIsModalOpen(false)}
-            >
-              取消
-            </Button>
-            <Button
-              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
-              onClick={handleSave}
-              disabled={createUser.isPending || updateUser.isPending}
-            >
-              {createUser.isPending || updateUser.isPending
-                ? "保存中..."
-                : "保存"}
-            </Button>
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                取消
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={createUser.isPending || updateUser.isPending}
+                className="bg-pink-500 hover:bg-pink-600 text-white"
+              >
+                {(createUser.isPending || updateUser.isPending)
+                  ? "保存中..."
+                  : "保存"}
+              </Button>
+            </div>
           </div>
+        </Modal>
+
+        {/* Balance Modal */}
+        <Modal
+          open={isBalanceModalOpen}
+          onClose={() => setIsBalanceModalOpen(false)}
+          title="充值余额"
+        >
+          {balanceUser && (
+            <div className="space-y-4 py-4">
+              <div className="bg-pink-50 rounded-lg p-4">
+                <div className="text-sm text-gray-500 mb-2">当前余额</div>
+                <div className="flex items-center gap-6">
+                  <span className="text-pink-500 text-lg font-medium">
+                    ❤️ {balanceUser.kissBalance ?? 0}
+                  </span>
+                  <span className="text-orange-500 text-lg font-medium">
+                    🤗 {balanceUser.hugBalance ?? 0}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  增加/减少 亲亲数
+                </label>
+                <Input
+                  type="number"
+                  value={balanceData.kissAmount}
+                  onChange={(e) =>
+                    setBalanceData({
+                      ...balanceData,
+                      kissAmount: parseInt(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="输入正数增加，负数减少"
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  输入正数增加余额，输入负数减少余额
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  增加/减少 贴贴数
+                </label>
+                <Input
+                  type="number"
+                  value={balanceData.hugAmount}
+                  onChange={(e) =>
+                    setBalanceData({
+                      ...balanceData,
+                      hugAmount: parseInt(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="输入正数增加，负数减少"
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  输入正数增加余额，输入负数减少余额
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="text-sm text-gray-500 mb-2">充值后余额</div>
+                <div className="flex items-center gap-6">
+                  <span className="text-pink-500 text-lg font-medium">
+                    ❤️ {(balanceUser.kissBalance ?? 0) + balanceData.kissAmount}
+                  </span>
+                  <span className="text-orange-500 text-lg font-medium">
+                    🤗 {(balanceUser.hugBalance ?? 0) + balanceData.hugAmount}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setIsBalanceModalOpen(false)}>
+                  取消
+                </Button>
+                <Button
+                  onClick={handleBalanceSave}
+                  disabled={topUpBalance.isPending}
+                  className="bg-pink-500 hover:bg-pink-600 text-white"
+                >
+                  {topUpBalance.isPending ? "保存中..." : "保存"}
+                </Button>
+              </div>
+            </div>
+          )}
         </Modal>
       </div>
     </PageContainer>

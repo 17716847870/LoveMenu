@@ -7,6 +7,8 @@ export interface User {
   role?: "admin" | "user";
   name: string;
   avatar?: string;
+  kissBalance?: number;
+  hugBalance?: number;
 }
 
 export interface Dish {
@@ -33,7 +35,7 @@ export interface CartItem {
 export interface Order {
   id: string;
   userId: string;
-  status: "pending" | "preparing" | "ready" | "completed" | "cancelled";
+  status: "pending" | "preparing" | "completed" | "cancelled";
   totalKiss: number;
   totalHug: number;
   items: CartItem[];

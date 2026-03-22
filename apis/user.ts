@@ -92,3 +92,20 @@ export function useDeleteUser() {
     },
   });
 }
+
+export function useTopUpBalance() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, kissAmount, hugAmount }: { id: string; kissAmount?: number; hugAmount?: number }) => {
+      const response = await http.patch<User>(`/api/users/${id}/balance`, { kissAmount, hugAmount });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(data.id) });
+      }
+    },
+  });
+}

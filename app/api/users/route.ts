@@ -15,6 +15,8 @@ export async function GET() {
         avatar: true,
         email: true,
         createdAt: true,
+        kissBalance: true,
+        hugBalance: true,
       },
     });
     return NextResponse.json({ data: users });

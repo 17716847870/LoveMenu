@@ -1,8 +1,7 @@
-import React from 'react';
 import { Order } from '@/types';
-import { X, Clock, AlertCircle, CheckCircle2, XCircle, Heart, Smile, MapPin } from 'lucide-react';
+import { X, Clock, AlertCircle, CheckCircle2, XCircle, Heart, Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { formatDateTime } from '@/utils/format';
 
 interface OrderDetailModalProps {
   order: Order;
@@ -60,7 +59,7 @@ export default function OrderDetailModal({ order, isOpen, onClose, onUpdateStatu
             </div>
             <div>
               <span className="text-gray-400 block mb-1">下单时间</span>
-              <span className="font-medium text-gray-800">{order.createdAt}</span>
+              <span className="font-medium text-gray-800">{formatDateTime(order.createdAt)}</span>
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import { ThemeName } from "@/types";
 interface CheckoutBarProps {
   onCheckout: () => void;
   totals: { kiss: number; hug: number };
+  isLoading?: boolean;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -33,21 +34,23 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function CheckoutBar({ onCheckout, totals }: CheckoutBarProps) {
+export default function CheckoutBar({ onCheckout, totals, isLoading }: CheckoutBarProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
 
   return (
     <div className={cn("fixed bottom-0 left-0 right-0 p-4 z-50 max-w-[480px] mx-auto", styles.container)}>
       <motion.button
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: isLoading ? 1 : 0.98 }}
         onClick={onCheckout}
+        disabled={isLoading}
         className={cn(
           "w-full py-3.5 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg",
-          styles.button
+          styles.button,
+          isLoading && "opacity-70 cursor-not-allowed"
         )}
       >
-        <span>立即下单</span>
+        <span>{isLoading ? "下单中..." : "立即下单"}</span>
         <span className="text-sm font-normal opacity-90">
           (❤️ {totals.kiss} + 🤗 {totals.hug})
         </span>

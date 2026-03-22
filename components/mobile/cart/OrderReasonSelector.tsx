@@ -11,6 +11,7 @@ interface OrderReasonSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => void;
+  isLoading?: boolean;
 }
 
 const reasons = [
@@ -69,13 +70,14 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function OrderReasonSelector({ isOpen, onClose, onConfirm }: OrderReasonSelectorProps) {
+export default function OrderReasonSelector({ isOpen, onClose, onConfirm, isLoading }: OrderReasonSelectorProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
   const [selectedReason, setSelectedReason] = useState("");
   const [customReason, setCustomReason] = useState("");
 
   const handleConfirm = () => {
+    if (isLoading) return;
     let finalReason = customReason.trim() || selectedReason;
     if (!finalReason) {
       finalReason = "今天一起吃点好吃的";
@@ -146,14 +148,16 @@ export default function OrderReasonSelector({ isOpen, onClose, onConfirm }: Orde
             </div>
 
             <motion.button
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: isLoading ? 1 : 0.98 }}
               onClick={handleConfirm}
+              disabled={isLoading}
               className={cn(
                 "w-full py-3.5 font-bold text-lg flex items-center justify-center transition-all",
-                styles.confirmBtn
+                styles.confirmBtn,
+                isLoading && "opacity-70 cursor-not-allowed"
               )}
             >
-              确认下单
+              {isLoading ? "下单中..." : "确认下单"}
             </motion.button>
           </motion.div>
         </>

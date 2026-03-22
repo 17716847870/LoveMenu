@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName, FoodRequest } from "@/types";
-import { X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { X, Image as ImageIcon, Loader2, Trash2 } from "lucide-react";
 
 interface EditFoodRequestProps {
   isOpen: boolean;
   onClose: () => void;
   request: FoodRequest | null;
-  onSubmit: (data: Partial<FoodRequest>) => void;
+  onSubmit: (data: Partial<FoodRequest> & { id: string }) => void;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -21,6 +21,8 @@ const themeStyles: Record<ThemeName, {
   input: string;
   label: string;
   submitBtn: string;
+  uploadZone: string;
+  uploadText: string;
 }> = {
   couple: {
     overlay: "bg-black/40",
@@ -29,6 +31,8 @@ const themeStyles: Record<ThemeName, {
     input: "bg-pink-50/50 border-pink-100 focus:border-pink-300 focus:ring-pink-100 text-pink-900 placeholder:text-pink-300",
     label: "text-pink-700",
     submitBtn: "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-pink-200",
+    uploadZone: "border-pink-200 bg-pink-50/50",
+    uploadText: "text-pink-400",
   },
   cute: {
     overlay: "bg-black/50",
@@ -37,6 +41,8 @@ const themeStyles: Record<ThemeName, {
     input: "bg-white border-2 border-orange-100 focus:border-orange-300 focus:ring-orange-100 text-orange-900 placeholder:text-orange-300 rounded-xl",
     label: "text-orange-800",
     submitBtn: "bg-orange-400 text-white shadow-orange-200 border-b-4 border-orange-600 active:border-b-0 active:translate-y-1",
+    uploadZone: "border-orange-200 bg-orange-50/30",
+    uploadText: "text-orange-400",
   },
   minimal: {
     overlay: "bg-black/60",
@@ -45,6 +51,8 @@ const themeStyles: Record<ThemeName, {
     input: "bg-white border-gray-200 focus:border-black focus:ring-gray-100 text-gray-900 placeholder:text-gray-400 rounded-lg",
     label: "text-gray-700",
     submitBtn: "bg-black text-white hover:bg-gray-800 rounded-lg",
+    uploadZone: "border-gray-200 bg-gray-50",
+    uploadText: "text-gray-400",
   },
   night: {
     overlay: "bg-black/80",
@@ -53,34 +61,79 @@ const themeStyles: Record<ThemeName, {
     input: "bg-slate-800 border-slate-700 focus:border-purple-500 focus:ring-purple-900 text-white placeholder:text-slate-500 rounded-xl",
     label: "text-slate-300",
     submitBtn: "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-purple-900/50 rounded-xl",
+    uploadZone: "border-slate-600 bg-slate-800/50",
+    uploadText: "text-slate-400",
   },
 };
 
 export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: EditFoodRequestProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
-  const [name, setName] = useState(request?.name || "");
-  const [description, setDescription] = useState(request?.description || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (request) {
       setName(request.name);
       setDescription(request.description);
+      setImage(request.image || "");
     }
   }, [request]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('path', 'food-requests');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.data?.url) {
+        setImage(result.data.url);
+      } else {
+        alert(result.message || '图片上传失败');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('图片上传失败，请重试');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !request) return;
 
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
     
     onSubmit({
       ...request,
       name,
       description,
+      image,
     });
     
     setIsSubmitting(false);
@@ -138,10 +191,61 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
 
               <div className="space-y-2">
                 <label className={cn("font-medium text-sm", styles.label)}>参考图片</label>
-                <div className={cn("w-full h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors opacity-60 hover:opacity-100", styles.input)}>
-                    <ImageIcon className="w-8 h-8" />
-                    <span className="text-xs">点击更换图片</span>
-                </div>
+                
+                {image ? (
+                  <div className="relative rounded-xl overflow-hidden">
+                    <img 
+                      src={image} 
+                      alt="预览" 
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute top-2 right-2 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                      >
+                        <ImageIcon size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={cn(
+                      "w-full h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
+                      styles.uploadZone,
+                      isUploading && "opacity-50 cursor-wait"
+                    )}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <span className={cn("text-xs", styles.uploadText)}>上传中...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-8 h-8" />
+                        <span className={cn("text-xs", styles.uploadText)}>点击上传图片</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
               </div>
 
               <motion.button

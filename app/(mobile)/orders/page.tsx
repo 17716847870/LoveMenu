@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ChevronLeft, 
@@ -9,58 +9,17 @@ import {
   Sparkles,
   Zap,
   Clock,
-  Camera,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Loader2,
+  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
-import OrderItemCard, { Order } from "@/components/mobile/OrderItemCard";
-
-const initialOrders: Order[] = [
-  {
-    id: "6",
-    dishes: ["小炒肉", "米饭"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "preparing",
-    createdAt: "2024-03-14 12:00",
-    reason: "午饭"
-  },
-  {
-    id: "5",
-    dishes: ["韩式炸鸡", "啤酒"],
-    kissPrice: 3,
-    hugPrice: 2,
-    status: "completed",
-    createdAt: "2024-03-13 22:00",
-    reason: "夜宵",
-    isEmergency: true,
-    hasMemory: true
-  },
-  {
-    id: "1",
-    dishes: ["可乐鸡翅", "炒饭"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "completed",
-    createdAt: "2024-03-12 18:30",
-    reason: "今天宝贝想吃",
-    hasMemory: true
-  },
-  {
-    id: "2",
-    dishes: ["豚骨拉面"],
-    kissPrice: 1,
-    hugPrice: 0,
-    status: "completed",
-    createdAt: "2024-03-11 19:00",
-    reason: "随便吃点",
-    hasMemory: false
-  }
-];
+import { useOrders, Order as ApiOrder } from "@/apis/orders";
+import OrderItemCard from "@/components/mobile/OrderItemCard";
 
 const themeStyles: Record<ThemeName, {
   bg: string;
@@ -74,6 +33,8 @@ const themeStyles: Record<ThemeName, {
   modalBg: string;
   primaryBtn: string;
   textareaBg: string;
+  uploadZone: string;
+  uploadText: string;
 }> = {
   couple: {
     bg: "bg-pink-50/30",
@@ -87,6 +48,8 @@ const themeStyles: Record<ThemeName, {
     modalBg: "bg-white border-pink-100",
     primaryBtn: "bg-pink-500 text-white hover:bg-pink-600 shadow-pink-200",
     textareaBg: "bg-pink-50/30 border-pink-100 focus:border-pink-300",
+    uploadZone: "border-pink-200 bg-pink-50/30",
+    uploadText: "text-pink-400",
   },
   cute: {
     bg: "bg-orange-50/30",
@@ -100,6 +63,8 @@ const themeStyles: Record<ThemeName, {
     modalBg: "bg-[#fff4fb] border-orange-200",
     primaryBtn: "bg-orange-400 text-white hover:bg-orange-500 shadow-orange-200",
     textareaBg: "bg-white border-orange-200 focus:border-orange-400",
+    uploadZone: "border-orange-200 bg-orange-50/30",
+    uploadText: "text-orange-400",
   },
   minimal: {
     bg: "bg-gray-50",
@@ -113,6 +78,8 @@ const themeStyles: Record<ThemeName, {
     modalBg: "bg-white border-gray-200",
     primaryBtn: "bg-gray-900 text-white hover:bg-gray-800 shadow-gray-200",
     textareaBg: "bg-gray-50 border-gray-200 focus:border-gray-400",
+    uploadZone: "border-gray-200 bg-gray-50",
+    uploadText: "text-gray-400",
   },
   night: {
     bg: "bg-slate-950",
@@ -126,29 +93,63 @@ const themeStyles: Record<ThemeName, {
     modalBg: "bg-slate-900 border-slate-700",
     primaryBtn: "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/20",
     textareaBg: "bg-slate-800 border-slate-700 focus:border-blue-500 text-white",
+    uploadZone: "border-slate-700 bg-slate-800/50",
+    uploadText: "text-slate-400",
   },
 };
+
+interface OrderForCard {
+  id: string;
+  dishes: string[];
+  kissPrice: number;
+  hugPrice: number;
+  status: string;
+  createdAt: string;
+  reason?: string;
+  isEmergency?: boolean;
+  hasMemory?: boolean;
+  memory?: {
+    text: string;
+    image?: string | string[];
+  };
+}
 
 export default function OrdersPage() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeStatus, setActiveStatus] = useState("all");
-  const [orders, setOrders] = useState(initialOrders);
-  
-  // 记录回忆弹窗状态
-  const [recordingOrderId, setRecordingOrderId] = useState<string | null>(null);
-  const [memoryText, setMemoryText] = useState("");
-  const [memoryImage, setMemoryImage] = useState("");
-  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
-  const filteredOrders = orders.filter(order => {
-    // 状态过滤
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeStatus, setActiveStatus] = useState("all");
+  
+  const [recordingOrderId, setRecordingOrderId] = useState<string | null>(null);
+  const [memoryText, setMemoryText] = useState("");
+  const [memoryImage, setMemoryImage] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: apiOrders = [], isLoading } = useOrders();
+  const [localMemoryOrders, setLocalMemoryOrders] = useState<Set<string>>(new Set());
+
+  const transformedOrders: OrderForCard[] = useMemo(() => {
+    return apiOrders.map(order => ({
+      id: order.id,
+      dishes: order.items.map(item => item.dish?.name || '未知菜品'),
+      kissPrice: order.totalKiss,
+      hugPrice: order.totalHug,
+      status: order.status,
+      createdAt: order.createdAt,
+      reason: order.reason,
+      isEmergency: order.isEmergency,
+      hasMemory: localMemoryOrders.has(order.id) || !!order.memory,
+      memory: order.memory,
+    }));
+  }, [apiOrders, localMemoryOrders]);
+
+  const filteredOrders = transformedOrders.filter(order => {
     if (activeStatus !== "all" && order.status !== activeStatus) return false;
-    
-    // 搜索过滤
     if (!searchQuery) return true;
     return (
       order.dishes.some(d => d.includes(searchQuery)) ||
@@ -156,36 +157,84 @@ export default function OrdersPage() {
     );
   });
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('path', 'order-memories');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.data?.url) {
+        setMemoryImage(result.data.url);
+      } else {
+        alert(result.message || '图片上传失败');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('图片上传失败，请重试');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleRecordMemory = (orderId: string) => {
     setRecordingOrderId(orderId);
     setMemoryText("");
     setMemoryImage("");
   };
 
-  const handleSubmitMemory = () => {
-    if (!memoryText.trim() && !memoryImage) return;
+  const handleSubmitMemory = async () => {
+    if (!recordingOrderId || (!memoryText.trim() && !memoryImage)) return;
     
-    // 更新订单状态为已记录
-    setOrders(prev => prev.map(o => 
-      o.id === recordingOrderId ? { ...o, hasMemory: true } : o
-    ));
+    setIsSubmitting(true);
     
-    // 实际项目中这里需要调用 API 保存回忆数据，然后可以在回忆相册中读取
-    console.log("Saved memory for order", recordingOrderId, { text: memoryText, image: memoryImage });
-    
-    setRecordingOrderId(null);
-    // 可选：显示成功提示或跳转到回忆相册
-    // alert("记录成功！已保存到回忆相册~");
+    try {
+      const response = await fetch('/api/orders/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: recordingOrderId,
+          text: memoryText,
+          image: memoryImage,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setLocalMemoryOrders(prev => new Set([...prev, recordingOrderId]));
+        setRecordingOrderId(null);
+      } else {
+        alert(result.message || '保存回忆失败');
+      }
+    } catch (error) {
+      console.error('Save memory error:', error);
+      alert('保存回忆失败，请重试');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className={cn("h-screen overflow-auto", currentTheme.bg)}>
-      {/* Header */}
       <header className={cn(
         "sticky top-0 z-40 backdrop-blur-md border-b pt-4",
         currentTheme.headerBg
       )}>
-        {/* Search Bar & Filters */}
         <div className="px-4 pb-4 flex flex-col gap-3">
           <div className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all",
@@ -204,12 +253,13 @@ export default function OrdersPage() {
             />
           </div>
 
-          {/* Status Tabs */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {[
               { id: 'all', label: '全部' },
+              { id: 'pending', label: '待接单' },
               { id: 'preparing', label: '制作中' },
               { id: 'completed', label: '已完成' },
+              { id: 'cancelled', label: '已取消' },
             ].map(status => (
               <button
                 key={status.id}
@@ -236,38 +286,42 @@ export default function OrdersPage() {
         </div>
       </header>
 
-      {/* Order List */}
       <div className="p-4 flex flex-col gap-4">
-        <AnimatePresence mode="popLayout">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order, index) => (
-              <OrderItemCard 
-                key={order.id} 
-                order={order} 
-                index={index}
-                onRecordMemory={handleRecordMemory}
-              />
-            ))
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="py-20 flex flex-col items-center justify-center gap-3"
-            >
-              <div className={cn(
-                "w-16 h-16 rounded-full flex items-center justify-center opacity-50",
-                currentTheme.searchBg
-              )}>
-                <Search className={cn("w-8 h-8", currentTheme.subText)} />
-              </div>
-              <p className={currentTheme.subText}>没有找到相关订单哦</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order, index) => (
+                <OrderItemCard 
+                  key={order.id} 
+                  order={order} 
+                  index={index}
+                  onRecordMemory={handleRecordMemory}
+                />
+              ))
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="py-20 flex flex-col items-center justify-center gap-3"
+              >
+                <div className={cn(
+                  "w-16 h-16 rounded-full flex items-center justify-center opacity-50",
+                  currentTheme.searchBg
+                )}>
+                  <Search className={cn("w-8 h-8", currentTheme.subText)} />
+                </div>
+                <p className={currentTheme.subText}>没有找到相关订单哦</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
-      {/* Record Memory Modal */}
       <AnimatePresence>
         {recordingOrderId && (
           <>
@@ -310,36 +364,70 @@ export default function OrdersPage() {
                     )}
                   />
                   
-                  <div className="flex items-center gap-2">
-                    <button className={cn(
-                      "flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border border-dashed transition-colors flex-1 justify-center",
-                      theme === 'night' 
-                        ? "border-slate-700 text-slate-400 hover:bg-slate-800" 
-                        : "border-gray-300 text-gray-500 hover:bg-gray-50"
-                    )}>
-                      <Camera className="w-4 h-4" /> 拍张照片
-                    </button>
-                    <button className={cn(
-                      "flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium border border-dashed transition-colors flex-1 justify-center",
-                      theme === 'night' 
-                        ? "border-slate-700 text-slate-400 hover:bg-slate-800" 
-                        : "border-gray-300 text-gray-500 hover:bg-gray-50"
-                    )}>
-                      <ImageIcon className="w-4 h-4" /> 从相册选
-                    </button>
-                  </div>
+                  {memoryImage ? (
+                    <div className="relative rounded-xl overflow-hidden">
+                      <img 
+                        src={memoryImage} 
+                        alt="预览" 
+                        className="w-full h-32 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setMemoryImage("")}
+                        className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className={cn(
+                        "w-full h-24 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
+                        currentTheme.uploadZone,
+                        isUploading && "opacity-50 cursor-wait"
+                      )}
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                          <span className={cn("text-xs", currentTheme.uploadText)}>上传中...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon className="w-6 h-6" />
+                          <span className={cn("text-xs", currentTheme.uploadText)}>添加照片</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </div>
 
                 <button 
                   onClick={handleSubmitMemory}
-                  disabled={!memoryText.trim() && !memoryImage}
+                  disabled={(!memoryText.trim() && !memoryImage) || isSubmitting}
                   className={cn(
-                    "w-full py-3.5 rounded-2xl font-bold mt-2 shadow-lg transition-all",
+                    "w-full py-3.5 rounded-2xl font-bold mt-2 shadow-lg transition-all flex items-center justify-center gap-2",
                     currentTheme.primaryBtn,
                     (!memoryText.trim() && !memoryImage) && "opacity-50 cursor-not-allowed"
                   )}
                 >
-                  保存到回忆相册
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      保存中...
+                    </>
+                  ) : (
+                    "保存到回忆相册"
+                  )}
                 </button>
               </div>
             </motion.div>

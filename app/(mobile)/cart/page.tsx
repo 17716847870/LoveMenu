@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
+import { useUser } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 
-// Import new components
 import CartHeader from "@/components/mobile/cart/CartHeader";
 import CartLoveTip from "@/components/mobile/cart/CartLoveTip";
 import CartList from "@/components/mobile/cart/CartList";
@@ -24,30 +25,68 @@ const pageStyles: Record<ThemeName, string> = {
 };
 
 export default function CartPage() {
-  const { items, totals, updateQuantity, removeItem, clearCart } = useCart();
+  const { items, totals, updateQuantity, removeItem, clearCart, isLoading, isSyncing } = useCart();
+  const { user } = useUser();
   const { theme } = useTheme();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReasonSelectorOpen, setIsReasonSelectorOpen] = useState(false);
 
   const handleCheckoutClick = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
     setIsReasonSelectorOpen(true);
   };
 
   const handleConfirmOrder = async (reason: string) => {
+    if (!user || items.length === 0) return;
+
     setIsReasonSelectorOpen(false);
     setIsSubmitting(true);
-    
-    // Simulate API call to create order with reason
-    console.log("Creating order with reason:", reason);
-    
-    setTimeout(() => {
-      clearCart();
+
+    try {
+      const orderData = {
+        userId: user.id,
+        items: items.map((item) => ({
+          dish: { id: item.dish.id },
+          quantity: item.quantity,
+          note: item.note,
+        })),
+        totalKiss: totals.kiss,
+        totalHug: totals.hug,
+        reason,
+        isEmergency: false,
+      };
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!res.ok) {
+        throw new Error("创建订单失败");
+      }
+
+      await clearCart();
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      router.push("/orders");
+    } catch (error) {
+      console.error("Order creation error:", error);
       setIsSubmitting(false);
-      // Navigate to success or orders page
-      router.push("/orders"); 
-    }, 1500);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className={cn("min-h-screen flex items-center justify-center", pageStyles[theme])}>
+        <div className="animate-pulse text-pink-500">加载中...</div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -73,13 +112,15 @@ export default function CartPage() {
       
       <CheckoutBar 
         onCheckout={handleCheckoutClick} 
-        totals={totals} 
+        totals={totals}
+        isLoading={isSubmitting}
       />
 
       <OrderReasonSelector
         isOpen={isReasonSelectorOpen}
         onClose={() => setIsReasonSelectorOpen(false)}
         onConfirm={handleConfirmOrder}
+        isLoading={isSubmitting}
       />
     </div>
   );

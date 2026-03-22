@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/Input";
 import { Heart, User, Minus, Plus } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
+
 interface CartItemProps {
   item: CartItemType;
   onUpdateQuantity: (id: string, quantity: number) => void;

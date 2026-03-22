@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   Trophy, 
@@ -14,21 +14,17 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
+import { useDishes } from "@/apis/dishes";
 
 export interface FavoriteDish {
   dishName: string;
   count: number;
+  dishId?: string;
 }
 
 interface WeeklyFavoriteCardProps {
   list?: FavoriteDish[];
 }
-
-const defaultList: FavoriteDish[] = [
-  { dishName: "红烧肉", count: 3 },
-  { dishName: "炒饭", count: 2 },
-  { dishName: "豚骨拉面", count: 1 },
-];
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -48,7 +44,7 @@ const themeStyles: Record<ThemeName, {
     rankItemBorder: "border",
     rankBadge: (rank) => rank === 1 ? "bg-pink-500 text-white" : rank === 2 ? "bg-pink-400 text-white" : "bg-pink-300 text-white",
     countText: "text-pink-500",
-    icon: Trophy, // ❤️ handled in render
+    icon: Trophy,
   },
   cute: {
     container: "bg-yellow-50 border-yellow-100 shadow-[4px_4px_0px_0px_rgba(250,204,21,0.2)]",
@@ -58,7 +54,7 @@ const themeStyles: Record<ThemeName, {
     rankItemBorder: "border-2 rounded-xl",
     rankBadge: (rank) => rank === 1 ? "bg-yellow-400 text-white" : rank === 2 ? "bg-yellow-300 text-white" : "bg-yellow-200 text-white",
     countText: "text-yellow-600",
-    icon: Flame, // 🍭 handled in render
+    icon: Flame,
   },
   minimal: {
     container: "bg-white border-gray-200",
@@ -136,10 +132,27 @@ const RankItem = ({ item, index, theme, styles }: { item: FavoriteDish; index: n
   );
 };
 
-export default function WeeklyFavoriteCard({ list = defaultList }: WeeklyFavoriteCardProps) {
+export default function WeeklyFavoriteCard({ list: propList }: WeeklyFavoriteCardProps) {
   const { theme } = useTheme();
+  const { data: dishes = [] } = useDishes();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const favoriteList = useMemo(() => {
+    if (propList?.length) {
+      return propList;
+    }
+    
+    return dishes
+      .filter(d => d.popularity && d.popularity > 0)
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+      .slice(0, 5)
+      .map(dish => ({
+        dishName: dish.name,
+        count: dish.popularity || 0,
+        dishId: dish.id,
+      }));
+  }, [dishes, propList]);
 
   const getTitle = () => {
     switch (theme) {
@@ -155,7 +168,6 @@ export default function WeeklyFavoriteCard({ list = defaultList }: WeeklyFavorit
       "rounded-[2rem] p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -174,22 +186,21 @@ export default function WeeklyFavoriteCard({ list = defaultList }: WeeklyFavorit
         </Link>
       </div>
 
-      {/* Rank List */}
       <div className={cn(
         "flex flex-col",
         theme === 'minimal' ? "gap-0" : "gap-3"
       )}>
-        {list.slice(0, 5).map((item, index) => (
-          <RankItem 
-            key={item.dishName} 
-            item={item} 
-            index={index} 
-            theme={theme} 
-            styles={currentTheme} 
-          />
-        ))}
-        
-        {list.length === 0 && (
+        {favoriteList.length > 0 ? (
+          favoriteList.map((item, index) => (
+            <RankItem 
+              key={item.dishId || item.dishName} 
+              item={item} 
+              index={index} 
+              theme={theme} 
+              styles={currentTheme} 
+            />
+          ))
+        ) : (
           <div className={cn("text-center py-8 text-sm opacity-60", currentTheme.header)}>
             本周还没有数据哦 ~
           </div>

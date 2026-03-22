@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/context/ThemeContext";
 import { FlyToCartProvider } from "@/context/FlyToCartContext";
 import { CartProvider } from "@/hooks/useCart";
+import { UserProvider } from "@/context/UserContext";
 import { MessageProvider } from "@/components/ui/Message";
 import QueryProvider from "@/components/providers/QueryProvider";
 import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
@@ -32,18 +33,20 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased w-screen`}>
         <ThemeProvider>
-          <FlyToCartProvider>
-            <CartProvider>
-              <MessageProvider>
-              <QueryProvider>
-                <div id="app-root" className="relative w-full">
-                  {children}
-                  <FloatingThemeButton />
-                </div>
-              </QueryProvider>
-            </MessageProvider>
-            </CartProvider>
-          </FlyToCartProvider>
+          <QueryProvider>
+            <UserProvider>
+              <FlyToCartProvider>
+                <CartProvider>
+                  <MessageProvider>
+                    <div id="app-root" className="relative w-full">
+                      {children}
+                      <FloatingThemeButton />
+                    </div>
+                  </MessageProvider>
+                </CartProvider>
+              </FlyToCartProvider>
+            </UserProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

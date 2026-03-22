@@ -3,42 +3,16 @@
 import React, { useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
-import { ThemeName, FoodRequest } from "@/types";
+import { ThemeName } from "@/types";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useFoodRequests, useCreateFoodRequest, useUpdateFoodRequest, FoodRequest } from "@/apis/foodRequests";
 
 import WishlistHeader from "@/components/mobile/wishlist/WishlistHeader";
 import RequestList from "@/components/mobile/wishlist/RequestList";
 import CreateFoodRequest from "@/components/mobile/wishlist/CreateFoodRequest";
 import EditFoodRequest from "@/components/mobile/wishlist/EditFoodRequest";
 import EmptyRequest from "@/components/mobile/wishlist/EmptyRequest";
-
-// Mock Data
-const initialRequests: FoodRequest[] = [
-  {
-    id: "1",
-    name: "韩式炸鸡",
-    description: "很想吃甜辣口味的韩式炸鸡，配上腌萝卜",
-    status: "pending",
-    createdAt: "2024-03-14",
-    image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-  },
-  {
-    id: "2",
-    name: "抹茶千层",
-    description: "下午茶想吃这个，稍微苦一点的那种",
-    status: "approved",
-    createdAt: "2024-03-10",
-    image: "https://images.unsplash.com/photo-1579306194872-64d3b7bac4c2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-  },
-  {
-    id: "3",
-    name: "螺蛳粉",
-    description: "偶尔也想吃点重口味的嘛",
-    status: "rejected",
-    createdAt: "2024-03-01",
-  }
-];
 
 const pageStyles: Record<ThemeName, string> = {
   couple: "bg-linear-to-b from-pink-50 to-white",
@@ -49,28 +23,32 @@ const pageStyles: Record<ThemeName, string> = {
 
 export default function WishlistPage() {
   const { theme } = useTheme();
-  const [requests, setRequests] = useState<FoodRequest[]>(initialRequests);
+  const { data: requests = [], isLoading } = useFoodRequests();
+  const createMutation = useCreateFoodRequest();
+  const updateMutation = useUpdateFoodRequest();
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<FoodRequest | null>(null);
 
   const handleCreate = (data: Omit<FoodRequest, "id" | "status" | "createdAt">) => {
-    const newRequest: FoodRequest = {
-      ...data,
-      id: Date.now().toString(),
-      status: "pending",
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    setRequests([newRequest, ...requests]);
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        setIsCreateOpen(false);
+      }
+    });
   };
 
-  const handleEdit = (data: Partial<FoodRequest>) => {
-    setRequests(requests.map(r => r.id === data.id ? { ...r, ...data } as FoodRequest : r));
-    setEditingRequest(null);
+  const handleEdit = (data: Partial<FoodRequest> & { id: string }) => {
+    updateMutation.mutate(data, {
+      onSuccess: () => {
+        setEditingRequest(null);
+      }
+    });
   };
 
   const handleDelete = (id: string) => {
     if (confirm("确定要删除这个提议吗？")) {
-      setRequests(requests.filter(r => r.id !== id));
+      updateMutation.mutate({ id, status: "deleted" });
     }
   };
 
@@ -78,7 +56,11 @@ export default function WishlistPage() {
     <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
       <WishlistHeader />
 
-      {requests.length > 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full" />
+        </div>
+      ) : requests.length > 0 ? (
         <RequestList 
           requests={requests} 
           onEdit={setEditingRequest} 
@@ -88,7 +70,6 @@ export default function WishlistPage() {
         <EmptyRequest onAdd={() => setIsCreateOpen(true)} />
       )}
 
-      {/* Floating Add Button (only visible when list is not empty) */}
       {requests.length > 0 && (
         <motion.button
           whileHover={{ scale: 1.05 }}

@@ -16,48 +16,26 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
+import { useOrders } from "@/apis/orders";
 
-// Define the Order interface as per documentation
-export interface Order {
+interface DisplayOrder {
   id: string;
   dishName: string;
   time: string;
   type: "home" | "restaurant";
+  quantity?: number;
 }
 
 interface TodayOrderedCardProps {
-  orders?: Order[];
+  orders?: DisplayOrder[];
 }
 
-// Default mock data for demonstration
-const defaultOrders: Order[] = [
-  {
-    id: "1",
-    dishName: "可乐鸡翅",
-    time: "中午",
-    type: "home",
-  },
-  {
-    id: "2",
-    dishName: "豚骨拉面",
-    time: "晚上",
-    type: "restaurant",
-  },
-  {
-    id: "3",
-    dishName: "韩式炸鸡",
-    time: "夜宵",
-    type: "home",
-  },
-];
-
-// Theme Configuration
 const themeStyles: Record<ThemeName, {
   container: string;
   header: string;
   viewAll: string;
   card: string;
-  cardBorder: string; // Additional border styles if needed
+  cardBorder: string;
   icon: React.ElementType;
   orderIcon: string;
   timeText: string;
@@ -109,7 +87,43 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-const OrderItem = ({ order, theme, styles }: { order: Order; theme: ThemeName; styles: typeof themeStyles.couple }) => {
+function getTimeOfDay(date: Date): string {
+  const hour = date.getHours();
+  if (hour < 11) return "早餐";
+  if (hour < 14) return "午餐";
+  if (hour < 18) return "下午茶";
+  if (hour < 21) return "晚餐";
+  return "夜宵";
+}
+
+function transformOrders(orders: ReturnType<typeof useOrders>['data']): DisplayOrder[] {
+  if (!orders) return [];
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return orders
+    .filter(order => {
+      const orderDate = new Date(order.createdAt);
+      orderDate.setHours(0, 0, 0, 0);
+      return orderDate.getTime() === today.getTime();
+    })
+    .slice(0, 5)
+    .flatMap(order => {
+      const orderType: "home" | "restaurant" = order.reason?.includes("外面") ? "restaurant" : "home";
+      const orderTime = getTimeOfDay(new Date(order.createdAt));
+      
+      return order.items.map((item, index) => ({
+        id: `${order.id}-${item.id}`,
+        dishName: item.dish?.name || `菜品${index + 1}`,
+        time: orderTime,
+        type: orderType,
+        quantity: item.quantity,
+      }));
+    });
+}
+
+const OrderItem = ({ order, theme, styles }: { order: DisplayOrder; theme: ThemeName; styles: typeof themeStyles.couple }) => {
   const isHome = order.type === "home";
   
   return (
@@ -128,6 +142,7 @@ const OrderItem = ({ order, theme, styles }: { order: Order; theme: ThemeName; s
           <span className="text-lg">{theme === 'cute' ? '🍗' : '🍽️'}</span>
           <span className={cn("font-bold text-base", styles.header)}>
             {order.dishName}
+            {order.quantity && order.quantity > 1 && <span className="text-sm ml-1 opacity-70">x{order.quantity}</span>}
           </span>
         </div>
         <div className={cn("text-xs font-medium px-2 py-1 rounded-full bg-white/50 flex items-center gap-1", styles.timeText)}>
@@ -146,10 +161,14 @@ const OrderItem = ({ order, theme, styles }: { order: Order; theme: ThemeName; s
   );
 };
 
-export default function TodayOrderedCard({ orders = defaultOrders }: TodayOrderedCardProps) {
+export default function TodayOrderedCard({ orders: propOrders }: TodayOrderedCardProps) {
   const { theme } = useTheme();
+  const { data: apiOrders } = useOrders();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const transformedOrders = transformOrders(apiOrders);
+  const orders = propOrders?.length ? propOrders : transformedOrders;
 
   const getTitle = () => {
     switch (theme) {
@@ -165,7 +184,6 @@ export default function TodayOrderedCard({ orders = defaultOrders }: TodayOrdere
       "rounded-4xl p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -184,7 +202,6 @@ export default function TodayOrderedCard({ orders = defaultOrders }: TodayOrdere
         </Link>
       </div>
 
-      {/* Order List */}
       <div className="flex flex-col gap-3">
         {orders.length > 0 ? (
           orders.map((order) => (

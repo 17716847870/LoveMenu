@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -13,17 +13,13 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { useOrders } from "@/apis/orders";
 
 interface FeedbackPreview {
+  id: string;
   title: string;
   type: string;
 }
-
-const mockFeedbacks: FeedbackPreview[] = [
-  { title: "页面加载有点慢", type: "bug" },
-  { title: "希望增加日料", type: "menu" },
-  { title: "夜间模式很好看", type: "experience" }
-];
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -64,8 +60,20 @@ const themeStyles: Record<ThemeName, {
 
 export default function RecentFeedbackCard() {
   const { theme } = useTheme();
+  const { data: orders = [] } = useOrders();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const feedbacks = useMemo(() => {
+    return orders
+      .filter(order => order.memory?.text)
+      .slice(0, 3)
+      .map(order => ({
+        id: order.id,
+        title: order.memory?.text || "",
+        type: order.reason || "experience",
+      }));
+  }, [orders]);
 
   const getTitle = () => {
     switch (theme) {
@@ -81,7 +89,6 @@ export default function RecentFeedbackCard() {
       "rounded-[2rem] p-6 flex flex-col gap-4 overflow-hidden relative transition-all duration-300",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -99,22 +106,27 @@ export default function RecentFeedbackCard() {
         </Link>
       </div>
 
-      {/* List */}
       <div className="flex flex-col gap-2">
-        {mockFeedbacks.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={cn(
-              "p-3 text-sm font-medium transition-all flex items-center justify-between rounded-xl",
-              currentTheme.item
-            )}
-          >
-            <span>{item.title}</span>
-          </motion.div>
-        ))}
+        {feedbacks.length > 0 ? (
+          feedbacks.map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={cn(
+                "p-3 text-sm font-medium transition-all flex items-center justify-between rounded-xl",
+                currentTheme.item
+              )}
+            >
+              <span>{item.title}</span>
+            </motion.div>
+          ))
+        ) : (
+          <div className={cn("text-center py-8 text-sm opacity-60", currentTheme.header)}>
+            还没有反馈哦 ~
+          </div>
+        )}
       </div>
       
       <Link href="/feedback" className="mt-1">

@@ -13,6 +13,8 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { formatDateTime } from "@/utils/format";
+
 
 export interface Order {
   id: string;
@@ -101,7 +103,10 @@ export default function OrderItemCard({ order, index = 0, onRecordMemory }: Orde
           "text-xs px-2 py-0.5 rounded-full font-medium ml-2",
           currentTheme.statusBadge
         )}>
-          {order.status === "completed" ? "已完成" : "进行中"}
+          {order.status === "pending" ? "待接单" : 
+           order.status === "preparing" ? "制作中" : 
+           order.status === "completed" ? "已完成" : 
+           order.status === "cancelled" ? "已取消" : "进行中"}
         </div>
       </div>
 
@@ -115,7 +120,7 @@ export default function OrderItemCard({ order, index = 0, onRecordMemory }: Orde
       <div className="flex items-center justify-between text-sm mt-1">
         <div className={cn("flex items-center gap-1 text-xs", currentTheme.timeText)}>
           <Clock className="w-3 h-3" />
-          {order.createdAt}
+          {formatDateTime(order.createdAt)}
         </div>
         
         <div className="flex items-center gap-3">

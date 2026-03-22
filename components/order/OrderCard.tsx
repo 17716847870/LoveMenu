@@ -2,17 +2,19 @@ import { Order } from "@/types";
 import { Card } from "@/components/ui/Card";
 import { OrderStatusTag } from "@/components/order/OrderStatusTag";
 import { Heart, User } from "lucide-react";
+import { formatDateTime } from "@/utils/format";
 
 interface OrderCardProps {
   order: Order;
 }
+
 
 export default function OrderCard({ order }: OrderCardProps) {
   return (
     <Card className="flex flex-col gap-3 p-4">
       <div className="flex justify-between items-center">
         <span className="text-sm text-muted-foreground">
-          {new Date(order.createdAt).toLocaleString()}
+          {formatDateTime(order.createdAt)}
         </span>
         <OrderStatusTag status={order.status} />
       </div>

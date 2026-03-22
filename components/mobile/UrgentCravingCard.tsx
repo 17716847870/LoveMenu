@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   Zap, 
@@ -11,6 +11,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
+import { useDishes } from "@/apis/dishes";
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -54,17 +55,58 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-const HOT_ITEMS = [
-  { icon: "🍔", name: "汉堡" },
-  { icon: "🍟", name: "薯条" },
-  { icon: "🍜", name: "拉面" },
-];
+const EMOJI_MAP: Record<string, string> = {
+  '面': '🍜',
+  '粉': '🍜',
+  '饭': '🍚',
+  '肉': '🥩',
+  '鸡': '🍗',
+  '鱼': '🐟',
+  '虾': '🦐',
+  '牛': '🥩',
+  '猪': '🥓',
+  '羊': '🍖',
+  '蔬': '🥬',
+  '沙拉': '🥗',
+  '汤': '🍲',
+  '甜': '🍰',
+  '蛋糕': '🎂',
+  '饼': '🥞',
+  '包': '🥖',
+  '串': '🍢',
+  '烤': '🍖',
+  '炸': '🍟',
+  '炒': '🍳',
+  '蒸': '♨️',
+  '煮': '🍲',
+  'default': '🍽️',
+};
+
+function getDishEmoji(name: string): string {
+  for (const [key, emoji] of Object.entries(EMOJI_MAP)) {
+    if (name.includes(key)) {
+      return emoji;
+    }
+  }
+  return EMOJI_MAP['default'];
+}
 
 export default function UrgentCravingCard() {
   const { theme } = useTheme();
-  // Fallback to couple theme if current theme is not found
+  const { data: dishes = [] } = useDishes();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const hotItems = useMemo(() => {
+    return dishes
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+      .slice(0, 3)
+      .map(dish => ({
+        name: dish.name,
+        emoji: getDishEmoji(dish.name),
+        id: dish.id,
+      }));
+  }, [dishes]);
 
   const getTitle = () => {
     switch (theme) {
@@ -80,7 +122,6 @@ export default function UrgentCravingCard() {
       "rounded-3xl p-5 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -88,23 +129,27 @@ export default function UrgentCravingCard() {
         </div>
       </div>
 
-      {/* Content: List of Hot Items */}
       <div className={cn("rounded-xl p-3 flex flex-col gap-2", currentTheme.list)}>
-        {HOT_ITEMS.map((item, index) => (
-          <motion.div 
-            key={item.name}
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className={cn("flex items-center gap-3 font-medium text-base py-1 px-2", currentTheme.item)}
-          >
-            <span className="text-xl">{item.icon}</span>
-            <span>{item.name}</span>
-          </motion.div>
-        ))}
+        {hotItems.length > 0 ? (
+          hotItems.map((item, index) => (
+            <motion.div 
+              key={item.id}
+              initial={{ x: -10, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: index * 0.1 }}
+              className={cn("flex items-center gap-3 font-medium text-base py-1 px-2", currentTheme.item)}
+            >
+              <span className="text-xl">{item.emoji}</span>
+              <span>{item.name}</span>
+            </motion.div>
+          ))
+        ) : (
+          <div className={cn("text-center py-4 text-sm opacity-60", currentTheme.item)}>
+            暂无热门菜品
+          </div>
+        )}
       </div>
 
-      {/* Action Button */}
       <Link href="/emergency" className="w-full block">
         <motion.button
           whileHover={{ scale: 1.02 }}

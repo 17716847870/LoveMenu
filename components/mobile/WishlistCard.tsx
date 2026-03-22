@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   Heart, 
@@ -14,20 +14,16 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
+import { useFoodRequests } from "@/apis/foodRequests";
 
 interface WishItem {
-  dishName: string;
+  id: string;
+  name: string;
 }
 
 interface WishlistCardProps {
   items?: WishItem[];
 }
-
-const defaultItems: WishItem[] = [
-  { dishName: "寿司" },
-  { dishName: "蛋糕" },
-  { dishName: "螺蛳粉" },
-];
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -71,10 +67,24 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function WishlistCard({ items = defaultItems }: WishlistCardProps) {
+export default function WishlistCard({ items: propItems }: WishlistCardProps) {
   const { theme } = useTheme();
+  const { data: foodRequests = [] } = useFoodRequests("pending");
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const wishlistItems = useMemo(() => {
+    if (propItems?.length) {
+      return propItems;
+    }
+    
+    return foodRequests
+      .slice(0, 4)
+      .map(request => ({
+        id: request.id,
+        name: request.name,
+      }));
+  }, [foodRequests, propItems]);
 
   const getTitle = () => {
     switch (theme) {
@@ -90,7 +100,6 @@ export default function WishlistCard({ items = defaultItems }: WishlistCardProps
       "rounded-[2rem] p-6 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -109,11 +118,10 @@ export default function WishlistCard({ items = defaultItems }: WishlistCardProps
         </Link>
       </div>
 
-      {/* Wish List */}
       <div className="flex flex-col gap-2">
-        {items.map((item, index) => (
+        {wishlistItems.map((item, index) => (
           <motion.div
-            key={index}
+            key={item.id || index}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
@@ -124,11 +132,10 @@ export default function WishlistCard({ items = defaultItems }: WishlistCardProps
               currentTheme.itemBorder
             )}
           >
-            <span>{item.dishName}</span>
+            <span>{item.name}</span>
           </motion.div>
         ))}
         
-        {/* Add Button Link */}
         <Link href="/wishlist">
           <motion.div
             whileTap={{ scale: 0.98 }}
@@ -145,7 +152,7 @@ export default function WishlistCard({ items = defaultItems }: WishlistCardProps
           </motion.div>
         </Link>
         
-        {items.length === 0 && (
+        {wishlistItems.length === 0 && (
           <div className={cn("text-center py-8 text-sm opacity-60", currentTheme.header)}>
             还没有添加想吃的菜哦 ~
           </div>

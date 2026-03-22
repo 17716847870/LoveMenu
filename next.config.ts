@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'love-menu.oss-cn-chengdu.aliyuncs.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'love-menu.oss-cn-chengdu.aliyuncs.com',
+      },
     ],
   },
 };

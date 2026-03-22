@@ -1,16 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LoveSelect from '@/components/admin/ui/LoveSelect/LoveSelect';
-
-const categoryOptions = [
-  { label: '全部', value: '' },
-  { label: '主食', value: 'c2' },
-  { label: '甜品', value: 'c1' },
-  { label: '小食', value: 'c3' },
-  { label: '饮品', value: 'c4' }, // 假设有饮品
-];
+import { useCategories } from '@/apis/category';
 
 const statusOptions = [
-  { label: '全部', value: '' },
+  { label: '全部', value: 'all' },
   { label: '上架', value: 'active' },
   { label: '下架', value: 'inactive' },
 ];
@@ -21,35 +14,31 @@ const sortOptions = [
   { label: '价格', value: 'price' },
 ];
 
+interface FilterBarProps {
+  activeCategory?: string;
+  activeSort?: string;
+  onSearch?: (term: string) => void;
+  onCategoryChange?: (value: string) => void;
+  onStatusChange?: (value: string) => void;
+  onSortChange?: (value: string) => void;
+  onReset?: () => void;
+}
+
 export default function FilterBar({
+  activeCategory = 'all',
+  activeSort = 'newest',
   onSearch,
   onCategoryChange,
   onStatusChange,
   onSortChange,
   onReset
-}: {
-  onSearch?: (term: string) => void;
-  onCategoryChange?: (value: string | string[]) => void;
-  onStatusChange?: (value: string | string[]) => void;
-  onSortChange?: (value: string | string[]) => void;
-  onReset?: () => void;
-}) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
-  const [sort, setSort] = useState<string>('newest');
+}: FilterBarProps) {
+  const { data: categories = [] } = useCategories();
 
-  const handleSearch = () => {
-    onSearch?.(searchTerm);
-  };
-
-  const handleReset = () => {
-    setSearchTerm('');
-    setCategory('');
-    setStatus('');
-    setSort('newest');
-    onReset?.();
-  };
+  const categoryOptions = [
+    { label: '全部', value: 'all' },
+    ...categories.map(cat => ({ label: cat.name, value: cat.id })),
+  ];
 
   return (
     <div className="bg-white p-5 rounded-xl shadow-sm mb-6 flex flex-wrap gap-4 items-end border border-pink-50">
@@ -59,8 +48,7 @@ export default function FilterBar({
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input 
             type="text" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearch?.(e.target.value)}
             placeholder="输入菜品名称..." 
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300 transition-colors h-[40px]"
           />
@@ -71,10 +59,10 @@ export default function FilterBar({
         <label className="block text-sm font-medium text-gray-700 mb-1.5">分类</label>
         <LoveSelect 
           options={categoryOptions} 
-          value={category} 
+          value={activeCategory}
           onChange={(val) => {
-            setCategory(val as string);
-            onCategoryChange?.(val);
+            const stringVal = typeof val === 'string' ? val : val[0];
+            onCategoryChange?.(stringVal);
           }}
           placeholder="全部"
           searchable
@@ -85,10 +73,10 @@ export default function FilterBar({
         <label className="block text-sm font-medium text-gray-700 mb-1.5">状态</label>
         <LoveSelect 
           options={statusOptions} 
-          value={status} 
+          value="all" 
           onChange={(val) => {
-            setStatus(val as string);
-            onStatusChange?.(val);
+            const stringVal = typeof val === 'string' ? val : val[0];
+            onStatusChange?.(stringVal);
           }}
           placeholder="全部"
         />
@@ -98,10 +86,10 @@ export default function FilterBar({
         <label className="block text-sm font-medium text-gray-700 mb-1.5">排序</label>
         <LoveSelect 
           options={sortOptions} 
-          value={sort} 
+          value={activeSort}
           onChange={(val) => {
-            setSort(val as string);
-            onSortChange?.(val);
+            const stringVal = typeof val === 'string' ? val : val[0];
+            onSortChange?.(stringVal);
           }}
           placeholder="排序方式"
         />
@@ -109,13 +97,7 @@ export default function FilterBar({
 
       <div className="flex gap-3">
         <button 
-          onClick={handleSearch}
-          className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-xl shadow-sm shadow-pink-200 transition-all font-medium h-[40px] flex items-center gap-2 active:scale-95"
-        >
-          <span>🔍</span> 查询
-        </button>
-        <button 
-          onClick={handleReset}
+          onClick={onReset}
           className="bg-pink-50 hover:bg-pink-100 text-pink-600 px-6 py-2 rounded-xl transition-all font-medium h-[40px] border border-transparent hover:border-pink-200 active:scale-95"
         >
           重置

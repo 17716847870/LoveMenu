@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react";
-import { ToastContainer, ToastItem } from "./ToastContainer";
-import { MessageType } from "./Toast";
+import React, { useCallback, useMemo, useEffect } from "react";
+import { toast } from "sonner";
 import { registerMessage } from "@/lib/message";
+
+type MessageType = "success" | "error" | "warning" | "info";
 
 interface MessageContextType {
   show: (type: MessageType, content: string, duration?: number) => void;
@@ -13,36 +14,40 @@ interface MessageContextType {
   info: (content: string, duration?: number) => void;
 }
 
-const MessageContext = createContext<MessageContextType | undefined>(undefined);
-
 export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
-
   const show = useCallback((type: MessageType, content: string, duration = 3000) => {
-    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    setToasts((prev) => [...prev, { id, type, content, duration }]);
+    switch (type) {
+      case "success":
+        toast.success(content, { duration });
+        break;
+      case "error":
+        toast.error(content, { duration });
+        break;
+      case "warning":
+        toast.warning(content, { duration });
+        break;
+      case "info":
+        toast.info(content, { duration });
+        break;
+    }
   }, []);
 
   const success = useCallback((content: string, duration?: number) => {
-    show("success", content, duration);
-  }, [show]);
+    toast.success(content, { duration });
+  }, []);
 
   const error = useCallback((content: string, duration?: number) => {
-    show("error", content, duration);
-  }, [show]);
+    toast.error(content, { duration });
+  }, []);
 
   const warning = useCallback((content: string, duration?: number) => {
-    show("warning", content, duration);
-  }, [show]);
+    toast.warning(content, { duration });
+  }, []);
 
   const info = useCallback((content: string, duration?: number) => {
-    show("info", content, duration);
-  }, [show]);
-
-  const handleClose = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    toast.info(content, { duration });
   }, []);
 
   useEffect(() => {
@@ -55,17 +60,36 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   return (
-    <MessageContext.Provider value={contextValue}>
+    <>
       {children}
-      <ToastContainer toasts={toasts} onClose={handleClose} />
-    </MessageContext.Provider>
+    </>
   );
 };
 
-export const useMessage = () => {
-  const context = useContext(MessageContext);
-  if (!context) {
-    throw new Error("useMessage must be used within a MessageProvider");
-  }
-  return context;
+export const useMessage = (): MessageContextType => {
+  return useMemo(
+    () => ({
+      show: (type: MessageType, content: string, duration?: number) => {
+        switch (type) {
+          case "success":
+            toast.success(content, { duration });
+            break;
+          case "error":
+            toast.error(content, { duration });
+            break;
+          case "warning":
+            toast.warning(content, { duration });
+            break;
+          case "info":
+            toast.info(content, { duration });
+            break;
+        }
+      },
+      success: (content: string, duration?: number) => toast.success(content, { duration }),
+      error: (content: string, duration?: number) => toast.error(content, { duration }),
+      warning: (content: string, duration?: number) => toast.warning(content, { duration }),
+      info: (content: string, duration?: number) => toast.info(content, { duration }),
+    }),
+    []
+  );
 };

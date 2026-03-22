@@ -64,12 +64,18 @@ export default function DishFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('提交前的 formData:', formData);
+    console.log('提交前的 image 值:', formData.image);
+    
     if (editingDish) {
-      onSave({
+      const dataToSave = {
         ...editingDish,
         ...formData,
-      });
+      };
+      console.log('编辑模式 - 保存的数据:', dataToSave);
+      onSave(dataToSave);
     } else {
+      console.log('新增模式 - 保存的数据:', formData);
       onSave(formData);
     }
   };
@@ -179,7 +185,10 @@ export default function DishFormModal({
               <label className="block text-sm font-medium text-gray-700 mb-1">菜品图片</label>
               <MultiImageUploader
                 value={formData.image}
-                onChange={(urls) => setFormData(prev => ({ ...prev, image: urls as string }))}
+                onChange={(urls) => {
+                  console.log(urls);
+                  setFormData(prev => ({ ...prev, image: urls as string }))
+                }}
                 mode="single"
                 path="dishes"
                 maxSize={5}

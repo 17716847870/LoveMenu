@@ -64,8 +64,36 @@ export default function ImageUploader({
     }
   }, [value, isMultiple]);
 
+  useEffect(() => {
+    console.log('MultiImageUploader useEffect 触发, images:', images);
+    if (images.length === 0) {
+      console.log('images 为空，跳过');
+      return;
+    }
+    
+    const allSuccessful = images.every(img => img.status === 'success');
+    const anyUploading = images.some(img => img.status === 'uploading');
+    
+    console.log('allSuccessful:', allSuccessful, 'anyUploading:', anyUploading);
+    
+    if (allSuccessful && !anyUploading) {
+      const successfulUrls = images
+        .filter(img => img.status === 'success' && img.remoteUrl)
+        .map(img => img.remoteUrl!);
+      
+      console.log('successfulUrls:', successfulUrls);
+      
+      if (successfulUrls.length > 0) {
+        const finalUrls = isMultiple ? successfulUrls : successfulUrls[0];
+        console.log('调用 onChange:', finalUrls);
+        onChange(finalUrls);
+      }
+    }
+  }, [images, isMultiple, onChange]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    console.log('handleFileChange 被调用, files:', files);
     if (!files.length) return;
 
     if (!isMultiple && files.length > 1) {
@@ -134,7 +162,11 @@ export default function ImageUploader({
             if (xhr.status >= 200 && xhr.status < 300) {
               try {
                 const response = JSON.parse(xhr.responseText);
-                resolve(response);
+                if (response.success && response.data) {
+                  resolve(response.data);
+                } else {
+                  reject(new Error(response.message || '上传失败'));
+                }
               } catch {
                 reject(new Error('解析响应失败'));
               }
@@ -155,6 +187,7 @@ export default function ImageUploader({
           xhr.send(formData);
         });
 
+        console.log('上传成功, result:', result);
         setImages(prev => prev.map(img =>
           img.id === newImages[i].id
             ? { ...img, remoteUrl: result.url, progress: 100, status: 'success' as const }
@@ -172,18 +205,6 @@ export default function ImageUploader({
             : img
         ));
         message.error(error instanceof Error ? error.message : '上传失败');
-      }
-    }
-
-    const allCompleted = images.length > 0 || files.length > 0;
-    if (allCompleted) {
-      const successfulImages = isMultiple 
-        ? images.filter(img => img.status === 'success').map(img => img.remoteUrl!)
-        : images.filter(img => img.status === 'success').map(img => img.remoteUrl!);
-      
-      if (successfulImages.length > 0) {
-        const finalUrls = isMultiple ? successfulImages : successfulImages[0];
-        onChange(finalUrls);
       }
     }
 

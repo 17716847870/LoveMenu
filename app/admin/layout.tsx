@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import AdminSidebar from "@/components/admin/shared/AdminSidebar";
 import AdminMobileTabBar, { FloatingButtonPosition } from "@/components/admin/shared/AdminMobileTabBar";
 import AdminContentWrapper from "@/components/admin/shared/AdminContentWrapper";
+import { Toaster } from "@/components/ui/toast";
 
 export default function AdminLayout({
   children,
@@ -17,17 +18,20 @@ export default function AdminLayout({
   const buttonPosition: FloatingButtonPosition = isChatPage ? "top-right" : "bottom-left";
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-auto bg-pink-50/30">
-      {/* Desktop Sidebar */}
-      <AdminSidebar />
+    <>
+      <Toaster />
+      <div className="flex flex-col md:flex-row h-screen overflow-auto bg-pink-50/30">
+        {/* Desktop Sidebar */}
+        <AdminSidebar />
 
-      {/* Main Content with smart padding based on route */}
-      <AdminContentWrapper>
-        {children}
-      </AdminContentWrapper>
+        {/* Main Content with smart padding based on route */}
+        <AdminContentWrapper>
+          {children}
+        </AdminContentWrapper>
 
-      {/* Mobile Tab Bar */}
-      <AdminMobileTabBar buttonPosition={buttonPosition} />
-    </div>
+        {/* Mobile Tab Bar */}
+        <AdminMobileTabBar buttonPosition={buttonPosition} />
+      </div>
+    </>
   );
 }

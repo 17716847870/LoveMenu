@@ -1,13 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
-
-const categoryOptions = [
-  { label: '全部', value: '' },
-  { label: '主食', value: 'c2' },
-  { label: '甜品', value: 'c1' },
-  { label: '小食', value: 'c3' },
-  { label: '饮品', value: 'c4' },
-];
+import { useCategories } from '@/apis/category';
 
 const sortOptions = [
   { label: '最新', value: 'newest' },
@@ -16,17 +9,27 @@ const sortOptions = [
 ];
 
 export default function MobileMenuFilterBar({
+  activeCategory,
   onSearch,
   onCategoryChange,
   onSortChange,
 }: {
+  activeCategory?: string;
   onSearch?: (term: string) => void;
   onCategoryChange?: (value: string) => void;
   onSortChange?: (value: string) => void;
 }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
   const [activeSort, setActiveSort] = useState('newest');
+
+  const { data: categories = [] } = useCategories();
+
+  const categoryOptions = [
+    { label: '全部', value: 'all' },
+    ...categories.map(cat => ({ label: cat.name, value: cat.id })),
+  ];
+
+  const currentCategory = activeCategory || 'all';
 
   return (
     <div className="md:hidden flex flex-col gap-3 mb-4 mt-2">
@@ -37,9 +40,11 @@ export default function MobileMenuFilterBar({
         <input 
           type="text" 
           value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            onSearch?.(e.target.value);
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              onSearch?.(searchTerm);
+            }
           }}
           placeholder="搜索菜品名称..." 
           className="w-full pl-10 pr-4 py-2.5 bg-white border border-pink-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm shadow-sm"
@@ -51,11 +56,11 @@ export default function MobileMenuFilterBar({
           <button
             key={cat.value}
             onClick={() => {
-              setActiveCategory(cat.value);
+              console.log('MobileMenuFilterBar - category clicked:', cat.value, cat.label);
               onCategoryChange?.(cat.value);
             }}
             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              activeCategory === cat.value 
+              currentCategory === cat.value 
                 ? 'bg-pink-500 text-white shadow-sm' 
                 : 'bg-white text-gray-600 border border-pink-50 hover:bg-pink-50'
             }`}

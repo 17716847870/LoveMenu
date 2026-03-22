@@ -1,5 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import LoveSelect from '../LoveSelect/LoveSelect';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 export type LovePaginationProps = {
   total: number;
@@ -89,55 +98,50 @@ export default function LovePagination({
 
   return (
     <div className={`flex flex-wrap justify-between items-center py-4 text-sm text-gray-600 bg-white px-6 rounded-xl shadow-sm border border-pink-50 gap-4 ${className}`}>
-      {/* 左侧：数据统计 */}
       <div className="flex items-center gap-3">
         <span className="text-gray-500">共 {total} 条数据</span>
       </div>
 
-      {/* 中间：分页按钮 */}
-      <div className="flex items-center gap-1.5 justify-center flex-1">
-        <button 
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage <= 1}
-          className="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium bg-white"
-        >
-          上一页
-        </button>
-        
-        <div className="flex items-center gap-1 px-2">
+      <Pagination className="flex-1 justify-center">
+        <PaginationContent className="flex gap-1">
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'hover:bg-pink-50 hover:text-pink-600'}
+            />
+          </PaginationItem>
+          
           {pageNumbers.map((num, index) => {
             if (num === '...') {
-              return <span key={`ellipsis-${index}`} className="px-1 text-gray-400">...</span>;
+              return <PaginationEllipsis key={`ellipsis-${index}`} />;
             }
             
             const isCurrent = num === currentPage;
             return (
-              <button
-                key={num}
-                onClick={() => handlePageChange(num as number)}
-                className={`
-                  w-9 h-9 rounded-lg flex items-center justify-center font-medium transition-all
-                  ${isCurrent 
-                    ? 'bg-pink-500 text-white shadow-sm shadow-pink-200 border border-transparent' 
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600'}
-                `}
-              >
-                {num}
-              </button>
+              <PaginationItem key={num}>
+                <PaginationLink
+                  onClick={() => handlePageChange(num as number)}
+                  isActive={isCurrent}
+                  className={isCurrent 
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer' 
+                    : 'hover:bg-pink-50 hover:text-pink-600 cursor-pointer'
+                  }
+                >
+                  {num}
+                </PaginationLink>
+              </PaginationItem>
             );
           })}
-        </div>
 
-        <button 
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
-          className="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-pink-50 hover:border-pink-200 hover:text-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium bg-white"
-        >
-          下一页
-        </button>
-      </div>
+          <PaginationItem>
+            <PaginationNext 
+              onClick={() => handlePageChange(currentPage + 1)}
+              className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'hover:bg-pink-50 hover:text-pink-600'}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
       
-      {/* 右侧：页大小 + 跳页 */}
       <div className="flex items-center gap-4">
         <div className="w-[150px]">
           <LoveSelect

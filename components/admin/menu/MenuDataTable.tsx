@@ -1,12 +1,33 @@
-import React from 'react';
-import { Dish } from '@/types';
-import { Search } from 'lucide-react';
+import { Dish, DishCategory } from '@/types';
+import { Search, Loader2 } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 type SortField = 'price' | 'popularity' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
+function formatDateTime(dateString: string | undefined): string {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 interface MenuDataTableProps {
   data: Dish[];
+  categories?: DishCategory[];
+  isLoading?: boolean;
   sortField: SortField | null;
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
@@ -15,8 +36,45 @@ interface MenuDataTableProps {
   onPreviewImage?: (src: string) => void;
 }
 
+function SkeletonRow() {
+  return (
+    <TableRow className="animate-pulse">
+      <TableCell>
+        <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-24"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-36"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-12 mb-1"></div>
+        <div className="h-4 bg-gray-200 rounded w-12"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-8"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-2">
+          <div className="h-8 bg-gray-200 rounded w-16"></div>
+          <div className="h-8 bg-gray-200 rounded w-16"></div>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function MenuDataTable({ 
   data, 
+  categories = [],
+  isLoading = false,
   sortField, 
   sortOrder, 
   onSort, 
@@ -24,6 +82,11 @@ export default function MenuDataTable({
   onEdit,
   onPreviewImage
 }: MenuDataTableProps) {
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    return category?.name || '未分类';
+  };
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) {
@@ -33,39 +96,47 @@ export default function MenuDataTable({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="bg-pink-50/50 text-gray-600 text-sm border-b border-pink-100">
-            <th className="py-4 px-6 font-medium">菜品信息</th>
-            <th className="py-4 px-6 font-medium w-28">分类</th>
-            <th 
-              className="py-4 px-6 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
+    <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6 relative w-full">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-pink-50/50 hover:bg-pink-50/50 border-b border-pink-100">
+            <TableHead className="text-gray-600 font-medium">图片</TableHead>
+            <TableHead className="text-gray-600 font-medium w-32">名称</TableHead>
+            <TableHead className="text-gray-600 font-medium w-48">描述</TableHead>
+            <TableHead className="text-gray-600 font-medium w-28">分类</TableHead>
+            <TableHead 
+              className="text-gray-600 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
               onClick={() => onSort('price')}
             >
               价格 {renderSortIcon('price')}
-            </th>
-            <th 
-              className="py-4 px-6 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
+            </TableHead>
+            <TableHead 
+              className="text-gray-600 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
               onClick={() => onSort('popularity')}
             >
               热度 {renderSortIcon('popularity')}
-            </th>
-            <th 
-              className="py-4 px-6 font-medium w-32 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
+            </TableHead>
+            <TableHead 
+              className="text-gray-600 font-medium w-40 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
               onClick={() => onSort('createdAt')}
             >
               创建时间 {renderSortIcon('createdAt')}
-            </th>
-            <th className="py-4 px-6 font-medium w-52 text-right">操作</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-pink-50/50">
-          {data.map((item) => (
-            <tr key={item.id} className="hover:bg-pink-50/30 transition-colors group">
-              <td className="py-4 px-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0 border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center text-2xl group">
+            </TableHead>
+            <TableHead className="text-gray-600 font-medium w-52 text-right">操作</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-pink-50/50">
+          {isLoading ? (
+            <>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </>
+          ) : (
+            data.map((item) => (
+              <TableRow key={item.id} className="hover:bg-pink-50/30 transition-colors group">
+                <TableCell>
+                  <div className="w-16 h-16 rounded-lg overflow-hidden relative border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center text-2xl group">
                     {item.image ? (
                       <>
                         <img 
@@ -87,59 +158,65 @@ export default function MenuDataTable({
                       <span>🥘</span>
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-medium text-gray-800 text-base">{item.name}</h3>
-                    <p className="text-gray-400 text-sm mt-1 line-clamp-1 max-w-[200px]">{item.description}</p>
+                </TableCell>
+                <TableCell>
+                  <span className="font-medium text-gray-800 text-base truncate block w-32">{item.name}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-gray-400 text-sm truncate block w-48">{item.description || '-'}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-medium">
+                    {getCategoryName(item.categoryId)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col text-xs">
+                     <span className="text-pink-600 font-semibold">💋 {item.kissPrice}</span>
+                     <span className="text-blue-500 font-semibold">🤗 {item.hugPrice}</span>
                   </div>
-                </div>
-              </td>
-              <td className="py-4 px-6">
-                <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-medium">
-                  {/* 这里应该根据 categoryId 获取分类名称，暂时直接显示 ID 或者需要父组件处理数据 */}
-                  {/* 为了简单，我们假设父组件已经处理了数据，或者我们在这里做一个简单的映射 */}
-                  {/* 实际上 Dish 类型里只有 categoryId，展示的时候最好是名字。*/}
-                  {/* 暂时显示 categoryId，后续可以在 page 层面做 join 或者 mock data 直接包含 categoryName */}
-                  {item.categoryId === 'c1' ? '甜品' : item.categoryId === 'c2' ? '主食' : item.categoryId === 'c3' ? '小食' : '其他'}
-                </span>
-              </td>
-              <td className="py-4 px-6">
-                <div className="flex flex-col text-xs">
-                   <span className="text-pink-600 font-semibold">💋 {item.kissPrice}</span>
-                   <span className="text-blue-500 font-semibold">🤗 {item.hugPrice}</span>
-                </div>
-              </td>
-              <td className="py-4 px-6">
-                <div className="flex items-center gap-1 text-gray-600">
-                  <span className="text-orange-500">🔥</span>
-                  <span className="font-medium">{item.popularity}</span>
-                </div>
-              </td>
-              <td className="py-4 px-6">
-                <span className="text-gray-500 text-sm">{item.createdAt || '-'}</span>
-              </td>
-              <td className="py-4 px-6 text-right">
-                <div className="flex justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={() => onEdit?.(item)}
-                    className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-md transition-colors text-sm font-medium flex items-center gap-1"
-                  >
-                    <span>✏️</span> 编辑
-                  </button>
-                  <button 
-                    onClick={() => onDelete?.(item.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 px-2.5 py-1.5 rounded-md transition-colors text-sm font-medium flex items-center gap-1"
-                  >
-                    <span>🗑️</span> 删除
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {data.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <span className="text-orange-500">🔥</span>
+                    <span className="font-medium">{item.popularity}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-gray-500 text-sm whitespace-nowrap">{formatDateTime(item.createdAt)}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => onEdit?.(item)}
+                      className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-md transition-colors text-sm font-medium flex items-center gap-1"
+                    >
+                      <span>✏️</span> 编辑
+                    </button>
+                    <button 
+                      onClick={() => onDelete?.(item.id)}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 px-2.5 py-1.5 rounded-md transition-colors text-sm font-medium flex items-center gap-1"
+                    >
+                      <span>🗑️</span> 删除
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+      {!isLoading && data.length === 0 && (
+        <div className="p-8 text-center text-gray-500 absolute inset-0 flex items-center justify-center">
           暂无数据
+        </div>
+      )}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="flex flex-col items-center gap-3 text-pink-500">
+            <Loader2 size={32} className="animate-spin" />
+            <span className="font-medium text-sm">加载中...</span>
+          </div>
         </div>
       )}
     </div>

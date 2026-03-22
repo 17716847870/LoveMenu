@@ -8,6 +8,9 @@ export async function PUT(
   try {
     const id = (await params).id;
     const body = await req.json();
+    console.log('API PUT 接收到的 id:', id);
+    console.log('API PUT 接收到的 body:', body);
+    console.log('API PUT 接收到的 image:', body.image);
     
     const updatedDish = await prisma.dish.update({
       where: { id },
@@ -22,9 +25,11 @@ export async function PUT(
         allowRestaurant: body.allowRestaurant,
       },
     });
+    console.log('API PUT 更新的菜品:', updatedDish);
 
     return NextResponse.json({ success: true, data: updatedDish });
   } catch (error) {
+    console.error('API PUT 错误:', error);
     return NextResponse.json({ message: '更新菜品失败' }, { status: 500 });
   }
 }

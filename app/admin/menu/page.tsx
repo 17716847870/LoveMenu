@@ -13,7 +13,7 @@ import { Dish } from '@/types';
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Plus } from 'lucide-react';
 import { useCategories } from '@/apis/category';
-import { useDishes, useCreateDish, useUpdateDish, useDeleteDish } from '@/apis/dishes';
+import { useDishes, useCreateDish, useUpdateDish, useDeleteDish, DishQueryParams } from '@/apis/dishes';
 import { useMessage } from '@/components/ui/Message';
 import ImagePreview from '@/components/common/ImagePreview';
 
@@ -33,26 +33,23 @@ export default function AdminMenuPage() {
     src: '' 
   });
   
-  // 排序和筛选状态
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [queryParams, setQueryParams] = useState<DishQueryParams>({
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
 
-  // 使用 TanStack Query 获取数据
-  const { data: allDishes = [], isLoading, error } = useDishes();
   const { data: categories = [] } = useCategories();
 
-  // 使用 mutations
+  console.log('Menu page - queryParams:', queryParams);
+  const { data: dishes = [], isLoading, error } = useDishes(queryParams);
+
   const createDish = useCreateDish();
   const updateDish = useUpdateDish();
   const deleteDish = useDeleteDish();
 
-  // 转换分类数据为选项
   const categoryOptions = useMemo(() => {
     return categories.map(cat => ({
       label: cat.name,
@@ -60,30 +57,25 @@ export default function AdminMenuPage() {
     }));
   }, [categories]);
 
-  // 处理删除点击
   const handleDeleteClick = (id: string) => {
     setSelectedMenuId(id);
     setIsConfirmOpen(true);
   };
 
-  // 处理新增点击
   const handleAddClick = () => {
     setEditingDish(null);
     setIsFormModalOpen(true);
   };
 
-  // 处理编辑点击
   const handleEditClick = (dish: Dish) => {
     setEditingDish(dish);
     setIsFormModalOpen(true);
   };
 
-  // 处理图片预览
   const handlePreviewImage = (src: string) => {
     setPreviewImage({ isOpen: true, src });
   };
 
-  // 保存菜品（创建或更新）
   const handleSaveDish = async (dishData: Partial<Dish>) => {
     try {
       if (editingDish) {
@@ -103,7 +95,6 @@ export default function AdminMenuPage() {
     }
   };
 
-  // 确认删除
   const handleConfirmDelete = async () => {
     if (selectedMenuId) {
       try {
@@ -117,71 +108,59 @@ export default function AdminMenuPage() {
     setSelectedMenuId(null);
   };
 
-  // 关闭确认对话框
   const handleCloseDialog = () => {
     setIsConfirmOpen(false);
     setSelectedMenuId(null);
   };
 
-  // 处理排序
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
+  const handleSearch = (term: string) => {
+    setQueryParams(prev => ({ ...prev, search: term || undefined }));
+    setCurrentPage(1);
   };
 
-  // 数据处理：筛选 -> 排序 -> 分页
-  const processedData = useMemo(() => {
-    let result = [...allDishes];
+  const handleCategoryChange = (val: string) => {
+    const categoryId = val === 'all' ? undefined : val;
+    console.log('handleCategoryChange - val:', val, 'categoryId:', categoryId);
+    setQueryParams(prev => ({ ...prev, categoryId }));
+    setCurrentPage(1);
+  };
 
-    // 筛选
-    if (searchTerm) {
-      result = result.filter(item => 
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (categoryFilter) {
-      result = result.filter(item => item.categoryId === categoryFilter);
-    }
+  const handleSortChange = (val: string) => {
+    let sortBy: 'createdAt' | 'popularity' | 'price' = 'createdAt';
+    let sortOrder: 'asc' | 'desc' = 'desc';
 
-    // 排序
-    if (sortField) {
-      result.sort((a, b) => {
-        let comparison = 0;
-        if (sortField === 'price') {
-          if (a.kissPrice !== b.kissPrice) {
-            comparison = a.kissPrice - b.kissPrice;
-          } else {
-            comparison = a.hugPrice - b.hugPrice;
-          }
-        } else if (sortField === 'popularity') {
-          comparison = (a.popularity || 0) - (b.popularity || 0);
-        } else if (sortField === 'createdAt') {
-          const dateA = new Date(a.createdAt || 0).getTime();
-          const dateB = new Date(b.createdAt || 0).getTime();
-          comparison = dateA - dateB;
-        }
-        return sortOrder === 'asc' ? comparison : -comparison;
-      });
+    if (val === 'newest') {
+      sortBy = 'createdAt';
+      sortOrder = 'desc';
+    } else if (val === 'popular') {
+      sortBy = 'popularity';
+      sortOrder = 'desc';
+    } else if (val === 'price') {
+      sortBy = 'price';
+      sortOrder = 'asc';
     }
 
-    return result;
-  }, [allDishes, sortField, sortOrder, searchTerm, categoryFilter, statusFilter]);
+    setQueryParams(prev => ({ ...prev, sortBy, sortOrder }));
+    setCurrentPage(1);
+  };
 
-  // 分页
-  const totalItems = processedData.length;
+  const handleReset = () => {
+    setQueryParams({
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+    setCurrentPage(1);
+  };
+
+  const totalItems = dishes.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1));
   
-  const currentData = processedData.slice(
+  const currentData = dishes.slice(
     (validCurrentPage - 1) * pageSize, 
     validCurrentPage * pageSize
   );
 
-  // 判断是否有操作正在进行
   const isOperating = createDish.isPending || updateDish.isPending || deleteDish.isPending;
 
   return (
@@ -201,91 +180,41 @@ export default function AdminMenuPage() {
           }
         />
 
-        {/* 加载状态 */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-gray-500">加载中...</div>
-          </div>
-        )}
-
-        {/* 错误状态 */}
         {error && !isLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-red-500">加载数据失败</div>
           </div>
         )}
 
-        {/* 数据展示 */}
-        {!isLoading && !error && (
+        {!error && (
           <>
             <div className="hidden md:block">
               <FilterBar 
-                onSearch={(term) => {
-                  setSearchTerm(term);
-                  setCurrentPage(1);
-                }}
-                onCategoryChange={(val) => {
-                  setCategoryFilter(val as string);
-                  setCurrentPage(1);
-                }}
-                onStatusChange={(val) => {
-                  setStatusFilter(val as string);
-                  setCurrentPage(1);
-                }}
-                onSortChange={(val) => {
-                  if (val === 'newest') {
-                    setSortField('createdAt');
-                    setSortOrder('desc');
-                  } else if (val === 'popular') {
-                    setSortField('popularity');
-                    setSortOrder('desc');
-                  } else if (val === 'price') {
-                    setSortField('price');
-                    setSortOrder('asc');
-                  }
-                  setCurrentPage(1);
-                }}
-                onReset={() => {
-                  setSearchTerm('');
-                  setCategoryFilter('');
-                  setStatusFilter('');
-                  setSortField(null);
-                  setSortOrder('desc');
-                  setCurrentPage(1);
-                }}
+                activeCategory={queryParams.categoryId || 'all'}
+                activeSort={queryParams.sortBy === 'createdAt' ? 'newest' : queryParams.sortBy === 'popularity' ? 'popular' : 'price'}
+                onSearch={handleSearch}
+                onCategoryChange={handleCategoryChange}
+                onStatusChange={() => {}}
+                onSortChange={handleSortChange}
+                onReset={handleReset}
               />
             </div>
 
             <MobileMenuFilterBar 
-              onSearch={(term) => {
-                setSearchTerm(term);
-                setCurrentPage(1);
-              }}
-              onCategoryChange={(val) => {
-                setCategoryFilter(val as string);
-                setCurrentPage(1);
-              }}
-              onSortChange={(val) => {
-                if (val === 'newest') {
-                  setSortField('createdAt');
-                  setSortOrder('desc');
-                } else if (val === 'popular') {
-                  setSortField('popularity');
-                  setSortOrder('desc');
-                } else if (val === 'price') {
-                  setSortField('price');
-                  setSortOrder('asc');
-                }
-                setCurrentPage(1);
-              }}
+              activeCategory={queryParams.categoryId || 'all'}
+              onSearch={handleSearch}
+              onCategoryChange={handleCategoryChange}
+              onSortChange={handleSortChange}
             />
             
             <div className="hidden md:block">
               <MenuDataTable 
                 data={currentData}
-                sortField={sortField}
-                sortOrder={sortOrder}
-                onSort={handleSort}
+                categories={categories}
+                isLoading={isLoading}
+                sortField={queryParams.sortBy || null}
+                sortOrder={queryParams.sortOrder || 'desc'}
+                onSort={(field) => handleSortChange(field === 'price' ? 'price' : field === 'popularity' ? 'popular' : 'newest')}
                 onDelete={handleDeleteClick}
                 onEdit={handleEditClick}
                 onPreviewImage={handlePreviewImage}
@@ -311,7 +240,6 @@ export default function AdminMenuPage() {
               }}
             />
 
-            {/* 移动端悬浮添加按钮 */}
             <button 
               onClick={handleAddClick}
               disabled={isOperating}

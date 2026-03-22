@@ -1,10 +1,42 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get('search') || undefined;
+    const categoryId = searchParams.get('categoryId') || undefined;
+    const sortBy = searchParams.get('sortBy') as 'createdAt' | 'popularity' | 'price' | undefined;
+    const sortOrder = searchParams.get('sortOrder') as 'asc' | 'desc' || 'desc';
+
+    console.log('API GET dishes - categoryId:', categoryId);
+    console.log('API GET dishes - all params:', Object.fromEntries(searchParams.entries()));
+
+    const where: any = {};
+    
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } },
+      ];
+    }
+    
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    const orderBy: any = {};
+    if (sortBy === 'price') {
+      orderBy.kissPrice = sortOrder;
+    } else if (sortBy === 'popularity') {
+      orderBy.popularity = sortOrder;
+    } else {
+      orderBy.createdAt = sortOrder;
+    }
+
     const dishes = await prisma.dish.findMany({
-      orderBy: { createdAt: 'desc' },
+      where,
+      orderBy,
       include: {
         category: true,
       }
@@ -18,6 +50,9 @@ export const GET = async () => {
 export const POST = async (req: Request) => {
   try {
     const body = await req.json();
+    console.log('API POST 接收到的 body:', body);
+    console.log('API POST 接收到的 image:', body.image);
+    
     const newDish = await prisma.dish.create({
       data: {
         name: body.name,
@@ -30,8 +65,10 @@ export const POST = async (req: Request) => {
         allowRestaurant: body.allowRestaurant,
       },
     });
+    console.log('API POST 创建的菜品:', newDish);
     return NextResponse.json({ success: true, data: newDish });
   } catch (error) {
+    console.error('API POST 错误:', error);
     return NextResponse.json({ message: '创建菜品失败' }, { status: 500 });
   }
 };

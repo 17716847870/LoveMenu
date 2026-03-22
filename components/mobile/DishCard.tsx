@@ -99,7 +99,7 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       
       {/* Hot Badge */}
       <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
-        {dish.popularity && dish.popularity > 80 && (
+        {!!(dish.popularity && dish.popularity > 80) && (
           <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-md bg-opacity-90 flex items-center gap-1", currentTheme.hotBadge)}>
             🔥 热销
           </span>

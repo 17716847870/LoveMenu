@@ -1,6 +1,6 @@
-import React from 'react';
 import { DishCategory } from '@/types';
 import { Edit2, Trash2 } from 'lucide-react';
+import { TableRow, TableCell } from '@/components/ui/table';
 
 interface CategoryWithCount extends DishCategory {
   dishCount: number;
@@ -10,6 +10,41 @@ interface CategoryDataTableProps {
   data: CategoryWithCount[];
   onEdit?: (category: DishCategory) => void;
   onDelete?: (id: string) => void;
+}
+
+function SkeletonRow() {
+  return (
+    <TableRow className="animate-pulse">
+      <TableCell>
+        <div className="w-16 h-16 rounded-lg bg-gray-200 shrink-0"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-24"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-36"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-12 mb-1"></div>
+        <div className="h-4 bg-gray-200 rounded w-12"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-8"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-2">
+          <div className="h-8 bg-gray-200 rounded w-16"></div>
+          <div className="h-8 bg-gray-200 rounded w-16"></div>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
 }
 
 export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDataTableProps) {
@@ -25,6 +60,9 @@ export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDa
           </tr>
         </thead>
         <tbody className="divide-y divide-pink-50/50">
+          {
+
+          }
           {data.map((category) => (
             <tr key={category.id} className="hover:bg-pink-50/30 transition-colors group">
               <td className="py-4 px-6 font-medium text-gray-900">

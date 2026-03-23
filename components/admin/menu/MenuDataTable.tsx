@@ -1,5 +1,5 @@
 import { Dish, DishCategory } from '@/types';
-import { Search, Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -8,21 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import Image from 'next/image';
+import { formatDateTime } from '@/utils/format';
 
 type SortField = 'price' | 'popularity' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
-
-function formatDateTime(dateString: string | undefined): string {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
 
 interface MenuDataTableProps {
   data: Dish[];
@@ -40,7 +30,7 @@ function SkeletonRow() {
   return (
     <TableRow className="animate-pulse">
       <TableCell>
-        <div className="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0"></div>
+        <div className="w-16 h-16 rounded-lg bg-gray-200 shrink-0"></div>
       </TableCell>
       <TableCell>
         <div className="h-4 bg-gray-200 rounded w-24"></div>
@@ -96,7 +86,7 @@ export default function MenuDataTable({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6 relative w-full">
+    <div className="bg-white rounded-xl shadow-sm border border-pink-50 h-fit mb-6 relative w-full">
       <Table>
         <TableHeader>
           <TableRow className="bg-pink-50/50 hover:bg-pink-50/50 border-b border-pink-100">
@@ -122,7 +112,7 @@ export default function MenuDataTable({
             >
               创建时间 {renderSortIcon('createdAt')}
             </TableHead>
-            <TableHead className="text-gray-600 font-medium w-52 text-right">操作</TableHead>
+            <TableHead className="text-gray-600 font-medium w-52">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-pink-50/50">
@@ -139,7 +129,7 @@ export default function MenuDataTable({
                   <div className="w-16 h-16 rounded-lg overflow-hidden relative border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center text-2xl group">
                     {item.image ? (
                       <>
-                        <img 
+                        <Image 
                           src={item.image} 
                           alt={item.name}
                           className="object-cover w-full h-full"
@@ -207,16 +197,8 @@ export default function MenuDataTable({
         </TableBody>
       </Table>
       {!isLoading && data.length === 0 && (
-        <div className="p-8 text-center text-gray-500 absolute inset-0 flex items-center justify-center">
+        <div className="p-8 text-center text-gray-500 flex items-center justify-center h-40 w-full">
           暂无数据
-        </div>
-      )}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
-          <div className="flex flex-col items-center gap-3 text-pink-500">
-            <Loader2 size={32} className="animate-spin" />
-            <span className="font-medium text-sm">加载中...</span>
-          </div>
         </div>
       )}
     </div>

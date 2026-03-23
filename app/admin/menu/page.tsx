@@ -17,9 +17,6 @@ import { useDishes, useCreateDish, useUpdateDish, useDeleteDish, DishQueryParams
 import { useMessage } from '@/components/ui/Message';
 import ImagePreview from '@/components/common/ImagePreview';
 
-type SortField = 'price' | 'popularity' | 'createdAt';
-type SortOrder = 'asc' | 'desc';
-
 export default function AdminMenuPage() {
   const message = useMessage();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -129,15 +126,18 @@ export default function AdminMenuPage() {
     let sortBy: 'createdAt' | 'popularity' | 'price' = 'createdAt';
     let sortOrder: 'asc' | 'desc' = 'desc';
 
-    if (val === 'newest') {
-      sortBy = 'createdAt';
-      sortOrder = 'desc';
-    } else if (val === 'popular') {
-      sortBy = 'popularity';
-      sortOrder = 'desc';
-    } else if (val === 'price') {
-      sortBy = 'price';
-      sortOrder = 'asc';
+    switch (val) {
+      case 'newest':
+        sortBy = 'createdAt';
+        sortOrder = 'desc';
+        break;
+      case 'popular':
+        sortBy = 'popularity';
+        sortOrder = 'desc';
+      case 'price':
+        sortBy = 'price';
+        sortOrder = 'asc';
+        break;
     }
 
     setQueryParams(prev => ({ ...prev, sortBy, sortOrder }));

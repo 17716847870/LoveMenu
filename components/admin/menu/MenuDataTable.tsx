@@ -11,16 +11,10 @@ import {
 import Image from 'next/image';
 import { formatDateTime } from '@/utils/format';
 
-type SortField = 'price' | 'popularity' | 'createdAt';
-type SortOrder = 'asc' | 'desc';
-
 interface MenuDataTableProps {
   data: Dish[];
   categories?: DishCategory[];
   isLoading?: boolean;
-  sortField: SortField | null;
-  sortOrder: SortOrder;
-  onSort: (field: SortField) => void;
   onDelete?: (id: string) => void;
   onEdit?: (dish: Dish) => void;
   onPreviewImage?: (src: string) => void;
@@ -64,10 +58,7 @@ function SkeletonRow() {
 export default function MenuDataTable({ 
   data, 
   categories = [],
-  isLoading = false,
-  sortField, 
-  sortOrder, 
-  onSort, 
+  isLoading = false, 
   onDelete,
   onEdit,
   onPreviewImage
@@ -76,13 +67,6 @@ export default function MenuDataTable({
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
     return category?.name || '未分类';
-  };
-
-  const renderSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <span className="text-gray-300 ml-1 text-xs">↕</span>;
-    }
-    return <span className="text-pink-500 ml-1 text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>;
   };
 
   return (
@@ -94,23 +78,14 @@ export default function MenuDataTable({
             <TableHead className="text-gray-600 font-medium w-32">名称</TableHead>
             <TableHead className="text-gray-600 font-medium w-48">描述</TableHead>
             <TableHead className="text-gray-600 font-medium w-28">分类</TableHead>
-            <TableHead 
-              className="text-gray-600 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
-              onClick={() => onSort('price')}
-            >
-              价格 {renderSortIcon('price')}
+            <TableHead className="text-gray-600 font-medium w-28">
+              价格
             </TableHead>
-            <TableHead 
-              className="text-gray-600 font-medium w-28 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
-              onClick={() => onSort('popularity')}
-            >
-              热度 {renderSortIcon('popularity')}
+            <TableHead className="text-gray-600 font-medium w-28">
+              热度
             </TableHead>
-            <TableHead 
-              className="text-gray-600 font-medium w-40 cursor-pointer hover:bg-pink-100/50 transition-colors select-none"
-              onClick={() => onSort('createdAt')}
-            >
-              创建时间 {renderSortIcon('createdAt')}
+            <TableHead className="text-gray-600 font-medium w-40">
+              创建时间
             </TableHead>
             <TableHead className="text-gray-600 font-medium w-52">操作</TableHead>
           </TableRow>
@@ -132,6 +107,8 @@ export default function MenuDataTable({
                         <Image 
                           src={item.image} 
                           alt={item.name}
+                          width={80}
+                          height={80}
                           className="object-cover w-full h-full"
                         />
                         <div 

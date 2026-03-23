@@ -14,9 +14,16 @@ export const formatDate = (value: string | Date) => {
   }).format(date);
 };
 
-export const formatDateTime = (value: string | Date | undefined) => {
+export const formatDateTime = (value: string | Date | undefined, format: string = 'yyyy-MM-dd HH:mm:ss') => {
   if (!value) return '--';
   const date = typeof value === "string" ? new Date(value) : value;
   const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  return format
+    .replace('yyyy', date.getFullYear().toString())
+    .replace('MM', pad(date.getMonth() + 1))
+    .replace('dd', pad(date.getDate()))
+    .replace('HH', pad(date.getHours()))
+    .replace('mm', pad(date.getMinutes()))
+    .replace('ss', pad(date.getSeconds()));
 };
+ 

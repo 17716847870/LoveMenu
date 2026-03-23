@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Upload, X, Loader2, CheckCircle, AlertCircle, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { useMessage } from '@/components/ui/Message';
 
@@ -47,49 +47,60 @@ export default function ImageUploader({
   const [images, setImages] = useState<ImageItem[]>([]);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const isMultiple = mode === 'multiple';
+  
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  
+  const handleOnChange = useCallback((urls: string | string[]) => {
+    onChangeRef.current(urls);
+  }, []);
 
   useEffect(() => {
     const existingUrls = isMultiple 
       ? (value as string[] || []) 
       : (value ? [value as string] : []);
     
-    if (existingUrls.length > 0 && images.length === 0) {
-      setImages(existingUrls.map((url, index) => ({
+    if (existingUrls.length > 0) {
+      const existingImages = existingUrls.map((url, index) => ({
         id: `existing-${index}`,
         localUrl: url,
         remoteUrl: url,
         progress: 100,
         status: 'success' as const,
-      })));
+      }));
+      
+      const remoteUrls = existingImages.map(img => img.remoteUrl);
+      const currentRemoteUrls = images
+        .filter(img => img.status === 'success' && img.remoteUrl)
+        .map(img => img.remoteUrl);
+      
+      if (JSON.stringify(remoteUrls) !== JSON.stringify(currentRemoteUrls)) {
+        setImages(existingImages);
+      }
+    } else if (images.length > 0 && !images.some(img => img.status === 'uploading')) {
+      setImages([]);
     }
   }, [value, isMultiple]);
 
   useEffect(() => {
-    console.log('MultiImageUploader useEffect 触发, images:', images);
     if (images.length === 0) {
-      console.log('images 为空，跳过');
       return;
     }
     
     const allSuccessful = images.every(img => img.status === 'success');
     const anyUploading = images.some(img => img.status === 'uploading');
     
-    console.log('allSuccessful:', allSuccessful, 'anyUploading:', anyUploading);
-    
     if (allSuccessful && !anyUploading) {
       const successfulUrls = images
         .filter(img => img.status === 'success' && img.remoteUrl)
         .map(img => img.remoteUrl!);
       
-      console.log('successfulUrls:', successfulUrls);
-      
       if (successfulUrls.length > 0) {
         const finalUrls = isMultiple ? successfulUrls : successfulUrls[0];
-        console.log('调用 onChange:', finalUrls);
-        onChange(finalUrls);
+        handleOnChange(finalUrls);
       }
     }
-  }, [images, isMultiple, onChange]);
+  }, [images, isMultiple, handleOnChange]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -227,9 +238,9 @@ export default function ImageUploader({
       .map(img => img.remoteUrl!);
     
     if (isMultiple) {
-      onChange(successfulUrls);
+      handleOnChange(successfulUrls);
     } else {
-      onChange(successfulUrls[0] || '');
+      handleOnChange(successfulUrls[0] || '');
     }
   };
 

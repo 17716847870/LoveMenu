@@ -1,20 +1,72 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export async function GET() {
-  return NextResponse.json({
-    topDishes: [
-      { id: 1, name: '可乐鸡翅', category: '主食', orderCount: 45, likes: 120, status: '已上菜单' },
-      { id: 2, name: '草莓松饼', category: '甜点', orderCount: 38, likes: 95, status: '已上菜单' },
-      { id: 3, name: '珍珠奶茶', category: '饮品', orderCount: 35, likes: 88, status: '已上菜单' },
-      { id: 4, name: '炸鸡排', category: '小吃', orderCount: 28, likes: 76, status: '已上菜单' },
-      { id: 5, name: '芝士披萨', category: '主食', orderCount: 20, likes: 65, status: '已上菜单' },
-    ],
-    topWishlist: [
-      { id: 101, name: '麻辣香锅', category: '主食', mentionCount: 12, likes: 45, status: '待审核' },
-      { id: 102, name: '提拉米苏', category: '甜点', mentionCount: 8, likes: 32, status: '待审核' },
-      { id: 103, name: '烤冷面', category: '主食', mentionCount: 7, likes: 28, status: '待审核' },
-      { id: 104, name: '杨枝甘露', category: '甜点', mentionCount: 5, likes: 20, status: '待审核' },
-      { id: 105, name: '冰糖葫芦', category: '小吃', mentionCount: 4, likes: 15, status: '待审核' },
-    ]
-  });
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const orderItems = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          createdAt: { gte: thirtyDaysAgo }
+        }
+      },
+      include: {
+        dish: {
+          include: {
+            category: true
+          }
+        }
+      }
+    });
+
+    const dishStats = new Map<string, { count: number; dish: typeof orderItems[0]['dish'] }>();
+    
+    for (const item of orderItems) {
+      const existing = dishStats.get(item.dishId);
+      if (existing) {
+        existing.count += item.quantity;
+      } else {
+        dishStats.set(item.dishId, { count: item.quantity, dish: item.dish });
+      }
+    }
+
+    const topDishes = Array.from(dishStats.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+      .map((item, idx) => ({
+        id: item.dish.id,
+        name: item.dish.name,
+        category: item.dish.category.name,
+        orderCount: item.count,
+        likes: item.dish.popularity,
+        status: '已上菜单'
+      }));
+
+    const topWishlist = await prisma.foodRequest.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    const formattedWishlist = topWishlist.map((item, idx) => ({
+      id: item.id,
+      name: item.name,
+      category: '待分类',
+      mentionCount: 1,
+      likes: 0,
+      status: item.status === 'pending' ? '待审核' : '已添加'
+    }));
+
+    return NextResponse.json({
+      topDishes,
+      topWishlist: formattedWishlist
+    });
+  } catch (error) {
+    console.error('Top items API error:', error);
+    return NextResponse.json(
+      { message: '获取热门数据失败' },
+      { status: 500 }
+    );
+  }
 }

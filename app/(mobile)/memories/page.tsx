@@ -16,74 +16,34 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import MemoryOrderCard from "@/components/mobile/MemoryOrderCard";
-import { Order } from "@/components/mobile/OrderItemCard";
+import { useOrders } from "@/apis/orders";
+import { formatDateTime } from "@/utils/format";
 
-// 使用相同的 mock 数据，但添加 memory 属性
-const mockOrders: (Order & { memory?: { text: string; image?: string | string[] } })[] = [
-  {
-    id: "5",
-    dishes: ["韩式炸鸡", "啤酒"],
-    kissPrice: 3,
-    hugPrice: 2,
-    status: "completed",
-    createdAt: "2024-03-13 22:00",
-    reason: "夜宵",
-    isEmergency: true,
-    memory: {
-      text: "今晚看球配炸鸡啤酒太爽啦！宝贝选的这家真不错，炸鸡外酥里嫩的😋",
-      image: [
-        "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop&q=60",
-        "https://images.unsplash.com/photo-1575037614876-c385cb80ca8c?w=500&auto=format&fit=crop&q=60"
-      ]
-    }
-  },
-  {
-    id: "1",
-    dishes: ["可乐鸡翅", "炒饭"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "completed",
-    createdAt: "2024-03-12 18:30",
-    reason: "今天宝贝想吃",
-    memory: {
-      text: "宝贝亲手做的可乐鸡翅，甜度刚刚好！把骨头都嘬干净了嘿嘿～"
-    }
-  },
-  {
-    id: "2",
-    dishes: ["豚骨拉面"],
-    kissPrice: 1,
-    hugPrice: 0,
-    status: "completed",
-    createdAt: "2024-03-11 19:00",
-    reason: "随便吃点"
-  },
-  {
-    id: "3",
-    dishes: ["草莓松饼", "奶茶"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "completed",
-    createdAt: "2024-03-10 14:20",
-    reason: "今天想吃点甜的",
-    memory: {
-      text: "下午茶时间！松饼软软糯糯的，和宝贝一起吃更甜了🍰",
-      image: "https://images.unsplash.com/photo-1579306194872-64d3b7bac4c2?w=500&auto=format&fit=crop&q=60"
-    }
-  }
-];
+interface MemoryOrder {
+  id: string;
+  dishes: string[];
+  kissPrice: number;
+  hugPrice: number;
+  status: string;
+  createdAt: string;
+  reason?: string;
+  isEmergency: boolean;
+  memory?: {
+    text: string;
+    image?: string | string[];
+  };
+}
 
-// Group orders by date label (Today, Yesterday, Date)
-const groupOrders = (orders: any[]) => {
-  const groups: Record<string, any[]> = {};
+const groupOrders = (orders: MemoryOrder[]) => {
+  const groups: Record<string, MemoryOrder[]> = {};
   
   orders.forEach(order => {
-    const date = new Date(order.createdAt.replace(/-/g, '/')); // Handle Safari date parsing
+    const date = new Date(order.createdAt.replace(/-/g, '/'));
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     
-    let label = order.createdAt.split(' ')[0];
+    let label = formatDateTime(order.createdAt, 'yyyy-MM-dd');
     
     if (date.toDateString() === today.toDateString()) {
       label = "今天";
@@ -161,13 +121,29 @@ export default function MemoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   
   const currentTheme = themeStyles[theme] || themeStyles.couple;
+  const { data: ordersResponse, isLoading } = useOrders({ status: 'completed' });
+  
+  const orders: MemoryOrder[] = (ordersResponse || [])
+    .filter(order => order.memory && order.memory.text)
+    .map(order => ({
+      id: order.id,
+      dishes: order.items.map(item => item.dish?.name || '').filter(Boolean),
+      kissPrice: order.totalKiss,
+      hugPrice: order.totalHug,
+      status: order.status,
+      createdAt: order.createdAt,
+      reason: order.reason,
+      isEmergency: order.isEmergency,
+      memory: order.memory,
+    }));
 
-  const filteredOrders = mockOrders.filter(order => {
+  const filteredOrders = orders.filter(order => {
     if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
     return (
-      order.dishes.some(d => d.includes(searchQuery)) ||
-      order.reason?.includes(searchQuery) ||
-      order.memory?.text.includes(searchQuery)
+      order.dishes.some(d => d.toLowerCase().includes(searchLower)) ||
+      order.reason?.toLowerCase().includes(searchLower) ||
+      order.memory?.text.toLowerCase().includes(searchLower)
     );
   });
 
@@ -175,7 +151,6 @@ export default function MemoriesPage() {
 
   return (
     <div className={cn("min-h-screen pb-safe", currentTheme.bg)}>
-      {/* Header */}
       <header className={cn(
         "sticky top-0 z-40 backdrop-blur-md border-b",
         currentTheme.headerBg
@@ -193,10 +168,9 @@ export default function MemoriesPage() {
             <h1 className={cn("text-lg font-bold", currentTheme.text)}>回忆相册</h1>
           </div>
           
-          <div className="w-10" /> {/* Spacer */}
+          <div className="w-10" />
         </div>
 
-        {/* Search Bar */}
         <div className="px-4 pb-4">
           <div className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all",
@@ -217,10 +191,15 @@ export default function MemoriesPage() {
         </div>
       </header>
 
-      {/* Timeline List */}
       <div className="p-4 flex flex-col gap-4">
         <AnimatePresence mode="popLayout">
-          {filteredOrders.length > 0 ? (
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-3">
+              <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" 
+                   style={{ borderColor: 'currentColor', borderTopColor: 'transparent' }} />
+              <p className={currentTheme.subText}>加载中...</p>
+            </div>
+          ) : filteredOrders.length > 0 ? (
             <div className="flex flex-col gap-8 pl-2">
               {Object.entries(groupedOrders).map(([label, groupOrders], groupIndex) => (
                 <motion.div 
@@ -229,7 +208,6 @@ export default function MemoriesPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: groupIndex * 0.1 }}
                 >
-                  {/* Date Label */}
                   <div className={cn(
                     "inline-block px-3 py-1 rounded-full text-sm font-bold mb-6 border",
                     currentTheme.timelineLabel
@@ -237,7 +215,6 @@ export default function MemoriesPage() {
                     {label}
                   </div>
 
-                  {/* Orders */}
                   <div className="border-l-2 border-transparent ml-2 pl-4 flex flex-col gap-0 relative">
                     {groupOrders.map((order, index) => (
                       <MemoryOrderCard 

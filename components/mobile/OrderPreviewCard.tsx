@@ -14,50 +14,7 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
 import OrderItemCard, { Order } from "./OrderItemCard";
-
-interface OrderPreviewCardProps {
-  orders?: Order[];
-}
-
-const defaultOrders: Order[] = [
-  {
-    id: "5",
-    dishes: ["韩式炸鸡", "啤酒"],
-    kissPrice: 3,
-    hugPrice: 2,
-    status: "completed",
-    createdAt: "2024-03-13 22:00",
-    reason: "夜宵",
-    isEmergency: true
-  },
-  {
-    id: "1",
-    dishes: ["可乐鸡翅", "炒饭"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "completed",
-    createdAt: "2024-03-12 18:30",
-    reason: "今天宝贝想吃"
-  },
-  {
-    id: "2",
-    dishes: ["豚骨拉面"],
-    kissPrice: 1,
-    hugPrice: 0,
-    status: "completed",
-    createdAt: "2024-03-11 19:00",
-    reason: "随便吃点"
-  },
-  {
-    id: "3",
-    dishes: ["草莓松饼", "奶茶"],
-    kissPrice: 2,
-    hugPrice: 1,
-    status: "completed",
-    createdAt: "2024-03-10 14:20",
-    reason: "今天想吃点甜的"
-  }
-];
+import { useOrders } from "@/apis/orders";
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -91,17 +48,32 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function OrderPreviewCard({ orders = defaultOrders }: OrderPreviewCardProps) {
+export default function OrderPreviewCard() {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
+
+  const { data: ordersResponse, isLoading } = useOrders({ status: 'completed' });
+
+  const orders: Order[] = (ordersResponse || [])
+    .filter(order => order.memory && order.memory.text)
+    .slice(0, 3)
+    .map(order => ({
+      id: order.id,
+      dishes: order.items.map(item => item.dish?.name || '').filter(Boolean),
+      kissPrice: order.totalKiss,
+      hugPrice: order.totalHug,
+      status: order.status,
+      createdAt: order.createdAt,
+      reason: order.reason,
+      isEmergency: order.isEmergency,
+    }));
 
   return (
     <div className={cn(
       "rounded-3xl p-5 flex flex-col gap-4 overflow-hidden relative transition-colors duration-300 border",
       currentTheme.container
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
@@ -120,10 +92,14 @@ export default function OrderPreviewCard({ orders = defaultOrders }: OrderPrevie
         </Link>
       </div>
 
-      {/* Order List */}
       <div className="flex flex-col gap-3">
-        {orders.length > 0 ? (
-          orders.slice(0, 3).map((order, index) => (
+        {isLoading ? (
+          <div className="flex justify-center py-6">
+            <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
+                 style={{ borderColor: 'currentColor', borderTopColor: 'transparent' }} />
+          </div>
+        ) : orders.length > 0 ? (
+          orders.map((order, index) => (
             <OrderItemCard 
               key={order.id} 
               order={order} 

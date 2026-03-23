@@ -212,9 +212,6 @@ export default function AdminMenuPage() {
                 data={currentData}
                 categories={categories}
                 isLoading={isLoading}
-                sortField={queryParams.sortBy || null}
-                sortOrder={queryParams.sortOrder || 'desc'}
-                onSort={(field) => handleSortChange(field === 'price' ? 'price' : field === 'popularity' ? 'popular' : 'newest')}
                 onDelete={handleDeleteClick}
                 onEdit={handleEditClick}
                 onPreviewImage={handlePreviewImage}
@@ -257,6 +254,7 @@ export default function AdminMenuPage() {
         onSave={handleSaveDish}
         editingDish={editingDish}
         categories={categoryOptions}
+        isSubmitting={updateDish.isPending || createDish.isPending}
       />
 
       <ConfirmDialog 

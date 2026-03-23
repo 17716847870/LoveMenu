@@ -1,13 +1,49 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export async function GET() {
-  return NextResponse.json([
-    { name: '周一', interactions: 8, points: 50, priority: 1 },
-    { name: '周二', interactions: 10, points: 65, priority: 0 },
-    { name: '周三', interactions: 7, points: 45, priority: 2 },
-    { name: '周四', interactions: 12, points: 85, priority: 1 },
-    { name: '周五', interactions: 15, points: 110, priority: 0 },
-    { name: '周六', interactions: 22, points: 160, priority: 3 },
-    { name: '周日', interactions: 18, points: 130, priority: 1 },
-  ]);
+  try {
+    const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const trends = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      const orders = await prisma.order.findMany({
+        where: {
+          createdAt: { gte: date, lt: nextDate }
+        },
+        select: {
+          isEmergency: true,
+          totalKiss: true,
+          totalHug: true
+        }
+      });
+
+      const dayName = dayNames[date.getDay()];
+      const interactions = orders.length;
+      const priority = orders.filter(o => o.isEmergency).length;
+      const points = orders.reduce((sum, o) => sum + o.totalKiss + o.totalHug, 0);
+
+      trends.push({
+        name: dayName,
+        interactions,
+        points,
+        priority
+      });
+    }
+
+    return NextResponse.json(trends);
+  } catch (error) {
+    console.error('Trends API error:', error);
+    return NextResponse.json(
+      { message: '获取趋势数据失败' },
+      { status: 500 }
+    );
+  }
 }

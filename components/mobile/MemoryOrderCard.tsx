@@ -1,17 +1,15 @@
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 import { 
   Heart, 
   Smile, 
   Quote,
-  Sparkles,
-  Zap
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { formatDateTime } from "@/utils/format";
 export interface Order {
   id: string;
   dishes: string[];
@@ -125,7 +123,7 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
             )}
           </div>
           <span className={cn("text-xs font-medium", currentTheme.time)}>
-            {order.createdAt.split(' ')[1]}
+            {formatDateTime(order.createdAt, 'HH:mm')}
           </span>
         </div>
 

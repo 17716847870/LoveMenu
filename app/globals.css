@@ -171,15 +171,3 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* Hide scrollbar for cleaner mobile look */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--muted);
-  border-radius: 3px;
-}

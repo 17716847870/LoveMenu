@@ -18,6 +18,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: updatedOrder });
   } catch (error) {
+    console.error('[api/orders/:id][PUT] 更新订单失败', error);
     return NextResponse.json({ message: '更新订单失败' }, { status: 500 });
   }
 }

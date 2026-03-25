@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
+    console.error('[api/auth/login] 登录失败', error);
     return NextResponse.json(
       { message: '登录失败' },
       { status: 500 }

@@ -44,6 +44,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: updatedUser });
   } catch (error) {
+    console.error('[api/users/:id/balance][PATCH] 更新余额失败', error);
     return NextResponse.json({ message: '更新余额失败' }, { status: 500 });
   }
 }

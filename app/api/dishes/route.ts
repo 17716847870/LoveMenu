@@ -43,6 +43,7 @@ export const GET = async (req: Request) => {
     });
     return NextResponse.json({ data: dishes });
   } catch (error) {
+    console.error("[api/dishes][GET] 获取菜品失败", error);
     return NextResponse.json({ message: '获取菜品失败' }, { status: 500 });
   }
 };

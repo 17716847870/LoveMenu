@@ -34,6 +34,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: updatedUser });
   } catch (error) {
+    console.error('[api/users/:id][PUT] 更新失败', error);
     return NextResponse.json({ message: '更新失败' }, { status: 500 });
   }
 }
@@ -51,6 +52,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('[api/users/:id][DELETE] 删除失败', error);
     return NextResponse.json({ message: '删除失败' }, { status: 500 });
   }
 }

@@ -18,6 +18,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: updatedRequest });
   } catch (error) {
+    console.error('[api/requests/:id][PUT] 更新请求失败', error);
     return NextResponse.json({ message: '更新请求失败' }, { status: 500 });
   }
 }
@@ -35,6 +36,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('[api/requests/:id][DELETE] 删除请求失败', error);
     return NextResponse.json({ message: '删除请求失败' }, { status: 500 });
   }
 }

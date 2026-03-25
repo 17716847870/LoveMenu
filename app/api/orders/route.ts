@@ -82,6 +82,7 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ success: true, data: order });
   } catch (error) {
+    console.error('[api/orders][POST] 创建订单失败', error);
     return NextResponse.json({ message: '创建订单失败' }, { status: 500 });
   }
 };

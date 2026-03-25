@@ -25,17 +25,19 @@ export const GET = async () => {
       return NextResponse.json({ message: "未登录" }, { status: 401 });
     }
 
-    const db = prisma as any;
-    const count = await db.chatMessage.count({
-      where: {
-        senderId: { not: currentUser.id },
-        reads: {
-          none: {
-            userId: currentUser.id,
-          },
-        },
-      },
-    });
+    const rows = await prisma.$queryRaw<Array<{ count: bigint | number }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM "ChatMessage" m
+      WHERE m."senderId" <> ${currentUser.id}
+        AND NOT EXISTS (
+          SELECT 1
+          FROM "ChatMessageRead" r
+          WHERE r."messageId" = m."id"
+            AND r."userId" = ${currentUser.id}
+        )
+    `;
+
+    const count = Number(rows[0]?.count ?? 0);
 
     return NextResponse.json({ data: { count } });
   } catch (error) {

@@ -8,38 +8,21 @@ type TokenPayload = {
   id: string;
 };
 
-type ChatMessageWithReads = {
+type ChatMessageRow = {
   id: string;
   senderId: string;
   type: string;
   content: string;
   createdAt: Date;
-  reads: { id: string }[];
-};
-
-type ChatMessageLite = {
-  id: string;
-};
-
-type ChatDb = {
-  chatMessage: {
-    count: (args: unknown) => Promise<number>;
-    findMany: (args: unknown) => Promise<ChatMessageWithReads[] | ChatMessageLite[]>;
-    create: (args: unknown) => Promise<{
-      id: string;
-      senderId: string;
-      type: string;
-      content: string;
-      createdAt: Date;
-    }>;
-  };
-  chatMessageRead: {
-    createMany: (args: unknown) => Promise<unknown>;
-  };
 };
 
 function getChatDb() {
-  return prisma as unknown as ChatDb;
+  return prisma as unknown as {
+    chatMessage: {
+      findMany: (args: unknown) => Promise<ChatMessageRow[]>;
+      create: (args: unknown) => Promise<ChatMessageRow>;
+    };
+  };
 }
 
 async function getCurrentUser() {
@@ -55,17 +38,20 @@ async function getCurrentUser() {
 }
 
 async function getUnreadCount(userId: string) {
-  const db = getChatDb();
-  return db.chatMessage.count({
-    where: {
-      senderId: { not: userId },
-      reads: {
-        none: {
-          userId,
-        },
-      },
-    },
-  });
+  const rows = await prisma.$queryRaw<Array<{ count: bigint | number }>>`
+    SELECT COUNT(*)::bigint AS count
+    FROM "ChatMessage" m
+    WHERE m."senderId" <> ${userId}
+      AND NOT EXISTS (
+        SELECT 1
+        FROM "ChatMessageRead" r
+        WHERE r."messageId" = m."id"
+          AND r."userId" = ${userId}
+      )
+  `;
+
+  const count = rows[0]?.count ?? 0;
+  return Number(count);
 }
 
 export const GET = async () => {
@@ -76,15 +62,17 @@ export const GET = async () => {
     }
 
     const db = getChatDb();
-    const messages = (await db.chatMessage.findMany({
+    const messages = await db.chatMessage.findMany({
       orderBy: { createdAt: "asc" },
-      include: {
-        reads: {
-          where: { userId: currentUser.id },
-          select: { id: true },
-        },
-      },
-    })) as ChatMessageWithReads[];
+    });
+
+    const readRows = await prisma.$queryRaw<Array<{ messageId: string }>>`
+      SELECT "messageId"
+      FROM "ChatMessageRead"
+      WHERE "userId" = ${currentUser.id}
+    `;
+
+    const readMessageIds = new Set(readRows.map((row) => row.messageId));
 
     const formattedMessages = messages.map((msg) => ({
       id: msg.id,
@@ -92,7 +80,7 @@ export const GET = async () => {
       type: msg.type,
       content: msg.content,
       createdAt: msg.createdAt.toISOString(),
-      isRead: msg.senderId === currentUser.id || msg.reads.length > 0,
+      isRead: msg.senderId === currentUser.id || readMessageIds.has(msg.id),
       isSender: msg.senderId === currentUser.id,
     }));
 
@@ -117,7 +105,12 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ message: "消息内容不能为空" }, { status: 400 });
     }
 
-    if (!["text", "image", "voice", "emoji"].includes(type)) {
+    if (![
+      "text",
+      "image",
+      "voice",
+      "emoji",
+    ].includes(type)) {
       return NextResponse.json({ message: "消息类型不支持" }, { status: 400 });
     }
 
@@ -176,28 +169,28 @@ export const PATCH = async () => {
       return NextResponse.json({ message: "未登录" }, { status: 401 });
     }
 
-    const db = getChatDb();
-    const unreadMessages = (await db.chatMessage.findMany({
-      where: {
-        senderId: { not: currentUser.id },
-        reads: {
-          none: {
-            userId: currentUser.id,
-          },
-        },
-      },
-      select: { id: true },
-    })) as ChatMessageLite[];
+    const unreadMessages = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT m."id"
+      FROM "ChatMessage" m
+      WHERE m."senderId" <> ${currentUser.id}
+        AND NOT EXISTS (
+          SELECT 1
+          FROM "ChatMessageRead" r
+          WHERE r."messageId" = m."id"
+            AND r."userId" = ${currentUser.id}
+        )
+    `;
 
     if (unreadMessages.length > 0) {
-      await db.chatMessageRead.createMany({
-        data: unreadMessages.map((item) => ({
-          id: crypto.randomUUID(),
-          messageId: item.id,
-          userId: currentUser.id,
-        })),
-        skipDuplicates: true,
-      });
+      await Promise.all(
+        unreadMessages.map((item) =>
+          prisma.$executeRaw`
+            INSERT INTO "ChatMessageRead" ("id", "messageId", "userId", "createdAt")
+            VALUES (${crypto.randomUUID()}, ${item.id}, ${currentUser.id}, NOW())
+            ON CONFLICT ("messageId", "userId") DO NOTHING
+          `
+        )
+      );
     }
 
     sendToUser(currentUser.id, "unread", { count: 0 });

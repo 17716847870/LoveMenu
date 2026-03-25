@@ -18,7 +18,7 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const [unreadCount, setUnreadCount] = useState(0);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const inChatPage = CHAT_PATHS.includes(pathname);
 
@@ -36,48 +36,69 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
   }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/chat/stream");
-    eventSourceRef.current = eventSource;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let closedByCleanup = false;
 
-    const onMessage = async (event: MessageEvent) => {
+    const connect = async () => {
       try {
-        const payload = JSON.parse(event.data) as { isSender?: boolean };
-        queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
-
-        if (payload.isSender) {
-          return;
-        }
-
-        if (inChatPage) {
-          await markChatAsRead();
-          setUnreadCount(0);
-        } else {
-          setUnreadCount((prev) => prev + 1);
-        }
+        await fetch("/api/chat/stream", { method: "GET" });
       } catch {
         // ignore
       }
-    };
 
-    const onUnread = (event: MessageEvent) => {
-      try {
-        const payload = JSON.parse(event.data) as { count?: number };
-        if (typeof payload.count === "number") {
-          setUnreadCount(payload.count);
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      const wsPort = process.env.NEXT_PUBLIC_CHAT_WS_PORT || "3001";
+      const wsUrl = `${protocol}://${window.location.hostname}:${wsPort}/chat`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onmessage = async (event) => {
+        try {
+          const parsed = JSON.parse(event.data) as {
+            event?: string;
+            payload?: { isSender?: boolean; count?: number };
+          };
+
+          if (parsed.event === "message") {
+            queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
+
+            if (parsed.payload?.isSender) {
+              return;
+            }
+
+            if (inChatPage) {
+              await markChatAsRead();
+              setUnreadCount(0);
+            } else {
+              setUnreadCount((prev) => prev + 1);
+            }
+          }
+
+          if (parsed.event === "unread" && typeof parsed.payload?.count === "number") {
+            setUnreadCount(parsed.payload.count);
+          }
+        } catch {
+          // ignore
         }
-      } catch {
-        // ignore
-      }
+      };
+
+      ws.onclose = () => {
+        wsRef.current = null;
+        if (!closedByCleanup) {
+          reconnectTimer = setTimeout(connect, 1000);
+        }
+      };
     };
 
-    eventSource.addEventListener("message", onMessage);
-    eventSource.addEventListener("unread", onUnread);
+    connect();
 
     return () => {
-      eventSource.removeEventListener("message", onMessage);
-      eventSource.removeEventListener("unread", onUnread);
-      eventSource.close();
-      eventSourceRef.current = null;
+      closedByCleanup = true;
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+      wsRef.current?.close();
+      wsRef.current = null;
     };
   }, [inChatPage, queryClient]);
 

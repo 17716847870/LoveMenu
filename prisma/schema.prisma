@@ -7,18 +7,19 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  username     String        @unique
+  id           String            @id @default(cuid())
+  username     String            @unique
   password     String
   name         String
-  email        String?       @unique
+  email        String?           @unique
   avatar       String?
-  role         String        @default("user")
-  kissBalance  Int           @default(100)
-  hugBalance   Int           @default(100)
-  createdAt    DateTime      @default(now())
+  role         String            @default("user")
+  kissBalance  Int               @default(100)
+  hugBalance   Int               @default(100)
+  createdAt    DateTime          @default(now())
   cartItems    CartItem[]
-  chat         ChatMessage[] @relation("ChatSender")
+  chat         ChatMessage[]     @relation("ChatSender")
+  chatReads    ChatMessageRead[]
   orders       Order[]
 }
 
@@ -115,12 +116,26 @@ model OrderFeedback {
 }
 
 model ChatMessage {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   senderId  String
   type      String
   content   String
-  createdAt DateTime @default(now())
-  sender    User     @relation("ChatSender", fields: [senderId], references: [id])
+  createdAt DateTime          @default(now())
+  sender    User              @relation("ChatSender", fields: [senderId], references: [id])
+  reads     ChatMessageRead[]
+}
+
+model ChatMessageRead {
+  id        String      @id @default(cuid())
+  messageId String
+  userId    String
+  createdAt DateTime    @default(now())
+  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([userId])
+  @@index([messageId])
 }
 
 model SystemConfig {

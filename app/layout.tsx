@@ -3,6 +3,7 @@ import { FlyToCartProvider } from "@/context/FlyToCartContext";
 import { CartProvider } from "@/hooks/useCart";
 import { UserProvider } from "@/context/UserContext";
 import { MessageProvider } from "@/components/ui/Message";
+import { ChatRealtimeProvider } from "@/context/ChatRealtimeContext";
 import QueryProvider from "@/components/providers/QueryProvider";
 import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
 import type { Metadata } from "next";
@@ -38,10 +39,12 @@ export default function RootLayout({
               <FlyToCartProvider>
                 <CartProvider>
                   <MessageProvider>
-                    <div id="app-root" className="relative w-full">
-                      {children}
-                      <FloatingThemeButton />
-                    </div>
+                    <ChatRealtimeProvider>
+                      <div id="app-root" className="relative w-full">
+                        {children}
+                        <FloatingThemeButton />
+                      </div>
+                    </ChatRealtimeProvider>
                   </MessageProvider>
                 </CartProvider>
               </FlyToCartProvider>

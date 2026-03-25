@@ -60,6 +60,7 @@ export interface ChatMessage {
   type: "text" | "image" | "voice" | "emoji";
   content: string;
   createdAt: string;
+  isRead?: boolean;
   isSender?: boolean;
 }
 

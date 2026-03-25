@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+import { useChatRealtime } from "@/context/ChatRealtimeContext";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { unreadCount } = useChatRealtime();
 
   const handleLogout = async () => {
     try {
@@ -85,6 +87,14 @@ export default function AdminSidebar() {
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>
+              {item.href === "/admin/chat" && unreadCount > 0 && (
+                <span className={cn(
+                  "ml-auto min-w-5 h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm animate-pulse",
+                  isActive ? "bg-white text-pink-500" : "bg-pink-500 text-white"
+                )}>
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}

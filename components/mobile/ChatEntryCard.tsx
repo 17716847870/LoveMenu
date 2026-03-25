@@ -7,6 +7,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Link from "next/link";
+import { useChatRealtime } from "@/context/ChatRealtimeContext";
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -57,10 +58,8 @@ const themeStyles: Record<ThemeName, {
 
 export default function ChatEntryCard() {
   const { theme } = useTheme();
+  const { unreadCount } = useChatRealtime();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
-  
-  // 模拟未读消息数量
-  const unreadCount = 2;
 
   return (
     <Link href="/chat">
@@ -89,10 +88,10 @@ export default function ChatEntryCard() {
             </h3>
             {unreadCount > 0 && (
               <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none",
+                "px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none shadow-sm animate-pulse",
                 currentTheme.badge
               )}>
-                {unreadCount}
+                {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
           </div>

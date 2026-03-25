@@ -36,6 +36,7 @@ export default function ChatPage() {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      isPending: msg.isPending,
     }));
   }, [chatMessages]);
 
@@ -47,7 +48,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, sendMessage.isPending]);
 
   const handleSend = async (content: string, type: "text" | "love") => {
     try {

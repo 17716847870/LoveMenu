@@ -36,7 +36,37 @@ export function useSendChatMessage() {
       }
       return response.data;
     },
-    onSuccess: () => {
+    onMutate: async (newMessage) => {
+      await queryClient.cancelQueries({ queryKey: chatKeys.messages() });
+
+      const previousMessages = queryClient.getQueryData<ChatMessage[]>(chatKeys.messages()) || [];
+
+      const optimisticMessage: ChatMessage = {
+        id: `temp-${Date.now()}`,
+        senderId: "self",
+        type: newMessage.type,
+        content: newMessage.content,
+        createdAt: new Date().toISOString(),
+        isRead: true,
+        isSender: true,
+        isPending: true,
+      };
+
+      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(), [...previousMessages, optimisticMessage]);
+
+      return { previousMessages, optimisticMessageId: optimisticMessage.id };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousMessages) {
+        queryClient.setQueryData(chatKeys.messages(), context.previousMessages);
+      }
+    },
+    onSuccess: (savedMessage, _variables, context) => {
+      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(), (current = []) =>
+        current.map((msg) => (msg.id === context?.optimisticMessageId ? savedMessage : msg))
+      );
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
     },
   });

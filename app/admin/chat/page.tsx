@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import PageHeader from "@/components/admin/shared/PageHeader";
-import { Send, Image as ImageIcon, Smile, Heart } from "lucide-react";
+import { Send, Image as ImageIcon, Smile, Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types";
 import { useChatMessages, useSendChatMessage } from "@/apis/chat";
@@ -21,7 +21,7 @@ export default function AdminChatPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, sendMessage.isPending]);
 
   const handleSend = async () => {
     const content = inputValue.trim();
@@ -100,14 +100,24 @@ export default function AdminChatPage() {
                 )}
               >
                 {msg.content}
-                <span
-                  className={cn(
-                    "text-[10px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap",
-                    msg.isSender ? "right-1 text-gray-400" : "left-1 text-gray-400"
-                  )}
-                >
-                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </span>
+
+                {msg.isPending && msg.isSender && (
+                  <span className="absolute -bottom-5 left-1 inline-flex items-center gap-1 text-[10px] text-pink-400">
+                    <Loader2 size={10} className="animate-spin" />
+                    发送中...
+                  </span>
+                )}
+
+                {!msg.isPending && (
+                  <span
+                    className={cn(
+                      "text-[10px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap",
+                      msg.isSender ? "right-1 text-gray-400" : "left-1 text-gray-400"
+                    )}
+                  >
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
               </div>
             </div>
           ))}

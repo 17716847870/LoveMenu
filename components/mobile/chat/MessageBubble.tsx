@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ export interface Message {
   content: string;
   sender: "me" | "partner";
   createdAt: string;
+  isPending?: boolean;
 }
 
 interface MessageBubbleProps {
@@ -86,9 +88,16 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           <LoveMessage type={message.content as "kiss" | "hug"} />
         )}
         
-        <span className="text-[10px] text-gray-400 px-1">
-          {message.createdAt.split(' ')[1]}
-        </span>
+        {message.isPending && isMe ? (
+          <span className="inline-flex items-center gap-1 text-[10px] text-pink-400 px-1">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            发送中...
+          </span>
+        ) : (
+          <span className="text-[10px] text-gray-400 px-1">
+            {message.createdAt.split(" ")[1]}
+          </span>
+        )}
       </div>
     </motion.div>
   );

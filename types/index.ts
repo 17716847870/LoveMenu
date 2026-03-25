@@ -62,6 +62,7 @@ export interface ChatMessage {
   createdAt: string;
   isRead?: boolean;
   isSender?: boolean;
+  isPending?: boolean;
 }
 
 export interface FoodRequest {

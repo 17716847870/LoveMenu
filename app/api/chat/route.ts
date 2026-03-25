@@ -97,7 +97,8 @@ export const GET = async () => {
     }));
 
     return NextResponse.json({ data: formattedMessages });
-  } catch {
+  } catch (error) {
+    console.error("[api/chat][GET] 获取消息失败", error);
     return NextResponse.json({ message: "获取消息失败" }, { status: 500 });
   }
 };
@@ -162,7 +163,8 @@ export const POST = async (req: Request) => {
         isSender: true,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[api/chat][POST] 发送消息失败", error);
     return NextResponse.json({ message: "发送消息失败" }, { status: 500 });
   }
 };
@@ -190,6 +192,7 @@ export const PATCH = async () => {
     if (unreadMessages.length > 0) {
       await db.chatMessageRead.createMany({
         data: unreadMessages.map((item) => ({
+          id: crypto.randomUUID(),
           messageId: item.id,
           userId: currentUser.id,
         })),
@@ -200,7 +203,8 @@ export const PATCH = async () => {
     sendToUser(currentUser.id, "unread", { count: 0 });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[api/chat][PATCH] 已读更新失败", error);
     return NextResponse.json({ message: "已读更新失败" }, { status: 500 });
   }
 };

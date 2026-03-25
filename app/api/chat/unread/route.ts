@@ -38,7 +38,8 @@ export const GET = async () => {
     });
 
     return NextResponse.json({ data: { count } });
-  } catch {
+  } catch (error) {
+    console.error("[api/chat/unread][GET] 获取未读数失败", error);
     return NextResponse.json({ message: "获取未读数失败" }, { status: 500 });
   }
 };

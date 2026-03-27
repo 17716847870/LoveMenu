@@ -8,6 +8,8 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import FloatingThemeButton from "@/components/mobile/FloatingThemeButton";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,6 +53,8 @@ export default function RootLayout({
             </UserProvider>
           </QueryProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

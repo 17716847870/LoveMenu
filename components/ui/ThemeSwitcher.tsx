@@ -2,7 +2,6 @@
 
 import { useTheme } from "@/context/ThemeContext";
 import { themes } from "@/lib/theme";
-import { ThemeName } from "@/types";
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();

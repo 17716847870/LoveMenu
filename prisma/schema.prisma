@@ -143,3 +143,36 @@ model SystemConfig {
   key   String @unique
   value String
 }
+
+// 纪念日提醒
+model Anniversary {
+  id             String           @id @default(cuid())
+  title          String           // 纪念日标题
+  calendarType   String           // "solar" | "lunar"
+  month          Int              // 月（国历直接用，农历存农历月）
+  day            Int              // 日（国历直接用，农历存农历日）
+  weekday        Int?             // 仅 repeatType=weekly 时使用，0=周日 1=周一 ... 6=周六
+  repeatType     String           // "once" | "weekly" | "monthly" | "quarterly" | "halfyear" | "yearly"
+  advanceDays    Int              @default(0) // 提前几天提醒，0=当天
+  emailTo        String           // 收件邮箱
+  emailSubject   String           // 邮件主题
+  emailContent   String           // 邮件正文（支持模板变量）
+  status         String           @default("active") // "active" | "paused" | "done"
+  nextRemindAt   DateTime?        // 下一次提醒的公历时间（早上10点北京时间）
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  logs           AnniversaryLog[]
+}
+
+// 纪念日发送历史
+model AnniversaryLog {
+  id             String       @id @default(cuid())
+  anniversaryId  String
+  sentAt         DateTime     @default(now())
+  emailTo        String
+  status         String       // "success" | "failed"
+  error          String?      // 失败原因
+  anniversary    Anniversary  @relation(fields: [anniversaryId], references: [id], onDelete: Cascade)
+
+  @@index([anniversaryId])
+}

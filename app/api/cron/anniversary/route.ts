@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   try {
     // 查找所有 active 状态、nextRemindAt <= 现在 的纪念日
     const now = new Date();
-    const due = await prisma.anniversary.findMany({
+    const due = await (prisma as any).anniversary.findMany({
       where: {
         status: 'active',
         nextRemindAt: { lte: now },
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     });
 
     const results = await Promise.allSettled(
-      due.map(async (ann) => {
+      due.map(async (ann:any) => {
         // 渲染邮件内容
         const dateStr = ann.nextRemindAt
           ? ann.nextRemindAt.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' })
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         const result = await sendEmail({ to: ann.emailTo, subject, html });
 
         // 写入发送历史
-        await prisma.anniversaryLog.create({
+        await (prisma as any).anniversaryLog.create({
           data: {
             anniversaryId: ann.id,
             emailTo: ann.emailTo,
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         // 更新下次提醒时间
         if (ann.repeatType === 'once') {
           // 单次：变为 done
-          await prisma.anniversary.update({
+          await (prisma as any).anniversary.update({
             where: { id: ann.id },
             data: { status: 'done', nextRemindAt: null },
           });
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
             repeatType: ann.repeatType as RepeatType,
             advanceDays: ann.advanceDays,
           }, tomorrow);
-          await prisma.anniversary.update({
+          await (prisma as any).anniversary.update({
             where: { id: ann.id },
             data: { nextRemindAt },
           });
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       })
     );
 
-    const succeeded = results.filter(r => r.status === 'fulfilled').length;
+    const succeeded = results.filter((r:any) => r.status === 'fulfilled').length;
     return NextResponse.json({ processed: due.length, succeeded });
   } catch (error) {
     console.error('[cron/anniversary]', error);

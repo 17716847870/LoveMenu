@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   serverExternalPackages: ['ali-oss', 'urllib', 'proxy-agent'],
   images: {
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +17,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: 'love-menu.oss-cn-chengdu.aliyuncs.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
       },
     ],
   },

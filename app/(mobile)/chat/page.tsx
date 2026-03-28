@@ -62,7 +62,9 @@ export default function ChatPage() {
   };
 
   return (
-    <div className={cn("flex flex-col h-screen", currentTheme.bg)}>
+    <div
+      className={cn("flex flex-col h-dvh", currentTheme.bg)}
+    >
       <ChatHeader />
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">

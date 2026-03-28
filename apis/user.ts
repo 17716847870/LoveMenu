@@ -16,6 +16,7 @@ export interface UpdateUserDto {
   password?: string;
   name?: string;
   role?: "user" | "admin";
+  avatar?: string;
 }
 
 export const userKeys = {

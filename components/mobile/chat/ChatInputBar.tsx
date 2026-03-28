@@ -65,14 +65,18 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 flex flex-col",
+      "flex flex-col shrink-0",
       currentTheme.container
     )}>
       {/* Quick Actions */}
       <QuickLoveActions onSend={onSend} />
 
       {/* Input Area */}
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 pb-6 sm:pb-3">
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-2 p-3"
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+      >
         {/* Action Buttons */}
         <div className="flex items-center gap-1">
           <button type="button" className={cn("p-2 rounded-full transition-colors", currentTheme.icon)}>

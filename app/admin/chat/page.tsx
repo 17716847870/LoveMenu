@@ -25,6 +25,7 @@ export default function AdminChatPage() {
 
   const handleSend = async () => {
     const content = inputValue.trim();
+    setInputValue('');
     if (!content) return;
 
     try {

@@ -4,7 +4,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background">
       {children}
     </div>
   );

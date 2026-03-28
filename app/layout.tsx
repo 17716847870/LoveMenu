@@ -27,6 +27,12 @@ export const metadata: Metadata = {
   description: "情侣互动点餐系统",
 };
 
+export const viewport = {
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

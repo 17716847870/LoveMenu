@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { PageContainer } from "@/components/ui/PageContainer";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { User } from "@/types";
-import { Plus, Edit2, Trash2, Shield, User as UserIcon, Coins } from "lucide-react";
+import { Plus, Edit2, Trash2, Shield, User as UserIcon, Coins, Camera } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import LoveSelect from "@/components/admin/ui/LoveSelect/LoveSelect";
 import { PageLoading } from "@/components/ui/Loading";
 import { useMessage } from "@/components/ui/Message";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/Avatar";
+import { useUser } from "@/context/UserContext";
 import {
   useUsers,
   useCreateUser,
@@ -25,12 +27,25 @@ export default function AccountsPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const [balanceUser, setBalanceUser] = useState<User | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const { user: currentUser, setUser: setCurrentUser } = useUser();
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lightboxSrc) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxSrc(null); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [lightboxSrc]);
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     name: "",
     role: "user" as "user" | "admin",
+    avatar: "",
   });
 
   const [balanceData, setBalanceData] = useState({
@@ -55,7 +70,9 @@ export default function AccountsPage() {
         password: "",
         name: user.name || "",
         role: user.role || "user",
+        avatar: user.avatar || "",
       });
+      setAvatarPreview(user.avatar || null);
     } else {
       setEditingUser(null);
       setFormData({
@@ -63,9 +80,39 @@ export default function AccountsPage() {
         password: "",
         name: "",
         role: "user",
+        avatar: "",
       });
+      setAvatarPreview(null);
     }
     setIsModalOpen(true);
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // 本地预览
+    const localUrl = URL.createObjectURL(file);
+    setAvatarPreview(localUrl);
+    // 上传
+    setIsUploadingAvatar(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("path", "avatars");
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || "上传失败");
+      const url: string = json.data?.url || json.data;
+      if (!url || typeof url !== "string") throw new Error("获取上传地址失败");
+      const secureUrl = url.replace(/^http:\/\//, "https://");
+      setFormData((prev) => ({ ...prev, avatar: secureUrl }));
+      setAvatarPreview(secureUrl);
+    } catch (err) {
+      message.error(err instanceof Error ? err.message : "头像上传失败");
+      setAvatarPreview(editingUser?.avatar || null);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   const handleOpenBalanceModal = (user: User) => {
@@ -79,11 +126,17 @@ export default function AccountsPage() {
       if (editingUser) {
         const payload: any = { ...formData };
         if (!payload.password) delete payload.password;
+        if (!payload.avatar) delete payload.avatar;
 
-        await updateUser.mutateAsync({
+        const updatedUser = await updateUser.mutateAsync({
           id: editingUser.id,
           data: payload,
         });
+
+        // 如果修改的是当前登录用户，同步更新 context
+        if (currentUser && editingUser.id === currentUser.id && updatedUser) {
+          setCurrentUser({ ...currentUser, ...updatedUser });
+        }
 
         message.success("账号更新成功");
       } else {
@@ -181,6 +234,7 @@ export default function AccountsPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-pink-50 text-gray-600 text-sm border-b border-pink-100">
+                <th className="p-4 font-medium">头像</th>
                 <th className="p-4 font-medium">账号</th>
                 <th className="p-4 font-medium">昵称</th>
                 <th className="p-4 font-medium">角色</th>
@@ -194,6 +248,20 @@ export default function AccountsPage() {
                   key={user.id}
                   className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
                 >
+                  <td className="p-4">
+                    <Avatar
+                      className={`w-9 h-9 ${user.avatar ? "cursor-zoom-in" : ""}`}
+                      onClick={() => user.avatar && setLightboxSrc(user.avatar)}
+                    >
+                      {user.avatar ? (
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                      ) : (
+                        <AvatarFallback className="bg-pink-100 text-pink-500 text-sm font-medium">
+                          {(user.name || user.username || "?").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </td>
                   <td className="p-4 font-medium text-gray-800">
                     {user.username}
                   </td>
@@ -271,11 +339,25 @@ export default function AccountsPage() {
           {users.map((user) => (
             <Card key={user.id} className="p-4">
               <div className="flex justify-between items-start mb-3">
-                <div>
-                  <div className="font-medium text-gray-800 text-lg">
-                    {user.username}
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    className={`w-10 h-10 ${user.avatar ? "cursor-zoom-in" : ""}`}
+                    onClick={() => user.avatar && setLightboxSrc(user.avatar)}
+                  >
+                    {user.avatar ? (
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                    ) : (
+                      <AvatarFallback className="bg-pink-100 text-pink-500 text-sm font-medium">
+                        {(user.name || user.username || "?").charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div>
+                    <div className="font-medium text-gray-800 text-lg">
+                      {user.username}
+                    </div>
+                    <div className="text-gray-500 text-sm mt-1">{user.name}</div>
                   </div>
-                  <div className="text-gray-500 text-sm mt-1">{user.name}</div>
                 </div>
                 <span
                   className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
@@ -345,6 +427,53 @@ export default function AccountsPage() {
           title={editingUser ? "编辑账号" : "新增账号"}
         >
           <div className="space-y-4 py-4">
+            {/* 头像上传：仅编辑当前登录账号时显示 */}
+            {editingUser && currentUser && editingUser.id === currentUser.id && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  头像
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="w-16 h-16">
+                      {avatarPreview ? (
+                        <AvatarImage src={avatarPreview} alt="头像预览" />
+                      ) : (
+                        <AvatarFallback className="bg-pink-100 text-pink-500 text-xl font-medium">
+                          {(formData.name || formData.username || "?").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    {isUploadingAvatar && (
+                      <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploadingAvatar}
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="flex items-center gap-2"
+                    >
+                      <Camera className="w-4 h-4" />
+                      {isUploadingAvatar ? "上传中..." : "更换头像"}
+                    </Button>
+                    <p className="text-xs text-gray-400 mt-1">支持 JPG、PNG，最大 5MB</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 登录账号
@@ -524,6 +653,28 @@ export default function AccountsPage() {
           )}
         </Modal>
       </div>
+
+      {/* Avatar Lightbox */}
+      {lightboxSrc && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setLightboxSrc(null)}
+        >
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightboxSrc}
+              alt="头像预览"
+              className="max-w-[80vw] max-h-[80vh] rounded-2xl shadow-2xl object-contain"
+            />
+            <button
+              onClick={() => setLightboxSrc(null)}
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }

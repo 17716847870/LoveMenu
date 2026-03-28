@@ -24,7 +24,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   return (
-    <div className="flex flex-col p-4 pb-32 pt-20">
+    <div className="flex flex-col p-4 pb-6 pt-20">
       {/* Date Divider */}
       <div className="flex justify-center mb-6">
         <span className={cn(

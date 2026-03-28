@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut, Users } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut, Users, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useRouter } from "next/navigation";
@@ -66,6 +66,11 @@ export default function AdminMobileTabBar({
       label: "账号管理",
       href: "/admin/accounts",
       icon: Users
+    },
+    {
+      label: "纪念日提醒",
+      href: "/admin/anniversaries",
+      icon: Bell
     }
   ];
 

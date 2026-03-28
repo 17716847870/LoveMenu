@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users, Bell } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { useChatRealtime } from "@/context/ChatRealtimeContext";
@@ -57,6 +57,11 @@ export default function AdminSidebar() {
       label: "账号管理",
       href: "/admin/accounts",
       icon: Users
+    },
+    {
+      label: "纪念日提醒",
+      href: "/admin/anniversaries",
+      icon: Bell
     }
   ];
 

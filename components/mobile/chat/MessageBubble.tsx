@@ -8,9 +8,16 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import LoveMessage from "./LoveMessage";
 
+export interface AvatarInfo {
+  myAvatar: string;
+  myName: string;
+  partnerAvatar: string;
+  partnerName: string;
+}
+
 export interface Message {
   id: string;
-  type: "text" | "love";
+  type: "text" | "love" | "image";
   content: string;
   sender: "me" | "partner";
   createdAt: string;
@@ -19,6 +26,7 @@ export interface Message {
 
 interface MessageBubbleProps {
   message: Message;
+  avatarInfo: AvatarInfo;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -53,10 +61,14 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function MessageBubble({ message }: MessageBubbleProps) {
+export default function MessageBubble({ message, avatarInfo }: MessageBubbleProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const isMe = message.sender === "me";
+
+  const { myAvatar, myName, partnerAvatar, partnerName } = avatarInfo;
+  const avatarSrc = isMe ? myAvatar : partnerAvatar;
+  const avatarFallback = isMe ? myName.charAt(0).toUpperCase() : partnerName.charAt(0).toUpperCase();
 
   return (
     <motion.div
@@ -68,8 +80,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
       )}
     >
       <Avatar className="w-8 h-8 mt-1 border border-white dark:border-slate-800 shadow-sm">
-        <AvatarImage src={isMe ? "/avatar-me.jpg" : "/avatar-partner.jpg"} />
-        <AvatarFallback>{isMe ? "ME" : "TA"}</AvatarFallback>
+        <AvatarImage src={avatarSrc} />
+        <AvatarFallback>{avatarFallback}</AvatarFallback>
       </Avatar>
 
       <div className={cn(
@@ -82,8 +94,16 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
             isMe ? currentTheme.me : currentTheme.partner,
             isMe ? currentTheme.textMe : currentTheme.textPartner
           )}>
-            {message.content}
+            {message.content.startsWith("quick:") ? message.content.slice(6) : message.content}
           </div>
+        ) : message.type === "image" ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={message.content}
+            alt="图片消息"
+            className="max-w-[220px] max-h-[300px] rounded-2xl object-cover shadow-sm cursor-pointer"
+            onClick={() => window.open(message.content, "_blank")}
+          />
         ) : (
           <LoveMessage type={message.content as "kiss" | "hug"} />
         )}
@@ -95,7 +115,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           </span>
         ) : (
           <span className="text-[10px] text-gray-400 px-1">
-            {message.createdAt.split(" ")[1]}
+            {message.createdAt}
           </span>
         )}
       </div>

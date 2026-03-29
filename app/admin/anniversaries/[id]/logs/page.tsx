@@ -35,7 +35,7 @@ export default function AnniversaryLogsPage({
 
       <PageHeader
         title={ann ? `「${ann.title}」发送历史` : "发送历史"}
-        description={ann ? `收件邮箱：${ann.emailTo}` : ""}
+        subtitle={ann ? `收件邮箱：${ann.emailTo}` : ""}
       />
 
       <div className="space-y-3">

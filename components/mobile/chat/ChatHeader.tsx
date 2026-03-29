@@ -6,6 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { useUser } from "@/context/UserContext";
+import { useUsers } from "@/apis/user";
+import { useMemo } from "react";
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -43,6 +46,16 @@ export default function ChatHeader() {
   const router = useRouter();
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
+  const { user: currentUser } = useUser();
+  const { data: users = [] } = useUsers();
+
+  const partner = useMemo(() => {
+    return users.find((u) => u.id !== currentUser?.id);
+  }, [users, currentUser]);
+
+  const partnerName = partner?.name || partner?.username || "伴侣";
+  const partnerAvatar = partner?.avatar || "";
+  const partnerInitial = partnerName.charAt(0).toUpperCase();
 
   return (
     <div className={cn(
@@ -50,7 +63,7 @@ export default function ChatHeader() {
       currentTheme.container
     )}>
       <div className="flex items-center gap-3">
-        <button 
+        <button
           onClick={() => router.back()}
           className={cn(
             "p-2 -ml-2 rounded-full transition-colors",
@@ -62,15 +75,15 @@ export default function ChatHeader() {
 
         <div className="relative">
           <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-800 shadow-sm">
-            <AvatarImage src="/avatar-partner.jpg" />
-            <AvatarFallback>TA</AvatarFallback>
+            <AvatarImage src={partnerAvatar} />
+            <AvatarFallback>{partnerInitial}</AvatarFallback>
           </Avatar>
           <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
         </div>
 
         <div className="flex flex-col">
           <span className={cn("font-bold text-sm leading-none", currentTheme.title)}>
-            亲爱的
+            {partnerName}
           </span>
           <span className={cn("text-[10px] font-medium mt-1 leading-none", currentTheme.status)}>
             在线

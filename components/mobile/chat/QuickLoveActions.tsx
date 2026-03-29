@@ -1,13 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Smile, Utensils } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 
 interface QuickLoveActionsProps {
-  onSend: (content: string, type: "love" | "text") => void;
+  onSend: (content: string, type: "text" | "love" | "image" | "emoji") => void;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -37,19 +36,24 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
+const actions = [
+  { emoji: "💋", label: "亲亲", value: "kiss", type: "love" as const },
+  { emoji: "🤗", label: "抱抱", value: "hug", type: "love" as const },
+  { emoji: "❤️", label: "爱你", value: "quick:爱你", type: "emoji" as const },
+  { emoji: "🍜", label: "想吃", value: "quick:想吃", type: "emoji" as const },
+  { emoji: "🥺", label: "想你", value: "quick:想你", type: "emoji" as const },
+  { emoji: "😘", label: "么么", value: "quick:么么", type: "emoji" as const },
+  { emoji: "🌙", label: "晚安", value: "quick:晚安", type: "emoji" as const },
+  { emoji: "☀️", label: "早安", value: "quick:早安", type: "emoji" as const },
+];
+
 export default function QuickLoveActions({ onSend }: QuickLoveActionsProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
-  const actions = [
-    { icon: Heart, label: "亲亲", value: "kiss", type: "love" as const },
-    { icon: Smile, label: "抱抱", value: "hug", type: "love" as const },
-    { icon: Utensils, label: "想吃", value: "想吃好吃的！", type: "text" as const },
-  ];
-
   return (
     <div className={cn(
-      "px-4 py-2 flex gap-3 overflow-x-auto no-scrollbar",
+      "px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar",
       currentTheme.container
     )}>
       {actions.map((action) => (
@@ -58,11 +62,11 @@ export default function QuickLoveActions({ onSend }: QuickLoveActionsProps) {
           whileTap={{ scale: 0.95 }}
           onClick={() => onSend(action.value, action.type)}
           className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-colors",
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium whitespace-nowrap transition-colors shrink-0",
             currentTheme.button
           )}
         >
-          <action.icon className={cn("w-4 h-4", currentTheme.icon)} />
+          <span className="text-base leading-none">{action.emoji}</span>
           <span className={currentTheme.icon}>{action.label}</span>
         </motion.button>
       ))}

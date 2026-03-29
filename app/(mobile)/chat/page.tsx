@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useEffect } from "react";
+import React, { useMemo, useRef, useEffect, useCallback } from "react";
 import ChatHeader from "@/components/mobile/chat/ChatHeader";
 import ChatMessages from "@/components/mobile/chat/ChatMessages";
 import ChatInputBar from "@/components/mobile/chat/ChatInputBar";
@@ -27,33 +27,47 @@ export default function ChatPage() {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   const messages = useMemo<Message[]>(() => {
-    return chatMessages.map((msg) => ({
-      id: msg.id,
-      type: msg.type === "emoji" && (msg.content === "kiss" || msg.content === "hug") ? "love" : "text",
-      content: msg.content,
-      sender: msg.isSender ? "me" : "partner",
-      createdAt: new Date(msg.createdAt).toLocaleString("zh-CN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      isPending: msg.isPending,
-    }));
+    return chatMessages.map((msg) => {
+      let type: Message["type"] = "text";
+      if (msg.type === "image") type = "image";
+      else if (msg.type === "emoji") {
+        if (msg.content === "kiss" || msg.content === "hug") type = "love";
+        else if (msg.content.startsWith("quick:")) type = "text";
+        else type = "text";
+      }
+      return {
+        id: msg.id,
+        type,
+        content: msg.content,
+        sender: msg.isSender ? "me" : "partner",
+        createdAt: new Date(msg.createdAt).toLocaleString("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        isPending: msg.isPending,
+      };
+    });
   }, [chatMessages]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, sendMessage.isPending]);
+  }, [messages, sendMessage.isPending, scrollToBottom]);
 
-  const handleSend = async (content: string, type: "text" | "love") => {
+  const handleSend = async (content: string, type: "text" | "love" | "image" | "emoji") => {
     try {
+      let msgType: "text" | "image" | "voice" | "emoji" = "text";
+      if (type === "love") msgType = "emoji";
+      else if (type === "image") msgType = "image";
+      else if (type === "emoji") msgType = "emoji";
+      
       await sendMessage.mutateAsync({
-        type: type === "love" ? "emoji" : "text",
+        type: msgType,
         content,
       });
     } catch {

@@ -95,7 +95,7 @@ export default function AnniversariesPage() {
 
   return (
     <PageContainer>
-      <PageHeader title="纪念日提醒" description="管理纪念日邮件提醒，支持国历/农历、多种循环方式"
+      <PageHeader title="纪念日提醒" subtitle="管理纪念日邮件提醒，支持国历/农历、多种循环方式"
         action={
           <Button onClick={openCreate} className="flex items-center gap-2">
               <Plus className="w-4 h-4" /> 新增提醒

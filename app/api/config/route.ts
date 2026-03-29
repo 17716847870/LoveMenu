@@ -1,16 +1,46 @@
 import { NextResponse } from "next/server";
-
-const config = {
-  background_image: "",
-  theme: "couple",
-  couple_text: "今天也想和你一起吃饭",
-  empty_state_image: "",
-};
+import { prisma } from "@/lib/db";
 
 export const GET = async () => {
-  return NextResponse.json({ data: config });
+  try {
+    const loveStartDateConfig = await prisma.systemConfig.findUnique({
+      where: { key: "loveStartDate" },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        loveStartDate: loveStartDateConfig?.value || "",
+      },
+    });
+  } catch (error) {
+    console.error("[api/config][GET] 获取配置失败", error);
+    return NextResponse.json({ message: "获取配置失败" }, { status: 500 });
+  }
 };
 
-export const POST = async () => {
-  return NextResponse.json({ ok: true });
+export const POST = async (req: Request) => {
+  try {
+    const body = await req.json();
+    const { loveStartDate } = body;
+
+    if (!loveStartDate) {
+      return NextResponse.json(
+        { message: "在一起的日期不能为空" },
+        { status: 400 }
+      );
+    }
+
+    // 使用 upsert 确保配置存在
+    await prisma.systemConfig.upsert({
+      where: { key: "loveStartDate" },
+      update: { value: loveStartDate },
+      create: { key: "loveStartDate", value: loveStartDate },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[api/config][POST] 保存配置失败", error);
+    return NextResponse.json({ message: "保存配置失败" }, { status: 500 });
+  }
 };

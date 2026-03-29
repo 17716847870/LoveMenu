@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 
@@ -105,11 +106,20 @@ const Counter = ({ value, className }: { value: number; className?: string }) =>
   return <motion.span className={className}>{display}</motion.span>;
 };
 
-export default function LoveBalanceCard({ balance = defaultBalance }: LoveBalanceCardProps) {
+export default function LoveBalanceCard({ balance }: LoveBalanceCardProps) {
   const { theme } = useTheme();
+  const { user } = useUser();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const IconKiss = currentTheme.iconKiss;
   const IconHug = currentTheme.iconHug;
+
+  // 用真实用户数据，如果没有则用默认值
+  const displayBalance = {
+    kissBalance: user?.kissBalance ?? 0,
+    hugBalance: user?.hugBalance ?? 0,
+    todayKissGain: 0, // 可以从 API 获取今日获得数据
+    todayHugGain: 0,
+  };
 
   return (
     <motion.div
@@ -129,10 +139,10 @@ export default function LoveBalanceCard({ balance = defaultBalance }: LoveBalanc
         <div className={cn("text-xs font-medium flex items-center gap-2", currentTheme.todayText)}>
           <span>今日获得</span>
           <span className="flex items-center gap-0.5">
-            <Heart className="w-3 h-3" /> {balance.todayKissGain}
+            <Heart className="w-3 h-3" /> {displayBalance.todayKissGain}
           </span>
           <span className="flex items-center gap-0.5">
-            <Smile className="w-3 h-3" /> {balance.todayHugGain}
+            <Smile className="w-3 h-3" /> {displayBalance.todayHugGain}
           </span>
         </div>
       </div>
@@ -155,7 +165,7 @@ export default function LoveBalanceCard({ balance = defaultBalance }: LoveBalanc
           <div>
             <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>亲亲余额</div>
             <div className={cn("text-3xl font-bold", currentTheme.textKiss)}>
-              <Counter value={balance.kissBalance} />
+              <Counter value={displayBalance.kissBalance} />
             </div>
           </div>
         </motion.div>
@@ -176,7 +186,7 @@ export default function LoveBalanceCard({ balance = defaultBalance }: LoveBalanc
           <div>
             <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>贴贴余额</div>
             <div className={cn("text-3xl font-bold", currentTheme.textHug)}>
-              <Counter value={balance.hugBalance} />
+              <Counter value={displayBalance.hugBalance} />
             </div>
           </div>
         </motion.div>

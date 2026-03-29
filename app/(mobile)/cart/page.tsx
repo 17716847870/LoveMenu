@@ -67,15 +67,26 @@ export default function CartPage() {
         body: JSON.stringify(orderData),
       });
 
+      const json = await res.json();
+
       if (!res.ok) {
-        throw new Error("创建订单失败");
+        // 处理余额不足错误
+        if (res.status === 400 && json.message?.includes("余额不足")) {
+          alert("❌ " + json.message);
+        } else {
+          alert("❌ " + (json.message || "创建订单失败"));
+        }
+        setIsSubmitting(false);
+        return;
       }
 
       await clearCart();
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] }); // 刷新用户余额
       router.push("/orders");
     } catch (error) {
       console.error("Order creation error:", error);
+      alert("❌ 创建订单失败，请稍后重试");
       setIsSubmitting(false);
     }
   };

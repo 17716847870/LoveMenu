@@ -16,6 +16,7 @@ import { useUsers } from "@/apis/user";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import Image from "next/image";
+import { getRandomMood } from "@/lib/moods";
 
 export interface CoupleProfile {
   userName: string;
@@ -115,6 +116,10 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
+const getMoodText = (isCoupleView: boolean): string => {
+  return getRandomMood(isCoupleView);
+};
+
 const calculateDays = (startDate: string) => {
   const start = new Date(startDate);
   const now = new Date();
@@ -128,11 +133,32 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
   const { user, setUser } = useUser();
   const { data: users = [], isLoading: usersLoading } = useUsers();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
-  const days = calculateDays(profile.loveStartDate);
+  
+  const [loveStartDate, setLoveStartDate] = useState<string>(profile.loveStartDate);
+  const days = calculateDays(loveStartDate);
+
+  // 页面加载时从 API 获取配置的在一起日期
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/config");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.data?.loveStartDate) {
+            setLoveStartDate(data.data.loveStartDate);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch config:", error);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   // 从 localStorage 读取模式，默认情侣模式
   const [isCoupleView, setIsCoupleView] = useState<boolean>(true);
   const [modeReady, setModeReady] = useState(false);
+  const [moodText, setMoodText] = useState<string>("");
 
   useEffect(() => {
     const saved = localStorage.getItem("lovemenu-profile-mode");
@@ -141,6 +167,11 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
     }
     setModeReady(true);
   }, []);
+
+  // 每次模式改变或页面加载时生成新的心情文案
+  useEffect(() => {
+    setMoodText(getMoodText(isCoupleView));
+  }, [isCoupleView, modeReady]);
 
   const emotion = useMemo(() => {
     if(isCoupleView){
@@ -307,7 +338,7 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
           </div>
 
           <p className={cn("text-sm opacity-70", currentTheme.nameText)}>
-            &quot;{profile.moodText}&quot;
+            &quot;{moodText}&quot;
           </p>
         </div>
 
@@ -421,30 +452,8 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
              {emotion} · 切换单人
            </button>
            <p className={cn("text-sm opacity-80", currentTheme.nameText)}>
-             &quot;{profile.moodText}&quot;
+             &quot;{moodText}&quot;
            </p>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-          <span className={cn("text-xs font-medium", currentTheme.statLabel)}>今日亲亲</span>
-          <span className={cn("text-lg font-bold", currentTheme.statValue)}>
-            ❤️ {profile.todayKiss}
-          </span>
-        </div>
-        <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-          <span className={cn("text-xs font-medium", currentTheme.statLabel)}>今日抱抱</span>
-          <span className={cn("text-lg font-bold", currentTheme.statValue)}>
-            🤗 {profile.todayHug}
-          </span>
-        </div>
-        <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-          <span className={cn("text-xs font-medium", currentTheme.statLabel)}>今日互动</span>
-          <span className={cn("text-lg font-bold", currentTheme.statValue)}>
-            ✨ {profile.todayInteraction}
-          </span>
         </div>
       </div>
     </motion.div>

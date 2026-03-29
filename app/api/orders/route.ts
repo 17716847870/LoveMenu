@@ -61,26 +61,59 @@ export const POST = async (req: Request) => {
     const body = await req.json();
     const { userId, items, totalKiss, totalHug, note, reason, isEmergency } = body;
 
-    const order = await prisma.order.create({
-      data: {
-        userId,
-        status: 'pending',
-        totalKiss,
-        totalHug,
-        note,
-        reason,
-        isEmergency,
-        items: {
-          create: items.map((item: any) => ({
-            dishId: item.dish.id,
-            quantity: item.quantity,
-            note: item.note,
-          })),
-        },
-      },
+    // 检查用户是否存在且获取当前余额
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { kissBalance: true, hugBalance: true },
     });
 
-    return NextResponse.json({ success: true, data: order });
+    if (!user) {
+      return NextResponse.json({ message: '用户不存在' }, { status: 404 });
+    }
+
+    // 检查余额是否足够
+    if ((user.kissBalance || 0) < totalKiss || (user.hugBalance || 0) < totalHug) {
+      return NextResponse.json(
+        { message: '亲亲或抱抱余额不足，无法完成下单' },
+        { status: 400 }
+      );
+    }
+
+    // 创建订单并扣除余额（使用事务确保原子性）
+    const result = await prisma.$transaction(async (tx) => {
+      // 创建订单
+      const order = await tx.order.create({
+        data: {
+          userId,
+          status: 'pending',
+          totalKiss,
+          totalHug,
+          note,
+          reason,
+          isEmergency,
+          items: {
+            create: items.map((item: any) => ({
+              dishId: item.dish.id,
+              quantity: item.quantity,
+              note: item.note,
+            })),
+          },
+        },
+      });
+
+      // 扣除用户余额
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          kissBalance: (user.kissBalance || 0) - totalKiss,
+          hugBalance: (user.hugBalance || 0) - totalHug,
+        },
+      });
+
+      return order;
+    });
+
+    return NextResponse.json({ success: true, data: result });
   } catch (error) {
     console.error('[api/orders][POST] 创建订单失败', error);
     return NextResponse.json({ message: '创建订单失败' }, { status: 500 });

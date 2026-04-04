@@ -10,7 +10,7 @@ function isAuthorized(req: Request): boolean {
   return secret === `Bearer ${process.env.CRON_SECRET}`;
 }
 
-export async function POST(req: Request) {
+async function runAnniversaryCron(req: Request) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
@@ -75,14 +75,22 @@ export async function POST(req: Request) {
           });
         }
 
-        return { id: ann.id, success: result.success };
+        return { id: ann.id, success: result.success, error: result.error ?? null };
       })
     );
 
     const succeeded = results.filter((r:any) => r.status === 'fulfilled').length;
-    return NextResponse.json({ processed: due.length, succeeded });
+    return NextResponse.json({ processed: due.length, succeeded, results });
   } catch (error) {
     console.error('[cron/anniversary]', error);
     return NextResponse.json({ message: '执行失败' }, { status: 500 });
   }
+}
+
+export async function GET(req: Request) {
+  return runAnniversaryCron(req);
+}
+
+export async function POST(req: Request) {
+  return runAnniversaryCron(req);
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
-import { sendToUser } from "@/lib/chatRealtime";
+import { broadcastChatMessage } from "@/lib/supabase-server";
 
 type TokenPayload = {
   id: string;
@@ -125,24 +125,23 @@ export const POST = async (req: Request) => {
 
     const users = await prisma.user.findMany({ select: { id: true } });
 
-    await Promise.all(
-      users.map(async (user) => {
-        const isSender = user.id === currentUser.id;
-        const unreadCount = await getUnreadCount(user.id);
-
-        sendToUser(user.id, "message", {
-          id: message.id,
-          senderId: message.senderId,
-          type: message.type,
-          content: message.content,
-          createdAt: message.createdAt.toISOString(),
-          isRead: isSender,
-          isSender,
-        });
-
-        sendToUser(user.id, "unread", { count: unreadCount });
-      })
+    const unreadByUser = await Promise.all(
+      users.map(async (user) => ({
+        userId: user.id,
+        unreadCount: await getUnreadCount(user.id),
+      }))
     );
+
+    await broadcastChatMessage({
+      message: {
+        id: message.id,
+        senderId: message.senderId,
+        type: message.type,
+        content: message.content,
+        createdAt: message.createdAt.toISOString(),
+      },
+      unreadByUser,
+    });
 
     return NextResponse.json({
       success: true,
@@ -193,9 +192,7 @@ export const PATCH = async () => {
       );
     }
 
-    sendToUser(currentUser.id, "unread", { count: 0 });
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data: { count: 0 } });
   } catch (error) {
     console.error("[api/chat][PATCH] 已读更新失败", error);
     return NextResponse.json({ message: "已读更新失败" }, { status: 500 });

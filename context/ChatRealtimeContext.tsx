@@ -1,9 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { chatKeys, fetchChatUnreadCount, markChatAsRead } from "@/apis/chat";
+import { useUser } from "@/context/UserContext";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { CHAT_REALTIME_CHANNEL } from "@/lib/supabase-server";
 
 type ChatRealtimeContextValue = {
   unreadCount: number;
@@ -13,12 +16,13 @@ type ChatRealtimeContextValue = {
 const ChatRealtimeContext = createContext<ChatRealtimeContextValue | undefined>(undefined);
 
 const CHAT_PATHS = ["/chat", "/admin/chat"];
+const CHAT_FALLBACK_POLL_INTERVAL = 3000;
 
 export function ChatRealtimeProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const { user } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
-  const wsRef = useRef<WebSocket | null>(null);
 
   const inChatPage = CHAT_PATHS.includes(pathname);
 
@@ -36,71 +40,57 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
   }, []);
 
   useEffect(() => {
-    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-    let closedByCleanup = false;
+    if (!user?.id) return;
+    refreshUnreadCount();
+  }, [user?.id]);
 
-    const connect = async () => {
-      try {
-        await fetch("/api/chat/stream", { method: "GET" });
-      } catch {
-        // ignore
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!user?.id) return;
+
+    if (!supabase) {
+      if (process.env.NODE_ENV !== "production") {
+        console.info("[chat] using polling fallback (Supabase Realtime unavailable)");
       }
 
-      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-      const wsPort = process.env.NEXT_PUBLIC_CHAT_WS_PORT || "3001";
-      const wsUrl = `${protocol}://${window.location.hostname}:${wsPort}/chat`;
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
+      const timer = setInterval(async () => {
+        await refreshUnreadCount();
+        queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
+      }, CHAT_FALLBACK_POLL_INTERVAL);
 
-      ws.onmessage = async (event) => {
-        try {
-          const parsed = JSON.parse(event.data) as {
-            event?: string;
-            payload?: { isSender?: boolean; count?: number };
-          };
+      return () => clearInterval(timer);
+    }
 
-          if (parsed.event === "message") {
-            queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[chat] using Supabase Realtime broadcast");
+    }
 
-            if (parsed.payload?.isSender) {
-              return;
-            }
+    const channel = supabase
+      .channel(CHAT_REALTIME_CHANNEL)
+      .on("broadcast", { event: "message" }, async ({ payload }) => {
+        queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
 
-            if (inChatPage) {
-              await markChatAsRead();
-              setUnreadCount(0);
-            } else {
-              setUnreadCount((prev) => prev + 1);
-            }
-          }
+        const unreadByUser = Array.isArray((payload as { unreadByUser?: unknown[] })?.unreadByUser)
+          ? ((payload as { unreadByUser: Array<{ userId: string; unreadCount: number }> }).unreadByUser)
+          : [];
 
-          if (parsed.event === "unread" && typeof parsed.payload?.count === "number") {
-            setUnreadCount(parsed.payload.count);
-          }
-        } catch {
-          // ignore
+        const unreadEntry = unreadByUser.find((item) => item.userId === user.id);
+
+        if (inChatPage) {
+          await markChatAsRead();
+          setUnreadCount(0);
+        } else if (unreadEntry) {
+          setUnreadCount(unreadEntry.unreadCount);
+        } else {
+          await refreshUnreadCount();
         }
-      };
-
-      ws.onclose = () => {
-        wsRef.current = null;
-        if (!closedByCleanup) {
-          reconnectTimer = setTimeout(connect, 1000);
-        }
-      };
-    };
-
-    connect();
+      })
+      .subscribe();
 
     return () => {
-      closedByCleanup = true;
-      if (reconnectTimer) {
-        clearTimeout(reconnectTimer);
-      }
-      wsRef.current?.close();
-      wsRef.current = null;
+      supabase.removeChannel(channel);
     };
-  }, [inChatPage, queryClient]);
+  }, [inChatPage, queryClient, user?.id]);
 
   useEffect(() => {
     if (!inChatPage) return;

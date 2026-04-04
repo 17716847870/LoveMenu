@@ -11,13 +11,35 @@ export async function PUT(
     console.log('API PUT 接收到的 id:', id);
     console.log('API PUT 接收到的 body:', body);
     console.log('API PUT 接收到的 image:', body.image);
+
+    const existingDish = await prisma.dish.findUnique({
+      where: { id },
+      select: { id: true, categoryId: true },
+    });
+
+    if (!existingDish) {
+      return NextResponse.json({ message: '菜品不存在' }, { status: 404 });
+    }
+
+    const nextCategoryId = typeof body.categoryId === 'string' && body.categoryId.trim()
+      ? body.categoryId.trim()
+      : existingDish.categoryId;
+
+    const categoryExists = await prisma.dishCategory.findUnique({
+      where: { id: nextCategoryId },
+      select: { id: true },
+    });
+
+    if (!categoryExists) {
+      return NextResponse.json({ message: '所选分类不存在，请重新选择' }, { status: 400 });
+    }
     
     const updatedDish = await prisma.dish.update({
       where: { id },
       data: {
         name: body.name,
         description: body.description,
-        categoryId: body.categoryId,
+        categoryId: nextCategoryId,
         kissPrice: body.kissPrice,
         hugPrice: body.hugPrice,
         image: body.image,

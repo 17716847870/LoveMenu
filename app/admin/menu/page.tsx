@@ -86,8 +86,8 @@ export default function AdminMenuPage() {
         message.success('菜品创建成功');
       }
       setIsFormModalOpen(false);
-    } catch (error) {
-      message.error('保存失败');
+    } catch (error: any) {
+      message.error(error?.message || '保存失败');
       throw error;
     }
   };

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
+import { useMessage } from "@/components/ui/Message";
 import { ThemeName, FoodRequest } from "@/types";
 import { X, Image as ImageIcon, Loader2, Trash2 } from "lucide-react";
 
@@ -68,6 +69,7 @@ const themeStyles: Record<ThemeName, {
 
 export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: EditFoodRequestProps) {
   const { theme } = useTheme();
+  const message = useMessage();
   const styles = themeStyles[theme];
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -106,11 +108,11 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
       if (result.success && result.data?.url) {
         setImage(result.data.url);
       } else {
-        alert(result.message || '图片上传失败');
+        message.error(result.message || '图片上传失败');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('图片上传失败，请重试');
+      message.error('图片上传失败，请重试');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {

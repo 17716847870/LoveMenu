@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useMessage } from "@/components/ui/Message";
 import { FoodRequest } from "@/types";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import { PageContainer } from "@/components/ui/PageContainer";
@@ -11,6 +12,7 @@ import MobileRequestListView from "@/components/admin/requests/MobileRequestList
 import LovePagination from "@/components/admin/ui/LovePagination/LovePagination";
 
 export default function AdminRequestsPage() {
+  const message = useMessage();
   const [requests, setRequests] = useState<FoodRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -40,7 +42,7 @@ export default function AdminRequestsPage() {
       });
       fetchRequests();
     } catch (error) {
-      alert('更新状态失败');
+      message.error('更新状态失败');
     }
   };
 
@@ -52,7 +54,7 @@ export default function AdminRequestsPage() {
       await fetch(`/api/requests/${id}`, { method: 'DELETE' });
       fetchRequests();
     } catch (error) {
-      alert('删除失败');
+      message.error('删除失败');
     }
   };
 

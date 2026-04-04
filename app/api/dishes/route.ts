@@ -53,6 +53,19 @@ export const POST = async (req: Request) => {
     const body = await req.json();
     console.log('API POST 接收到的 body:', body);
     console.log('API POST 接收到的 image:', body.image);
+
+    if (!body.categoryId || typeof body.categoryId !== 'string') {
+      return NextResponse.json({ message: '请选择菜品分类' }, { status: 400 });
+    }
+
+    const categoryExists = await prisma.dishCategory.findUnique({
+      where: { id: body.categoryId },
+      select: { id: true },
+    });
+
+    if (!categoryExists) {
+      return NextResponse.json({ message: '所选分类不存在，请重新选择' }, { status: 400 });
+    }
     
     const newDish = await prisma.dish.create({
       data: {

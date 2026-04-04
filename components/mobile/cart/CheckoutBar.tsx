@@ -50,7 +50,7 @@ export default function CheckoutBar({ onCheckout, totals, isLoading }: CheckoutB
           isLoading && "opacity-70 cursor-not-allowed"
         )}
       >
-        <span>{isLoading ? "下单中..." : "立即下单"}</span>
+        <span>{isLoading ? "处理中..." : "立即下单"}</span>
         <span className="text-sm font-normal opacity-90">
           (❤️ {totals.kiss} + 🤗 {totals.hug})
         </span>

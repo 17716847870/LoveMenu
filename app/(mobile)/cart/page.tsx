@@ -6,6 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { useUser } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { useMessage } from "@/components/ui/Message";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 
@@ -26,14 +27,17 @@ const pageStyles: Record<ThemeName, string> = {
 
 export default function CartPage() {
   const { items, totals, updateQuantity, removeItem, clearCart, isLoading, isSyncing } = useCart();
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const { theme } = useTheme();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const message = useMessage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReasonSelectorOpen, setIsReasonSelectorOpen] = useState(false);
 
   const handleCheckoutClick = () => {
+    if (isUserLoading) return;
+
     if (!user) {
       router.push("/login");
       return;
@@ -72,9 +76,9 @@ export default function CartPage() {
       if (!res.ok) {
         // 处理余额不足错误
         if (res.status === 400 && json.message?.includes("余额不足")) {
-          alert("❌ " + json.message);
+          message.error(json.message);
         } else {
-          alert("❌ " + (json.message || "创建订单失败"));
+          message.error(json.message || "创建订单失败");
         }
         setIsSubmitting(false);
         return;
@@ -86,7 +90,7 @@ export default function CartPage() {
       router.push("/orders");
     } catch (error) {
       console.error("Order creation error:", error);
-      alert("❌ 创建订单失败，请稍后重试");
+      message.error("创建订单失败，请稍后重试");
       setIsSubmitting(false);
     }
   };
@@ -124,7 +128,7 @@ export default function CartPage() {
       <CheckoutBar 
         onCheckout={handleCheckoutClick} 
         totals={totals}
-        isLoading={isSubmitting}
+        isLoading={isSubmitting || isUserLoading}
       />
 
       <OrderReasonSelector

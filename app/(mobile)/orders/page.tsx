@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { useMessage } from "@/components/ui/Message";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { useOrders, Order as ApiOrder } from "@/apis/orders";
@@ -117,6 +118,7 @@ interface OrderForCard {
 export default function OrdersPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const message = useMessage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
@@ -178,11 +180,11 @@ export default function OrdersPage() {
       if (result.success && result.data?.url) {
         setMemoryImage(result.data.url);
       } else {
-        alert(result.message || '图片上传失败');
+        message.error(result.message || '图片上传失败');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('图片上传失败，请重试');
+      message.error('图片上传失败，请重试');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -219,11 +221,11 @@ export default function OrdersPage() {
         setLocalMemoryOrders(prev => new Set([...prev, recordingOrderId]));
         setRecordingOrderId(null);
       } else {
-        alert(result.message || '保存回忆失败');
+        message.error(result.message || '保存回忆失败');
       }
     } catch (error) {
       console.error('Save memory error:', error);
-      alert('保存回忆失败，请重试');
+      message.error('保存回忆失败，请重试');
     } finally {
       setIsSubmitting(false);
     }

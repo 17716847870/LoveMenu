@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useMessage } from '@/components/ui/Message';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -23,6 +24,7 @@ export default function ImageUploader({
   disabled = false,
 }: ImageUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const message = useMessage();
   const { upload, isUploading, progress } = useImageUpload();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +32,7 @@ export default function ImageUploader({
     if (!file) return;
 
     if (file.size > maxSize * 1024 * 1024) {
-      alert(`图片大小不能超过 ${maxSize}MB`);
+      message.error(`图片大小不能超过 ${maxSize}MB`);
       return;
     }
 

@@ -8,11 +8,28 @@ export async function PUT(
   try {
     const id = (await params).id;
     const data = await req.json();
+    const name = data.name?.trim();
+
+    if (!name) {
+      return NextResponse.json({ message: '分类名称不能为空' }, { status: 400 });
+    }
+
+    const existedCategory = await prisma.dishCategory.findFirst({
+      where: {
+        name,
+        id: { not: id },
+      },
+      select: { id: true },
+    });
+
+    if (existedCategory) {
+      return NextResponse.json({ message: '分类名称已存在，请使用其他名称' }, { status: 400 });
+    }
     
     const updatedCategory = await prisma.dishCategory.update({
       where: { id },
       data: {
-        name: data.name,
+        name,
         sortOrder: data.sortOrder,
       },
     });

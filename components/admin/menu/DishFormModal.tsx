@@ -3,6 +3,7 @@ import { Dish } from '@/types';
 import { X } from 'lucide-react';
 import LoveSelect from '@/components/admin/ui/LoveSelect/LoveSelect';
 import MultiImageUploader from '@/components/common/MultiImageUploader';
+import {asyncSetState} from '@/lib/utils'
 
 interface DishFormModalProps {
   isOpen: boolean;
@@ -13,6 +14,16 @@ interface DishFormModalProps {
   categories?: Array<{ label: string; value: string }>;
 }
 
+const EMPTY_FORM_DATA = {
+  name: '',
+  description: '',
+  categoryId: '',
+  kissPrice: 0,
+  hugPrice: 0,
+  popularity: 0,
+  image: '',
+};
+
 export default function DishFormModal({ 
   isOpen, 
   onClose, 
@@ -21,58 +32,55 @@ export default function DishFormModal({
   isSubmitting = false,
   categories = []
 }: DishFormModalProps) {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    categoryId: '',
-    kissPrice: 0,
-    hugPrice: 0,
-    popularity: 0,
-    image: '',
-  });
+  const [formData, setFormData] = useState(EMPTY_FORM_DATA);
 
   useEffect(() => {
     if (isOpen) {
       if (editingDish) {
-        setFormData({
-          name: editingDish.name,
-          description: editingDish.description || '',
-          categoryId: editingDish.categoryId,
-          kissPrice: editingDish.kissPrice,
-          hugPrice: editingDish.hugPrice,
-          popularity: editingDish.popularity || 0,
-          image: editingDish.image || '',
+        asyncSetState(() => {
+          setFormData({
+            name: editingDish.name,
+            description: editingDish.description || '',
+            categoryId: editingDish.categoryId,
+            kissPrice: editingDish.kissPrice,
+            hugPrice: editingDish.hugPrice,
+            popularity: editingDish.popularity || 0,
+            image: editingDish.image || '',
+          });
         });
       } else {
-        setFormData({
-          name: '',
-          description: '',
-          categoryId: '',
-          kissPrice: 0,
-          hugPrice: 0,
-          popularity: 0,
-          image: '',
+        asyncSetState(() => {
+          setFormData(EMPTY_FORM_DATA);
         });
       }
     }
   }, [isOpen, editingDish]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      asyncSetState(() => {
+        setFormData(EMPTY_FORM_DATA);
+      });
+    }
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setFormData(EMPTY_FORM_DATA);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('提交前的 formData:', formData);
-    console.log('提交前的 image 值:', formData.image);
     
     if (editingDish) {
       const dataToSave = {
         ...editingDish,
         ...formData,
       };
-      console.log('编辑模式 - 保存的数据:', dataToSave);
       onSave(dataToSave);
     } else {
-      console.log('新增模式 - 保存的数据:', formData);
       onSave(formData);
     }
   };
@@ -86,14 +94,21 @@ export default function DishFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-pink-50 flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4"
+      onMouseDown={handleClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-pink-50 flex flex-col max-h-[90vh]"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-pink-50/30">
           <h2 className="text-xl font-bold text-gray-800">
             {editingDish ? '编辑菜品' : '新增菜品'}
           </h2>
           <button 
-            onClick={onClose}
+            type="button"
+            onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
           >
             <X size={20} />
@@ -183,7 +198,6 @@ export default function DishFormModal({
               <MultiImageUploader
                 value={formData.image}
                 onChange={(urls) => {
-                  console.log(urls);
                   setFormData(prev => ({ ...prev, image: urls as string }))
                 }}
                 mode="single"
@@ -198,7 +212,7 @@ export default function DishFormModal({
         <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
           <button 
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-6 py-2 rounded-xl text-gray-600 hover:bg-gray-200 transition-colors font-medium"
           >
             取消

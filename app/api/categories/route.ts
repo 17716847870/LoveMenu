@@ -18,9 +18,26 @@ export const GET = async () => {
 export const POST = async (req: Request) => {
   try {
     const body = await req.json();
+    const name = body.name?.trim();
+
+    if (!name) {
+      return NextResponse.json({ message: '分类名称不能为空' }, { status: 400 });
+    }
+
+    const existedCategory = await prisma.dishCategory.findFirst({
+      where: {
+        name,
+      },
+      select: { id: true },
+    });
+
+    if (existedCategory) {
+      return NextResponse.json({ message: '分类名称已存在，请勿重复创建' }, { status: 400 });
+    }
+
     const newCategory = await prisma.dishCategory.create({
       data: {
-        name: body.name,
+        name,
         sortOrder: body.sortOrder,
       },
     });

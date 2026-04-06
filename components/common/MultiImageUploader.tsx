@@ -78,9 +78,15 @@ export default function ImageUploader({
         setImages(existingImages);
       }
     } else if (images.length > 0 && !images.some(img => img.status === 'uploading')) {
+      images.forEach((img) => {
+        if (!img.remoteUrl) {
+          URL.revokeObjectURL(img.localUrl);
+        }
+      });
       setImages([]);
+      setPreviewIndex(null);
     }
-  }, [value, isMultiple]);
+  }, [value, isMultiple, images]);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -337,6 +343,16 @@ export default function ImageUploader({
       document.body.style.overflow = 'unset';
     };
   }, [previewIndex]);
+
+  useEffect(() => {
+    return () => {
+      images.forEach((img) => {
+        if (!img.remoteUrl) {
+          URL.revokeObjectURL(img.localUrl);
+        }
+      });
+    };
+  }, [images]);
 
   const displayUrls = images.map(img => img.localUrl);
 

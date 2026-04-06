@@ -7,11 +7,10 @@ import { Heart, Sparkles, Zap, Utensils } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
+import { useHomeMood } from "@/apis/home";
 
 interface CoupleMoodCardProps {
   username?: string;
-  mood?: string;
-  craving?: string;
 }
 
 // Helper to get greeting based on time
@@ -87,14 +86,14 @@ const cardThemes: Record<ThemeName, {
   }
 };
 
-export default function CoupleMoodCard({ 
-  mood = "😊 开心",
-  craving = "🍗 炸鸡" 
-}: CoupleMoodCardProps) {
+export default function CoupleMoodCard() {
   const { theme } = useTheme();
+  const { data } = useHomeMood();
   const [greeting, setGreeting] = useState("");
   const currentTheme = cardThemes[theme] || cardThemes.couple;
   const Icon = currentTheme.icon;
+  const mood = data?.mood || "🌤️ 今天也很适合好好吃饭";
+  const craving = data?.craving || "还没想好，去菜单里挑挑吧";
 
   useEffect(() => {
     // eslint-disable-next-line

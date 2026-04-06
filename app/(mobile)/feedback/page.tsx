@@ -6,40 +6,13 @@ import { cn } from "@/lib/utils";
 import { ThemeName, Feedback } from "@/types";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useCreateFeedback, useDeleteFeedback, useFeedbacks, useUpdateFeedback } from "@/apis/feedback";
 
 import FeedbackHeader from "@/components/mobile/feedback/FeedbackHeader";
 import FeedbackList from "@/components/mobile/feedback/FeedbackList";
 import CreateFeedback from "@/components/mobile/feedback/CreateFeedback";
 import EditFeedback from "@/components/mobile/feedback/EditFeedback";
 import EmptyFeedback from "@/components/mobile/feedback/EmptyFeedback";
-
-// Mock Data
-const initialFeedbacks: Feedback[] = [
-  {
-    id: "1",
-    type: "experience",
-    title: "页面加载有点慢",
-    content: "有时候打开菜单需要等好几秒，希望能优化一下速度。",
-    status: "processing",
-    createdAt: "2024-03-14",
-  },
-  {
-    id: "2",
-    type: "menu",
-    title: "希望增加日料",
-    content: "最近特别想吃寿司和拉面，可以加进菜单吗？",
-    status: "open",
-    createdAt: "2024-03-12",
-  },
-  {
-    id: "3",
-    type: "feature",
-    title: "夜间模式很好看",
-    content: "特别喜欢新的夜间模式，颜色搭配很舒服！",
-    status: "resolved",
-    createdAt: "2024-03-10",
-  }
-];
 
 const pageStyles: Record<ThemeName, string> = {
   couple: "bg-linear-to-b from-pink-50 to-white",
@@ -50,28 +23,34 @@ const pageStyles: Record<ThemeName, string> = {
 
 export default function FeedbackPage() {
   const { theme } = useTheme();
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>(initialFeedbacks);
+  const { data: feedbacks = [], isLoading } = useFeedbacks();
+  const createMutation = useCreateFeedback();
+  const updateMutation = useUpdateFeedback();
+  const deleteMutation = useDeleteFeedback();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFeedback, setEditingFeedback] = useState<Feedback | null>(null);
 
   const handleCreate = (data: Omit<Feedback, "id" | "status" | "createdAt">) => {
-    const newFeedback: Feedback = {
-      ...data,
-      id: Date.now().toString(),
-      status: "open",
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    setFeedbacks([newFeedback, ...feedbacks]);
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        setIsCreateOpen(false);
+      },
+    });
   };
 
   const handleEdit = (data: Partial<Feedback>) => {
-    setFeedbacks(feedbacks.map(f => f.id === data.id ? { ...f, ...data } as Feedback : f));
-    setEditingFeedback(null);
+    if (!data.id) return;
+
+    updateMutation.mutate(data as { id: string } & Partial<Feedback>, {
+      onSuccess: () => {
+        setEditingFeedback(null);
+      },
+    });
   };
 
   const handleDelete = (id: string) => {
     if (confirm("确定要删除这条反馈吗？")) {
-      setFeedbacks(feedbacks.filter(f => f.id !== id));
+      deleteMutation.mutate(id);
     }
   };
 
@@ -79,7 +58,11 @@ export default function FeedbackPage() {
     <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
       <FeedbackHeader />
 
-      {feedbacks.length > 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full" />
+        </div>
+      ) : feedbacks.length > 0 ? (
         <FeedbackList 
           feedbacks={feedbacks} 
           onEdit={setEditingFeedback} 

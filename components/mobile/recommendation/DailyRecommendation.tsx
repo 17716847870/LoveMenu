@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Heart, Sparkles, Target, Zap, ArrowRight } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -10,14 +10,12 @@ import { ThemeName, Dish } from "@/types";
 import FoodRecommendationItem from "./FoodRecommendationItem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { RecommendationItem, useRecommendations } from "@/apis/recommendations";
+import { useAddFavorite, useFavorites, useRemoveFavorite } from "@/apis/favorites";
+import { useUser } from "@/context/UserContext";
 
 interface DailyRecommendationProps {
   compact?: boolean;
-}
-
-interface RecommendationItem extends Dish {
-  reason: string;
-  isFavorite: boolean;
 }
 
 const themeStyles: Record<ThemeName, {
@@ -57,151 +55,132 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-const REASONS = [
-  "你上次点过这个",
-  "基于你喜欢的口味",
-  "今天适合吃这个",
-  "大家都说好吃",
-  "尝尝新口味吧",
-  "热量低，适合晚上吃",
-  "周末犒劳一下自己"
-];
-
 export default function DailyRecommendation({ compact = false }: DailyRecommendationProps) {
   const { theme } = useTheme();
   const { addItem } = useCart();
+  const { user } = useUser();
   const router = useRouter();
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: allRecommendations = [], isLoading, refetch, isFetching } = useRecommendations();
+  const { data: favorites = [] } = useFavorites(user?.id);
+  const addFavoriteMutation = useAddFavorite(user?.id);
+  const removeFavoriteMutation = useRemoveFavorite(user?.id);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
-  const generateRecommendations = useCallback(async () => {
-    setIsLoading(true);
-    
-    try {
-      const res = await fetch('/api/dishes');
-      const data = await res.json();
-      const allDishes = data.data || [];
-      
-      const count = compact ? 3 : 6;
-      const shuffled = [...allDishes].sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, count);
-      
-      const newRecommendations = selected.map(dish => ({
-        ...dish,
-        reason: REASONS[Math.floor(Math.random() * REASONS.length)],
-        isFavorite: Math.random() > 0.8 
-      }));
-      
-      setRecommendations(newRecommendations);
-    } catch (error) {
-      console.error('Failed to fetch recommendations', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [compact]);
+  const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.dishId)), [favorites]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      generateRecommendations();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [generateRecommendations]);
+  const recommendations = useMemo(() => {
+    const count = compact ? 3 : 6;
+    return allRecommendations.slice(0, count);
+  }, [allRecommendations, compact]);
 
   const handleRefresh = () => {
-    generateRecommendations();
+    refetch();
   };
 
-  const handleFavorite = (dishId: string) => {
-    setRecommendations(prev => prev.map(item => 
-      item.id === dishId ? { ...item, isFavorite: !item.isFavorite } : item
-    ));
+  const handleFavorite = async (dishId: string) => {
+    if (!user?.id) return;
+
+    if (favoriteIds.has(dishId)) {
+      await removeFavoriteMutation.mutateAsync(dishId);
+      return;
+    }
+
+    await addFavoriteMutation.mutateAsync(dishId);
   };
 
   const handleAddToCart = (dish: Dish) => {
     addItem(dish);
   };
-  
+
   const handleItemClick = (dish: Dish) => {
     router.push(`/menu/${dish.id}`);
   };
 
   const getTitle = () => {
     switch (theme) {
-      case 'cute': return "🍱 今日推荐";
-      case 'minimal': return "Today Recommend";
-      case 'night': return "⚡ Today Recommend";
-      default: return "❤️ 今日推荐";
+      case "cute":
+        return "🍱 今日推荐";
+      case "minimal":
+        return "Today Recommend";
+      case "night":
+        return "⚡ Today Recommend";
+      default:
+        return "❤️ 今日推荐";
     }
   };
 
   return (
-    <div className={cn(
-      "rounded-4xl p-5 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
-      currentTheme.container
-    )}>
-      {/* Header */}
+    <div
+      className={cn(
+        "rounded-4xl p-5 shadow-sm border flex flex-col gap-4 overflow-hidden relative transition-colors duration-300",
+        currentTheme.container
+      )}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
           <span className={currentTheme.header}>{getTitle()}</span>
         </div>
-        
-        <button 
+
+        <button
           onClick={handleRefresh}
           className={cn("p-2 rounded-full transition-all", currentTheme.refreshButton)}
-          disabled={isLoading}
+          disabled={isLoading || isFetching}
           aria-label="Refresh recommendations"
         >
-          <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+          <RefreshCw className={cn("w-4 h-4", (isLoading || isFetching) && "animate-spin")} />
         </button>
       </div>
 
-      {/* Content */}
       <div className="flex flex-col gap-3 min-h-[200px]">
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <motion.div 
+            <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex-1 flex items-center justify-center text-sm text-gray-400 py-10"
             >
-              正在为你挑选美食...
+              正在根据真实数据为你挑选美食...
             </motion.div>
-          ) : (
-            <motion.div 
+          ) : recommendations.length > 0 ? (
+            <motion.div
               key="list"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex flex-col gap-3"
             >
-              {recommendations.map((item, index) => (
-                <FoodRecommendationItem 
-                  key={`${item.id}-${index}`}
+              {recommendations.map((item: RecommendationItem) => (
+                <FoodRecommendationItem
+                  key={item.id}
                   dish={item}
                   reason={item.reason}
-                  isFavorite={item.isFavorite}
+                  isFavorite={favoriteIds.has(item.id)}
                   onAdd={handleAddToCart}
                   onFavorite={handleFavorite}
                   onItemClick={handleItemClick}
                 />
               ))}
             </motion.div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-sm text-gray-400 py-10">
+              暂时还没有可推荐的菜品
+            </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Footer / View All */}
       {compact && !isLoading && (
         <Link href="/recommendation" className="block mt-1">
-          <div className={cn(
-            "w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-1 transition-colors",
-            currentTheme.viewAll
-          )}>
+          <div
+            className={cn(
+              "w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-1 transition-colors",
+              currentTheme.viewAll
+            )}
+          >
             查看全部推荐
             <ArrowRight className="w-4 h-4" />
           </div>

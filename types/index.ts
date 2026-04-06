@@ -25,6 +25,13 @@ export interface Dish {
   createdAt?: string;
 }
 
+export interface DishFavorite {
+  id: string;
+  userId: string;
+  dishId: string;
+  createdAt: string;
+}
+
 export interface CartItem {
   id: string;
   dish: Dish;

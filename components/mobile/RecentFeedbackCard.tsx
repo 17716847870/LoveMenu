@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -13,13 +13,7 @@ import {
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
-import { useOrders } from "@/apis/orders";
-
-interface FeedbackPreview {
-  id: string;
-  title: string;
-  type: string;
-}
+import { useFeedbacks } from "@/apis/feedback";
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -60,20 +54,18 @@ const themeStyles: Record<ThemeName, {
 
 export default function RecentFeedbackCard() {
   const { theme } = useTheme();
-  const { data: orders = [] } = useOrders();
+  const { data: feedbacksData = [] } = useFeedbacks();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
   const feedbacks = useMemo(() => {
-    return orders
-      .filter(order => order.memory?.text)
+    return feedbacksData
       .slice(0, 3)
-      .map(order => ({
-        id: order.id,
-        title: order.memory?.text || "",
-        type: order.reason || "experience",
+      .map((feedback) => ({
+        id: feedback.id,
+        title: feedback.title,
       }));
-  }, [orders]);
+  }, [feedbacksData]);
 
   const getTitle = () => {
     switch (theme) {
@@ -108,12 +100,11 @@ export default function RecentFeedbackCard() {
 
       <div className="flex flex-col gap-2">
         {feedbacks.length > 0 ? (
-          feedbacks.map((item, index) => (
+          feedbacks.map((item) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
               className={cn(
                 "p-3 text-sm font-medium transition-all flex items-center justify-between rounded-xl",
                 currentTheme.item

@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+const CONFIG_KEYS = ["loveStartDate", "homeMoodText", "homeCravingText"] as const;
+
+type ConfigKey = (typeof CONFIG_KEYS)[number];
+
 export const GET = async () => {
   try {
-    const loveStartDateConfig = await prisma.systemConfig.findUnique({
-      where: { key: "loveStartDate" },
+    const configs = await prisma.systemConfig.findMany({
+      where: {
+        key: {
+          in: [...CONFIG_KEYS],
+        },
+      },
     });
+
+    const configMap = new Map(configs.map((item) => [item.key, item.value]));
 
     return NextResponse.json({
       success: true,
       data: {
-        loveStartDate: loveStartDateConfig?.value || "",
+        loveStartDate: configMap.get("loveStartDate") || "",
+        homeMoodText: configMap.get("homeMoodText") || "",
+        homeCravingText: configMap.get("homeCravingText") || "",
       },
     });
   } catch (error) {
@@ -21,22 +33,17 @@ export const GET = async () => {
 
 export const POST = async (req: Request) => {
   try {
-    const body = await req.json();
-    const { loveStartDate } = body;
+    const body = await req.json() as Partial<Record<ConfigKey, string>>;
 
-    if (!loveStartDate) {
-      return NextResponse.json(
-        { message: "在一起的日期不能为空" },
-        { status: 400 }
-      );
-    }
-
-    // 使用 upsert 确保配置存在
-    await prisma.systemConfig.upsert({
-      where: { key: "loveStartDate" },
-      update: { value: loveStartDate },
-      create: { key: "loveStartDate", value: loveStartDate },
-    });
+    await Promise.all(
+      CONFIG_KEYS.map((key) =>
+        prisma.systemConfig.upsert({
+          where: { key },
+          update: { value: body[key] || "" },
+          create: { key, value: body[key] || "" },
+        })
+      )
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

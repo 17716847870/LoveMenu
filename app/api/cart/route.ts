@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export const GET = async (req: Request) => {
   try {
@@ -27,6 +28,7 @@ export const GET = async (req: Request) => {
     return NextResponse.json({ data: formattedItems });
   } catch (error) {
     console.error("[api/cart] 请求失败", error);
+    await logApiError({ req, scope: '/api/cart[GET]' }, error);
     return NextResponse.json({ message: "获取购物车失败" }, { status: 500 });
   }
 };
@@ -61,6 +63,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ success: true, data: newItem });
   } catch (error) {
     console.error("[api/cart] 请求失败", error);
+    await logApiError({ req, scope: '/api/cart[POST]' }, error);
     return NextResponse.json({ message: "添加到购物车失败" }, { status: 500 });
   }
 };
@@ -82,6 +85,7 @@ export const DELETE = async (req: Request) => {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/cart] 请求失败", error);
+    await logApiError({ req, scope: '/api/cart[DELETE]' }, error);
     return NextResponse.json({ message: "删除购物车项失败" }, { status: 500 });
   }
 };
@@ -109,6 +113,7 @@ export const PUT = async (req: Request) => {
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (error) {
     console.error("[api/cart] 请求失败", error);
+    await logApiError({ req, scope: '/api/cart[PUT]' }, error);
     return NextResponse.json({ message: "更新购物车失败" }, { status: 500 });
   }
 };

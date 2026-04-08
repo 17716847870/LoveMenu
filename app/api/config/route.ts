@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 const CONFIG_KEYS = ["loveStartDate", "homeMoodText", "homeCravingText"] as const;
 
@@ -27,6 +28,7 @@ export const GET = async () => {
     });
   } catch (error) {
     console.error("[api/config][GET] 获取配置失败", error);
+    await logApiError({ scope: '/api/config[GET]', path: '/api/config', method: 'GET' }, error);
     return NextResponse.json({ message: "获取配置失败" }, { status: 500 });
   }
 };
@@ -48,6 +50,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/config][POST] 保存配置失败", error);
+    await logApiError({ req, scope: '/api/config[POST]' }, error);
     return NextResponse.json({ message: "保存配置失败" }, { status: 500 });
   }
 };

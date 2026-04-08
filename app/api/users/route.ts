@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { logApiError } from '@/lib/error-log';
 
 const SALT_ROUNDS = 10;
 
@@ -22,6 +23,7 @@ export async function GET() {
     return NextResponse.json({ data: users });
   } catch (error) {
     console.error('[api/users][GET] 获取失败', error);
+    await logApiError({ scope: '/api/users[GET]', path: '/api/users', method: 'GET' }, error);
     return NextResponse.json({ message: '获取失败' }, { status: 500 });
   }
 }
@@ -60,6 +62,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, data: newUser });
   } catch (error) {
     console.error('[api/users][POST] 添加失败', error);
+    await logApiError({ req, scope: '/api/users[POST]' }, error);
     return NextResponse.json({ message: '添加失败' }, { status: 500 });
   }
 }

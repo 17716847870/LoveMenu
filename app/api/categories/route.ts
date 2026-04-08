@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export const GET = async () => {
   try {
@@ -11,6 +12,7 @@ export const GET = async () => {
     return NextResponse.json({ data: categories });
   } catch (error) {
     console.error('[api/categories][GET] 获取分类失败', error);
+    await logApiError({ scope: '/api/categories[GET]', path: '/api/categories', method: 'GET' }, error);
     return NextResponse.json({ message: '获取分类失败' }, { status: 500 });
   }
 };
@@ -44,6 +46,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ success: true, data: newCategory });
   } catch (error) {
     console.error('[api/categories][POST] 创建分类失败', error);
+    await logApiError({ req, scope: '/api/categories[POST]' }, error);
     return NextResponse.json({ message: '创建分类失败' }, { status: 500 });
   }
 };

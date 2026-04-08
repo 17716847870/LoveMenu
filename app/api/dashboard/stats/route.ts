@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -92,6 +93,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Stats API error:', error);
+    await logApiError({ scope: '/api/dashboard/stats[GET]', path: '/api/dashboard/stats', method: 'GET' }, error);
     return NextResponse.json(
       { message: '获取统计数据失败' },
       { status: 500 }

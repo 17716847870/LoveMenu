@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -90,6 +91,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[api/home/mood][GET] 获取首页状态失败", error);
+    await logApiError({ scope: '/api/home/mood[GET]', path: '/api/home/mood', method: 'GET' }, error);
     return NextResponse.json({ message: "获取首页状态失败" }, { status: 500 });
   }
 }

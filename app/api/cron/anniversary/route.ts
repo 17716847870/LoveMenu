@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { calcNextRemindAt, renderEmailContent, CalendarType, RepeatType } from '@/lib/anniversary';
+import { logApiError } from '@/lib/error-log';
 
 // Cron 鉴权：支持手动 Bearer 调用，也兼容 Vercel Cron 请求头
 function isAuthorized(req: Request): boolean {
@@ -100,6 +101,7 @@ async function runAnniversaryCron(req: Request) {
     return NextResponse.json({ processed: due.length, succeeded, results });
   } catch (error) {
     console.error('[cron/anniversary]', error);
+    await logApiError({ scope: '/api/cron/anniversary[None]', path: '/api/cron/anniversary', method: 'None' }, error);
     return NextResponse.json({ message: '执行失败' }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -64,6 +65,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Top items API error:', error);
+    await logApiError({ scope: '/api/dashboard/top-items[GET]', path: '/api/dashboard/top-items', method: 'GET' }, error);
     return NextResponse.json(
       { message: '获取热门数据失败' },
       { status: 500 }

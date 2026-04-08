@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function PUT(
   req: Request,
@@ -37,6 +38,7 @@ export async function PUT(
     return NextResponse.json({ success: true, data: updatedCategory });
   } catch (error) {
     console.error('[api/categories/:id][PUT] 更新分类失败', error);
+    await logApiError({ req, scope: '/api/categories/[id][PUT]' }, error);
     return NextResponse.json({ message: '更新分类失败' }, { status: 500 });
   }
 }
@@ -64,6 +66,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[api/categories/:id][DELETE] 删除分类失败', error);
+    await logApiError({ req, scope: '/api/categories/[id][DELETE]' }, error);
     return NextResponse.json({ message: '删除分类失败' }, { status: 500 });
   }
 }

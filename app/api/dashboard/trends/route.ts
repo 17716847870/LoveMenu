@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -41,6 +42,7 @@ export async function GET() {
     return NextResponse.json(trends);
   } catch (error) {
     console.error('Trends API error:', error);
+    await logApiError({ scope: '/api/dashboard/trends[GET]', path: '/api/dashboard/trends', method: 'GET' }, error);
     return NextResponse.json(
       { message: '获取趋势数据失败' },
       { status: 500 }

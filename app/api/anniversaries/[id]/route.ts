@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { calcNextRemindAt, CalendarType, RepeatType } from '@/lib/anniversary';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,6 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ data: record });
   } catch (error) {
     console.error('[api/anniversaries][GET/:id]', error);
+    await logApiError({ scope: '/api/anniversaries/[id][GET]', path: '/api/anniversaries/[id]', method: 'GET' }, error);
     return NextResponse.json({ message: '获取失败' }, { status: 500 });
   }
 }
@@ -52,6 +54,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ data: record });
   } catch (error) {
     console.error('[api/anniversaries][PUT/:id]', error);
+    await logApiError({ req, scope: '/api/anniversaries/[id][PUT]' }, error);
     return NextResponse.json({ message: '更新失败' }, { status: 500 });
   }
 }
@@ -63,6 +66,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[api/anniversaries][DELETE/:id]', error);
+    await logApiError({ scope: '/api/anniversaries/[id][DELETE]', path: '/api/anniversaries/[id]', method: 'DELETE' }, error);
     return NextResponse.json({ message: '删除失败' }, { status: 500 });
   }
 }

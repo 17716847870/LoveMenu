@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 function normalizeText(value: string) {
   return value.replace(/\s+/g, "").toLowerCase();
@@ -93,6 +94,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[api/recommendations][GET] 获取推荐失败", error);
+    await logApiError({ scope: '/api/recommendations[GET]', path: '/api/recommendations', method: 'GET' }, error);
     return NextResponse.json({ message: "获取推荐失败" }, { status: 500 });
   }
 }

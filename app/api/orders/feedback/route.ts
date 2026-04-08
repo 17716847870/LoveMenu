@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function POST(req: Request) {
   try {
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, data: feedback });
   } catch (error) {
     console.error('Create feedback error:', error);
+    await logApiError({ req, scope: '/api/orders/feedback[POST]' }, error);
     return NextResponse.json(
       { message: error instanceof Error ? error.message : '创建回忆失败' },
       { status: 500 }

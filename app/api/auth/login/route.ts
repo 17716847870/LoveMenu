@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
+import { logApiError } from '@/lib/error-log';
 
 export async function POST(req: Request) {
   try {
@@ -58,6 +59,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error('[api/auth/login] 登录失败', error);
+    await logApiError({ req, scope: '/api/auth/login[POST]' }, error);
     return NextResponse.json(
       { message: '登录失败' },
       { status: 500 }

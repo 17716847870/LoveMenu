@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -52,6 +53,7 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({ data: formattedOrders });
   } catch (error) {
     console.error('获取订单失败:', error);
+    await logApiError({ req, scope: '/api/orders[GET]' }, error);
     return NextResponse.json({ message: '获取订单失败' }, { status: 500 });
   }
 };
@@ -116,6 +118,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     console.error('[api/orders][POST] 创建订单失败', error);
+    await logApiError({ req, scope: '/api/orders[POST]' }, error);
     return NextResponse.json({ message: '创建订单失败' }, { status: 500 });
   }
 };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users, Bell, Settings } from "lucide-react";
+import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users, Bell, Settings, Bug } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { useChatRealtime } from "@/context/ChatRealtimeContext";
@@ -62,6 +62,11 @@ export default function AdminSidebar() {
       label: "纪念日提醒",
       href: "/admin/anniversaries",
       icon: Bell
+    },
+    {
+      label: "错误日志",
+      href: "/admin/error-logs",
+      icon: Bug
     },
     {
       label: "系统配置",

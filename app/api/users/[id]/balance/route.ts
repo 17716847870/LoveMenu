@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function PATCH(
   req: Request,
@@ -45,6 +46,7 @@ export async function PATCH(
     return NextResponse.json({ success: true, data: updatedUser });
   } catch (error) {
     console.error('[api/users/:id/balance][PATCH] 更新余额失败', error);
+    await logApiError({ req, scope: '/api/users/[id]/balance[PATCH]' }, error);
     return NextResponse.json({ message: '更新余额失败' }, { status: 500 });
   }
 }

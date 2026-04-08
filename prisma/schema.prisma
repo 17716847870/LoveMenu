@@ -191,3 +191,21 @@ model AnniversaryLog {
 
   @@index([anniversaryId])
 }
+
+model ErrorLog {
+  id        String   @id @default(cuid())
+  source    String   // "api" | "frontend"
+  level     String   @default("error")
+  scope     String?
+  path      String?
+  method    String?
+  message   String
+  stack     String?
+  url       String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([source, createdAt])
+  @@index([createdAt])
+}

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export async function PATCH(
   req: Request,
@@ -36,6 +37,7 @@ export async function PATCH(
     });
   } catch (error) {
     console.error("[api/feedback/:id][PATCH] 更新反馈失败", error);
+    await logApiError({ req, scope: '/api/feedback/[id][PATCH]' }, error);
     return NextResponse.json({ message: "更新反馈失败" }, { status: 500 });
   }
 }
@@ -52,6 +54,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/feedback/:id][DELETE] 删除反馈失败", error);
+    await logApiError({ req, scope: '/api/feedback/[id][DELETE]' }, error);
     return NextResponse.json({ message: "删除反馈失败" }, { status: 500 });
   }
 }

@@ -4,7 +4,7 @@ import { verifyToken } from './lib/auth';
 
 const publicPaths = ['/login', '/403'];
 const authApiPaths = ['/api/auth/login', '/api/auth/logout'];
-const publicApiPrefixes = ['/api/auth', '/api/cron'];
+const publicApiPrefixes = ['/api/auth', '/api/cron', '/api/error-logs'];
 const staticPaths = ['/_next', '/favicon.ico', '/logo.png'];
 
 export async function proxy(request: NextRequest) {

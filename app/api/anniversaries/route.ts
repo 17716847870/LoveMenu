@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { calcNextRemindAt, CalendarType, RepeatType } from '@/lib/anniversary';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -10,6 +11,7 @@ export async function GET() {
     return NextResponse.json({ data: list });
   } catch (error) {
     console.error('[api/anniversaries][GET]', error);
+    await logApiError({ scope: '/api/anniversaries[GET]', path: '/api/anniversaries', method: 'GET' }, error);
     return NextResponse.json({ message: '获取失败' }, { status: 500 });
   }
 }
@@ -49,6 +51,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ data: record }, { status: 201 });
   } catch (error) {
     console.error('[api/anniversaries][POST]', error);
+    await logApiError({ req, scope: '/api/anniversaries[POST]' }, error);
     return NextResponse.json({ message: '创建失败' }, { status: 500 });
   }
 }

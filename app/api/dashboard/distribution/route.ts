@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logApiError } from '@/lib/error-log';
 
 export async function GET() {
   try {
@@ -53,6 +54,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Distribution API error:', error);
+    await logApiError({ scope: '/api/dashboard/distribution[GET]', path: '/api/dashboard/distribution', method: 'GET' }, error);
     return NextResponse.json(
       { message: '获取分布数据失败' },
       { status: 500 }

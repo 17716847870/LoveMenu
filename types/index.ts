@@ -93,3 +93,18 @@ export interface Feedback {
   status: FeedbackStatus;
   createdAt: string;
 }
+
+export interface AppErrorLog {
+  id: string;
+  source: 'api' | 'frontend';
+  level: 'error' | 'warn';
+  scope?: string | null;
+  path?: string | null;
+  method?: string | null;
+  message: string;
+  stack?: string | null;
+  url?: string | null;
+  userAgent?: string | null;
+  metadata?: Record<string, unknown> | null;
+  createdAt: string;
+}

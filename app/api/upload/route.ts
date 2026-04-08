@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { uploadImage } from '@/lib/oss';
+import { logApiError } from '@/lib/error-log';
 
 export const POST = async (req: Request) => {
   try {
@@ -42,6 +43,7 @@ export const POST = async (req: Request) => {
     });
   } catch (error) {
     console.error('Upload error:', error);
+    await logApiError({ req, scope: '/api/upload[POST]' }, error);
     return NextResponse.json(
       { message: error instanceof Error ? error.message : '上传失败' },
       { status: 500 }

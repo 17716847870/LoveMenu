@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logApiError } from '@/lib/error-log';
 
 export const GET = async (req: Request) => {
   try {
@@ -44,6 +45,7 @@ export const GET = async (req: Request) => {
     return NextResponse.json({ data: dishes });
   } catch (error) {
     console.error("[api/dishes][GET] 获取菜品失败", error);
+    await logApiError({ req, scope: '/api/dishes[GET]' }, error);
     return NextResponse.json({ message: '获取菜品失败' }, { status: 500 });
   }
 };
@@ -83,6 +85,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ success: true, data: newDish });
   } catch (error) {
     console.error('API POST 错误:', error);
+    await logApiError({ req, scope: '/api/dishes[POST]' }, error);
     return NextResponse.json({ message: '创建菜品失败' }, { status: 500 });
   }
 };

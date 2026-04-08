@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { broadcastChatMessage } from "@/lib/supabase-server";
+import { logApiError } from '@/lib/error-log';
 
 type TokenPayload = {
   id: string;
@@ -87,6 +88,7 @@ export const GET = async () => {
     return NextResponse.json({ data: formattedMessages });
   } catch (error) {
     console.error("[api/chat][GET] 获取消息失败", error);
+    await logApiError({ scope: '/api/chat[GET]', path: '/api/chat', method: 'GET' }, error);
     return NextResponse.json({ message: "获取消息失败" }, { status: 500 });
   }
 };
@@ -157,6 +159,7 @@ export const POST = async (req: Request) => {
     });
   } catch (error) {
     console.error("[api/chat][POST] 发送消息失败", error);
+    await logApiError({ req, scope: '/api/chat[POST]' }, error);
     return NextResponse.json({ message: "发送消息失败" }, { status: 500 });
   }
 };
@@ -195,6 +198,7 @@ export const PATCH = async () => {
     return NextResponse.json({ success: true, data: { count: 0 } });
   } catch (error) {
     console.error("[api/chat][PATCH] 已读更新失败", error);
+    await logApiError({ scope: '/api/chat[PATCH]', path: '/api/chat', method: 'PATCH' }, error);
     return NextResponse.json({ message: "已读更新失败" }, { status: 500 });
   }
 };

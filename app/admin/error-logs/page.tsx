@@ -233,7 +233,7 @@ export default function ErrorLogsPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 break-words">{log.message}</p>
+                  <p className="text-sm font-semibold text-gray-900 wrap-break-word">{log.message}</p>
                   {log.path && (
                     <p className="mt-1 text-sm text-gray-500 break-all">
                       路径：{log.path}
@@ -245,7 +245,7 @@ export default function ErrorLogsPage() {
                 {log.stack && (
                   <pre
                     className="rounded-2xl bg-slate-950 text-slate-100 text-xs p-4
-                      overflow-x-auto whitespace-pre-wrap break-words"
+                      overflow-x-auto whitespace-pre-wrap wrap-break-word"
                   >
                     {log.stack}
                   </pre>
@@ -254,7 +254,7 @@ export default function ErrorLogsPage() {
                 {log.metadata && (
                   <div className="rounded-2xl bg-slate-50 border border-slate-200 p-3">
                     <p className="text-xs font-semibold text-slate-500 mb-2">附加信息</p>
-                    <pre className="text-xs text-slate-700 whitespace-pre-wrap break-words">
+                    <pre className="text-xs text-slate-700 whitespace-pre-wrap wrap-break-word">
                       {JSON.stringify(log.metadata, null, 2)}
                     </pre>
                   </div>

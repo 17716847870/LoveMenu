@@ -22,6 +22,8 @@ interface LoveChartProps {
   dataKeys?: string[];
   colors?: string[];
   className?: string;
+  showLegend?: boolean;
+  pieOuterRadius?: number;
 }
 
 const DEFAULT_COLORS = ['#ff4d7d', '#ffb347', '#6366f1', '#10b981'];
@@ -33,6 +35,8 @@ export default function LoveChart({
   dataKeys,
   colors = DEFAULT_COLORS,
   className,
+  showLegend = true,
+  pieOuterRadius = 100,
 }: LoveChartProps) {
   return (
     <div className={cn(
@@ -109,7 +113,7 @@ export default function LoveChart({
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
-                  outerRadius={100}
+                  outerRadius={pieOuterRadius}
                   paddingAngle={5}
                   dataKey="value"
                   stroke="var(--card)"
@@ -128,7 +132,7 @@ export default function LoveChart({
                   }} 
                   itemStyle={{ color: 'var(--foreground)' }}
                 />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                {showLegend && <Legend verticalAlign="bottom" height={36} iconType="circle" />}
               </PieChart>
             )}
           </ResponsiveContainer>

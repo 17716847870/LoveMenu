@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logApiError } from '@/lib/error-log';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET() {
+  noStore();
   try {
     const categories = await prisma.dishCategory.findMany({
       include: {
@@ -23,12 +25,13 @@ export async function GET() {
 
     const [allOrders, emergencyOrders, wishlistRequests] = await Promise.all([
       prisma.order.count({
-        where: { createdAt: { gte: thirtyDaysAgo } }
+        where: { createdAt: { gte: thirtyDaysAgo }, status: { not: 'cancelled' } }
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: thirtyDaysAgo },
-          isEmergency: true
+          isEmergency: true,
+          status: { not: 'cancelled' }
         }
       }),
       prisma.foodRequest.count({

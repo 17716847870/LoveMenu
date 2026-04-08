@@ -1,8 +1,10 @@
 import { PageContainer } from "../../components/ui/PageContainer";
 import DashboardClient from "../../components/admin/dashboard/DashboardClient";
 import { prisma } from "@/lib/db";
+import { unstable_noStore as noStore } from "next/cache";
 
 async function getStats() {
+  noStore();
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -19,22 +21,28 @@ async function getStats() {
       feedbackYesterday,
       wishlistYesterday
     ] = await Promise.all([
-      prisma.order.count({ where: { createdAt: { gte: today, lt: tomorrow } } }),
-      prisma.order.count({ where: { createdAt: { gte: today, lt: tomorrow }, isEmergency: true } }),
+      prisma.order.count({ where: { createdAt: { gte: today, lt: tomorrow }, status: { not: 'cancelled' } } }),
+      prisma.order.count({ where: { createdAt: { gte: today, lt: tomorrow }, isEmergency: true, status: { not: 'cancelled' } } }),
       prisma.feedback.count({ where: { createdAt: { gte: today, lt: tomorrow } } }),
       prisma.foodRequest.count({ where: { createdAt: { gte: today, lt: tomorrow } } }),
-      prisma.order.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today } } }),
-      prisma.order.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }, isEmergency: true } }),
+      prisma.order.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }, status: { not: 'cancelled' } } }),
+      prisma.order.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }, isEmergency: true, status: { not: 'cancelled' } } }),
       prisma.feedback.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today } } }),
       prisma.foodRequest.count({ where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today } } })
     ]);
 
     const ordersTodayData = await prisma.order.aggregate({
-      where: { createdAt: { gte: today, lt: tomorrow } },
+      where: { createdAt: { gte: today, lt: tomorrow }, status: { not: 'cancelled' } },
+      _sum: { totalKiss: true, totalHug: true }
+    });
+
+    const ordersYesterdayData = await prisma.order.aggregate({
+      where: { createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }, status: { not: 'cancelled' } },
       _sum: { totalKiss: true, totalHug: true }
     });
 
     const pointsToday = (ordersTodayData._sum.totalKiss || 0) + (ordersTodayData._sum.totalHug || 0);
+    const pointsYesterday = (ordersYesterdayData._sum.totalKiss || 0) + (ordersYesterdayData._sum.totalHug || 0);
 
     const getTrend = (today: number, yesterday: number): 'up' | 'down' | 'neutral' => {
       if (today > yesterday) return 'up';
@@ -49,7 +57,7 @@ async function getStats() {
       newFeedback: newFeedbackCount,
       newWishlist: newWishlistCount,
       interactionsTrend: getTrend(ordersToday, ordersYesterday),
-      pointsTrend: 'up',
+      pointsTrend: getTrend(pointsToday, pointsYesterday),
       priorityTrend: getTrend(emergencyOrdersToday, emergencyOrdersYesterday),
       feedbackTrend: getTrend(newFeedbackCount, feedbackYesterday),
       wishlistTrend: getTrend(newWishlistCount, wishlistYesterday),
@@ -65,6 +73,7 @@ async function getStats() {
 }
 
 async function getTrends() {
+  noStore();
   try {
     const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const trends = [];
@@ -77,7 +86,7 @@ async function getTrends() {
       nextDate.setDate(nextDate.getDate() + 1);
 
       const orders = await prisma.order.findMany({
-        where: { createdAt: { gte: date, lt: nextDate } },
+        where: { createdAt: { gte: date, lt: nextDate }, status: { not: 'cancelled' } },
         select: { isEmergency: true, totalKiss: true, totalHug: true }
       });
 
@@ -105,6 +114,7 @@ async function getTrends() {
 }
 
 async function getDistribution() {
+  noStore();
   try {
     const categories = await prisma.dishCategory.findMany({
       include: { _count: { select: { dishes: true } } },
@@ -117,8 +127,8 @@ async function getDistribution() {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const [allOrders, emergencyOrders, wishlistRequests] = await Promise.all([
-      prisma.order.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
-      prisma.order.count({ where: { createdAt: { gte: thirtyDaysAgo }, isEmergency: true } }),
+      prisma.order.count({ where: { createdAt: { gte: thirtyDaysAgo }, status: { not: 'cancelled' } } }),
+      prisma.order.count({ where: { createdAt: { gte: thirtyDaysAgo }, isEmergency: true, status: { not: 'cancelled' } } }),
       prisma.foodRequest.count({ where: { createdAt: { gte: thirtyDaysAgo } } })
     ]);
 
@@ -147,12 +157,13 @@ async function getDistribution() {
 }
 
 async function getTopItems() {
+  noStore();
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const orderItems = await prisma.orderItem.findMany({
-      where: { order: { createdAt: { gte: thirtyDaysAgo } } },
+      where: { order: { createdAt: { gte: thirtyDaysAgo }, status: { not: 'cancelled' } } },
       include: { dish: { include: { category: true } } }
     });
 
@@ -175,14 +186,27 @@ async function getTopItems() {
         category: item.dish.category.name,
         orderCount: item.count,
         likes: item.dish.popularity,
-        status: '已上菜单'
+        status: '有效订单中'
       }));
 
-    const topWishlist = await prisma.foodRequest.findMany({ orderBy: { createdAt: 'desc' }, take: 5 });
-    const formattedWishlist = topWishlist.map(item => ({
-      id: item.id, name: item.name, category: '待分类',
-      mentionCount: 1, likes: 0,
-      status: item.status === 'pending' ? '待审核' : '已添加'
+    const topWishlist = await prisma.foodRequest.groupBy({
+      by: ['name', 'status'],
+      _count: { _all: true },
+      _max: { createdAt: true },
+      orderBy: [
+        { _count: { name: 'desc' } },
+        { _max: { createdAt: 'desc' } }
+      ],
+      take: 5
+    });
+
+    const formattedWishlist = topWishlist.map((item, idx) => ({
+      id: `${item.name}-${item.status}-${idx}`,
+      name: item.name,
+      category: '待分类',
+      mentionCount: item._count._all,
+      likes: 0,
+      status: item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已添加' : '已拒绝'
     }));
 
     return { topDishes, topWishlist: formattedWishlist };

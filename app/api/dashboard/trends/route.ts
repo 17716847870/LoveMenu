@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logApiError } from '@/lib/error-log';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET() {
+  noStore();
   try {
     const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const trends = [];
@@ -17,7 +19,8 @@ export async function GET() {
 
       const orders = await prisma.order.findMany({
         where: {
-          createdAt: { gte: date, lt: nextDate }
+          createdAt: { gte: date, lt: nextDate },
+          status: { not: 'cancelled' }
         },
         select: {
           isEmergency: true,

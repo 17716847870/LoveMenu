@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logApiError } from '@/lib/error-log';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET() {
+  noStore();
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -22,13 +24,15 @@ export async function GET() {
     ] = await Promise.all([
       prisma.order.count({
         where: {
-          createdAt: { gte: today, lt: tomorrow }
+          createdAt: { gte: today, lt: tomorrow },
+          status: { not: 'cancelled' }
         }
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: today, lt: tomorrow },
-          isEmergency: true
+          isEmergency: true,
+          status: { not: 'cancelled' }
         }
       }),
       prisma.feedback.count({
@@ -43,13 +47,15 @@ export async function GET() {
       }),
       prisma.order.count({
         where: {
-          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }
+          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
+          status: { not: 'cancelled' }
         }
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
-          isEmergency: true
+          isEmergency: true,
+          status: { not: 'cancelled' }
         }
       }),
       prisma.feedback.count({
@@ -66,12 +72,22 @@ export async function GET() {
 
     const ordersTodayData = await prisma.order.aggregate({
       where: {
-        createdAt: { gte: today, lt: tomorrow }
+        createdAt: { gte: today, lt: tomorrow },
+        status: { not: 'cancelled' }
+      },
+      _sum: { totalKiss: true, totalHug: true }
+    });
+
+    const ordersYesterdayData = await prisma.order.aggregate({
+      where: {
+        createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
+        status: { not: 'cancelled' }
       },
       _sum: { totalKiss: true, totalHug: true }
     });
 
     const pointsToday = (ordersTodayData._sum.totalKiss || 0) + (ordersTodayData._sum.totalHug || 0);
+    const pointsYesterday = (ordersYesterdayData._sum.totalKiss || 0) + (ordersYesterdayData._sum.totalHug || 0);
 
     const getTrend = (today: number, yesterday: number): 'up' | 'down' | 'neutral' => {
       if (today > yesterday) return 'up';
@@ -86,7 +102,7 @@ export async function GET() {
       newFeedback: newFeedbackCount,
       newWishlist: newWishlistCount,
       interactionsTrend: getTrend(ordersToday, ordersYesterday),
-      pointsTrend: 'up',
+      pointsTrend: getTrend(pointsToday, pointsYesterday),
       priorityTrend: getTrend(emergencyOrdersToday, emergencyOrdersYesterday),
       feedbackTrend: getTrend(newFeedbackCount, feedbackYesterday),
       wishlistTrend: getTrend(newWishlistCount, wishlistYesterday),

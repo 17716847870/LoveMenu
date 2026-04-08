@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logApiError } from '@/lib/error-log';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET() {
+  noStore();
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -10,7 +12,8 @@ export async function GET() {
     const orderItems = await prisma.orderItem.findMany({
       where: {
         order: {
-          createdAt: { gte: thirtyDaysAgo }
+          createdAt: { gte: thirtyDaysAgo },
+          status: { not: 'cancelled' }
         }
       },
       include: {
@@ -42,21 +45,27 @@ export async function GET() {
         category: item.dish.category.name,
         orderCount: item.count,
         likes: item.dish.popularity,
-        status: '已上菜单'
+        status: '有效订单中'
       }));
 
-    const topWishlist = await prisma.foodRequest.findMany({
-      orderBy: { createdAt: 'desc' },
+    const topWishlist = await prisma.foodRequest.groupBy({
+      by: ['name', 'status'],
+      _count: { _all: true },
+      _max: { createdAt: true },
+      orderBy: [
+        { _count: { name: 'desc' } },
+        { _max: { createdAt: 'desc' } }
+      ],
       take: 5
     });
 
     const formattedWishlist = topWishlist.map((item, idx) => ({
-      id: item.id,
+      id: `${item.name}-${item.status}-${idx}`,
       name: item.name,
       category: '待分类',
-      mentionCount: 1,
+      mentionCount: item._count._all,
       likes: 0,
-      status: item.status === 'pending' ? '待审核' : '已添加'
+      status: item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已添加' : '已拒绝'
     }));
 
     return NextResponse.json({

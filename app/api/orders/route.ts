@@ -76,7 +76,7 @@ export const POST = async (req: Request) => {
     // 检查余额是否足够
     if ((user.kissBalance || 0) < totalKiss || (user.hugBalance || 0) < totalHug) {
       return NextResponse.json(
-        { message: '亲亲或抱抱余额不足，无法完成下单' },
+        { message: '亲亲或贴贴余额不足，无法完成下单' },
         { status: 400 }
       );
     }

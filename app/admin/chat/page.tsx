@@ -131,7 +131,7 @@ export default function AdminChatPage() {
     }
     if (msg.type === "emoji") {
       if (msg.content === "kiss" || msg.content === "hug") {
-        const LOVE_MAP: Record<string, string> = { kiss: "💋 亲亲", hug: "🤗 抱抱" };
+        const LOVE_MAP: Record<string, string> = { kiss: "💋 亲亲", hug: "🤗 贴贴" };
         return <span className="text-2xl">{LOVE_MAP[msg.content] ?? msg.content}</span>;
       }
       if (msg.content.startsWith("quick:")) {

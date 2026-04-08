@@ -70,7 +70,7 @@ export default function IngredientCost({
         {hugPrice > 0 && (
           <div className={getBadgeStyles("hug")}>
             <Smile className="w-4 h-4" />
-            <span>{hugPrice} 个抱抱</span>
+            <span>{hugPrice} 个贴贴</span>
           </div>
         )}
         {kissPrice === 0 && hugPrice === 0 && (

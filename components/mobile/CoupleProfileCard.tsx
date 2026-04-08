@@ -348,7 +348,7 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             <span className={cn("text-lg font-bold", currentTheme.statValue)}>❤️ {user?.kissBalance ?? 0}</span>
           </div>
           <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>抱抱余额</span>
+            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>贴贴余额</span>
             <span className={cn("text-lg font-bold", currentTheme.statValue)}>🤗 {user?.hugBalance ?? 0}</span>
           </div>
           <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>

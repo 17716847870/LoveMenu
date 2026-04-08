@@ -167,7 +167,7 @@ export default function DishFormModal({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">🤗 抱抱价格</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">🤗 贴贴价格</label>
                 <input 
                   type="number" 
                   min="0"

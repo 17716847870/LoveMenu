@@ -15,7 +15,7 @@
 - `avatar` (String?): 头像 URL（可选）
 - `role` (String): 角色，默认 `"user"`（`"admin" | "user"`）
 - `kissBalance` (Int): 亲亲余额，默认 `100`
-- `hugBalance` (Int): 抱抱余额，默认 `100`
+- `hugBalance` (Int): 贴贴余额，默认 `100`
 - `createdAt` (DateTime): 创建时间
 
 **关联：**
@@ -39,7 +39,7 @@
 - `description` (String): 描述
 - `categoryId` (String): 外键 -> `DishCategory.id`
 - `kissPrice` (Int): 亲亲价格
-- `hugPrice` (Int): 抱抱价格
+- `hugPrice` (Int): 贴贴价格
 - `image` (String?): 图片 URL
 - `popularity` (Int): 热度，默认 `0`
 - `allowCook` (Boolean): 是否支持在家做，默认 `true`
@@ -59,7 +59,7 @@
 - `userId` (String): 外键 -> `User.id`
 - `status` (String): 订单状态（如 `pending / preparing / completed / cancelled`）
 - `totalKiss` (Int): 总亲亲消耗
-- `totalHug` (Int): 总抱抱消耗
+- `totalHug` (Int): 总贴贴消耗
 - `note` (String?): 备注
 - `reason` (String?): 下单理由
 - `isEmergency` (Boolean): 紧急订单标记，默认 `false`

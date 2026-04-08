@@ -38,7 +38,7 @@ const themeStyles: Record<ThemeName, {
 
 const actions = [
   { emoji: "💋", label: "亲亲", value: "kiss", type: "love" as const },
-  { emoji: "🤗", label: "抱抱", value: "hug", type: "love" as const },
+  { emoji: "🤗", label: "贴贴", value: "hug", type: "love" as const },
   { emoji: "❤️", label: "爱你", value: "quick:爱你", type: "emoji" as const },
   { emoji: "🍜", label: "想吃", value: "quick:想吃", type: "emoji" as const },
   { emoji: "🥺", label: "想你", value: "quick:想你", type: "emoji" as const },

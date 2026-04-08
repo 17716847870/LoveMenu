@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import { useUser } from "@/context/UserContext";
@@ -26,7 +26,7 @@ const pageStyles: Record<ThemeName, string> = {
 };
 
 export default function CartPage() {
-  const { items, totals, updateQuantity, removeItem, clearCart, isLoading, isSyncing } = useCart();
+  const { items, totals, updateQuantity, removeItem, clearCart, isLoading } = useCart();
   const { user, isLoading: isUserLoading } = useUser();
   const { theme } = useTheme();
   const router = useRouter();

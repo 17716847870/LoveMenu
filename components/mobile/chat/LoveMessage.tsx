@@ -65,7 +65,7 @@ export default function LoveMessage({ type, count = 1 }: LoveMessageProps) {
       
       <div className="flex flex-col">
         <span className={cn("font-bold text-sm", currentTheme.text)}>
-          发送了一个{type === "kiss" ? "亲亲" : "抱抱"}
+          发送了一个{type === "kiss" ? "亲亲" : "贴贴"}
         </span>
         <span className={cn("text-xs opacity-70", currentTheme.text)}>
           {type === "kiss" ? "❤️" : "🤗"} +{count}

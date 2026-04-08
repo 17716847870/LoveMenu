@@ -11,6 +11,7 @@ import MobileOrderListView from "@/components/admin/orders/MobileOrderListView";
 import LovePagination from "@/components/admin/ui/LovePagination/LovePagination";
 import OrderDetailModal from "@/components/admin/orders/OrderDetailModal";
 import { useOrders, useUpdateOrder } from "@/apis/orders";
+import { useMessage } from "@/components/ui/Message";
 
 export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,15 +22,27 @@ export default function AdminOrdersPage() {
 
   const { data: orders = [] } = useOrders();
   const updateOrder = useUpdateOrder();
+  const message = useMessage();
 
   const handleUpdateStatus = async (orderId: string, newStatus: Order['status']) => {
+    const targetOrder = orders.find((order) => order.id === orderId) ?? selectedOrder ?? null;
+
     try {
       await updateOrder.mutateAsync({ id: orderId, status: newStatus });
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
+
+      if (newStatus === 'cancelled' && targetOrder) {
+        message.success(`订单已取消，已退回 💋 ${targetOrder.totalKiss} / 🫂 ${targetOrder.totalHug}`);
+      } else if (newStatus === 'preparing') {
+        message.success('订单已进入制作中');
+      } else if (newStatus === 'completed') {
+        message.success('订单已标记完成');
+      }
     } catch (error) {
       console.error('更新状态失败', error);
+      message.error(error instanceof Error ? error.message : '更新状态失败');
     }
   };
 

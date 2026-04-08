@@ -3,15 +3,32 @@ import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { calcNextRemindAt, renderEmailContent, CalendarType, RepeatType } from '@/lib/anniversary';
 
-// Vercel Cron 鉴权：只允许 Vercel 内部调用，本地开发环境跳过
+// Cron 鉴权：支持手动 Bearer 调用，也兼容 Vercel Cron 请求头
 function isAuthorized(req: Request): boolean {
   if (process.env.NODE_ENV === 'development') return true;
-  const secret = req.headers.get('authorization');
-  return secret === `Bearer ${process.env.CRON_SECRET}`;
+
+  const authorization = req.headers.get('authorization');
+  if (process.env.CRON_SECRET && authorization === `Bearer ${process.env.CRON_SECRET}`) {
+    return true;
+  }
+
+  const vercelCronHeader = req.headers.get('x-vercel-cron');
+  const userAgent = req.headers.get('user-agent') ?? '';
+
+  if (vercelCronHeader === '1' || userAgent.toLowerCase().includes('vercel-cron')) {
+    return true;
+  }
+
+  return false;
 }
 
 async function runAnniversaryCron(req: Request) {
   if (!isAuthorized(req)) {
+    console.warn('[cron/anniversary] unauthorized request', {
+      userAgent: req.headers.get('user-agent'),
+      hasAuthorization: Boolean(req.headers.get('authorization')),
+      vercelCronHeader: req.headers.get('x-vercel-cron'),
+    });
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 

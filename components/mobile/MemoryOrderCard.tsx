@@ -86,6 +86,7 @@ const themeStyles: Record<ThemeName, {
 export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
+  const memoryImages = Array.isArray(order.memory?.image) ? order.memory.image : null;
 
   return (
     <div className="relative pl-8 pb-8 last:pb-0">
@@ -163,16 +164,17 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
               {order.memory?.image && (
                 <div className={cn(
                   "mt-1",
-                  Array.isArray(order.memory.image) && order.memory.image.length > 1
+                  memoryImages && memoryImages.length > 1
                     ? "grid grid-cols-2 gap-2"
                     : ""
                 )}>
-                  {Array.isArray(order.memory.image) ? (
-                    order.memory.image.map((img, idx) => (
+                  {memoryImages ? (
+                    memoryImages.map((img, idx) => (
                       <div key={idx} className={cn(
                         "rounded-lg overflow-hidden relative",
-                        order.memory!.image!.length === 1 ? "w-full h-32" : "w-full aspect-square"
+                        memoryImages.length === 1 ? "w-full h-32" : "w-full aspect-square"
                       )}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
                           src={img} 
                           alt={`回忆照片 ${idx + 1}`} 
@@ -182,8 +184,9 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
                     ))
                   ) : (
                     <div className="w-full h-32 rounded-lg overflow-hidden relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
-                        src={order.memory.image} 
+                        src={typeof order.memory.image === 'string' ? order.memory.image : ''} 
                         alt="回忆照片" 
                         className="w-full h-full object-cover"
                       />

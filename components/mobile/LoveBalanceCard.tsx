@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { 
   Heart, 
   Smile, 
   Zap, 
   Sparkles,
-  TrendingUp,
   ArrowRight
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -21,17 +20,6 @@ export interface LoveBalance {
   todayKissGain: number;
   todayHugGain: number;
 }
-
-interface LoveBalanceCardProps {
-  balance?: LoveBalance;
-}
-
-const defaultBalance: LoveBalance = {
-  kissBalance: 12,
-  hugBalance: 8,
-  todayKissGain: 2,
-  todayHugGain: 1
-};
 
 const themeStyles: Record<ThemeName, {
   container: string;
@@ -106,7 +94,7 @@ const Counter = ({ value, className }: { value: number; className?: string }) =>
   return <motion.span className={className}>{display}</motion.span>;
 };
 
-export default function LoveBalanceCard({ balance }: LoveBalanceCardProps) {
+export default function LoveBalanceCard() {
   const { theme } = useTheme();
   const { user } = useUser();
   const currentTheme = themeStyles[theme] || themeStyles.couple;

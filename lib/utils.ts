@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function asyncSetState<T>(fn:() => void){
+export function asyncSetState(fn:() => void){
   setTimeout(() => {
     fn();
   }, 0)

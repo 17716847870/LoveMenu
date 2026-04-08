@@ -6,7 +6,6 @@ import {
   Heart, 
   Sparkles, 
   Zap, 
-  Flame, 
   Plus
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
@@ -80,9 +79,6 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
   const imageRef = React.useRef<HTMLDivElement>(null);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const ButtonIcon = currentTheme.icon;
-
-  const isHot = (dish.popularity || 0) > 50;
-  const isSuperHot = (dish.popularity || 0) > 80;
 
   return (
     <motion.div

@@ -5,13 +5,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, Sparkles, Zap, Utensils } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { cn } from "@/lib/utils";
+import { cn, asyncSetState } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { useHomeMood } from "@/apis/home";
-
-interface CoupleMoodCardProps {
-  username?: string;
-}
 
 // Helper to get greeting based on time
 function getGreeting() {
@@ -32,7 +28,6 @@ const cardThemes: Record<ThemeName, {
   content: string;
   button: string;
   icon: React.ElementType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   animation: any;
 }> = {
   couple: {
@@ -96,8 +91,9 @@ export default function CoupleMoodCard() {
   const craving = data?.craving || "还没想好，去菜单里挑挑吧";
 
   useEffect(() => {
-    // eslint-disable-next-line
-    setGreeting(getGreeting());
+    asyncSetState(() => {
+      setGreeting(getGreeting());
+    })
   }, []);
 
   return (

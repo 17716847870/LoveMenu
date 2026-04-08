@@ -9,25 +9,11 @@ import ChatEntryCard from "@/components/mobile/ChatEntryCard";
 import LogoutButton from "@/components/mobile/LogoutButton";
 
 export default function ProfilePage() {
-  const { user, setUser } = useUser();
+  const { refreshUser } = useUser();
 
-  // 页面加载时从 API 获取最新用户数据
   useEffect(() => {
-    if (user?.id) {
-      const fetchLatestUser = async () => {
-        try {
-          const res = await fetch(`/api/users/${user.id}`);
-          if (res.ok) {
-            const data = await res.json();
-            setUser(data.data || data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch latest user data:", error);
-        }
-      };
-      fetchLatestUser();
-    }
-  }, [user?.id, setUser]);
+    void refreshUser();
+  }, [refreshUser]);
 
   return (
     <div className="flex flex-col gap-6 p-4 pb-24">

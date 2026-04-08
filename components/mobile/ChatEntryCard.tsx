@@ -96,7 +96,7 @@ export default function ChatEntryCard() {
             )}
           </div>
           <p className={cn("text-sm mt-0.5 truncate", currentTheme.desc)}>
-            "想吃什么快跟我说呀～"
+            {"想吃什么快跟我说呀～"}
           </p>
         </div>
 

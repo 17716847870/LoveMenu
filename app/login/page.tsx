@@ -33,8 +33,6 @@ export default function LoginPage() {
         throw new Error(data.message || "登录失败");
       }
 
-      localStorage.setItem("lovemenu-user", JSON.stringify(data.user));
-
       if (data.user.role === "admin") {
         router.push("/admin");
       } else {

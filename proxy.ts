@@ -4,13 +4,15 @@ import { verifyToken } from './lib/auth';
 
 const publicPaths = ['/login', '/403'];
 const authApiPaths = ['/api/auth/login', '/api/auth/logout'];
-const staticPaths = ['/_next', '/favicon.ico', '/logo.png', '/api/auth'];
+const publicApiPrefixes = ['/api/auth', '/api/cron'];
+const staticPaths = ['/_next', '/favicon.ico', '/logo.png'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
     staticPaths.some((path) => pathname.startsWith(path)) ||
+    publicApiPrefixes.some((path) => pathname.startsWith(path)) ||
     authApiPaths.includes(pathname)
   ) {
     return NextResponse.next();

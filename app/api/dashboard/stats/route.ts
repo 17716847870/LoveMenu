@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logApiError } from '@/lib/error-log';
-import { unstable_noStore as noStore } from 'next/cache';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logApiError } from "@/lib/error-log";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET() {
   noStore();
@@ -20,79 +20,86 @@ export async function GET() {
       ordersYesterday,
       emergencyOrdersYesterday,
       feedbackYesterday,
-      wishlistYesterday
+      wishlistYesterday,
     ] = await Promise.all([
       prisma.order.count({
         where: {
           createdAt: { gte: today, lt: tomorrow },
-          status: { not: 'cancelled' }
-        }
+          status: { not: "cancelled" },
+        },
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: today, lt: tomorrow },
           isEmergency: true,
-          status: { not: 'cancelled' }
-        }
+          status: { not: "cancelled" },
+        },
       }),
       prisma.feedback.count({
         where: {
-          createdAt: { gte: today, lt: tomorrow }
-        }
+          createdAt: { gte: today, lt: tomorrow },
+        },
       }),
       prisma.foodRequest.count({
         where: {
-          createdAt: { gte: today, lt: tomorrow }
-        }
+          createdAt: { gte: today, lt: tomorrow },
+        },
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
-          status: { not: 'cancelled' }
-        }
+          status: { not: "cancelled" },
+        },
       }),
       prisma.order.count({
         where: {
           createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
           isEmergency: true,
-          status: { not: 'cancelled' }
-        }
+          status: { not: "cancelled" },
+        },
       }),
       prisma.feedback.count({
         where: {
-          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }
-        }
+          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
+        },
       }),
       prisma.foodRequest.count({
         where: {
-          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today }
-        }
-      })
+          createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
+        },
+      }),
     ]);
 
     const ordersTodayData = await prisma.order.aggregate({
       where: {
         createdAt: { gte: today, lt: tomorrow },
-        status: { not: 'cancelled' }
+        status: { not: "cancelled" },
       },
-      _sum: { totalKiss: true, totalHug: true }
+      _sum: { totalKiss: true, totalHug: true },
     });
 
     const ordersYesterdayData = await prisma.order.aggregate({
       where: {
         createdAt: { gte: new Date(today.getTime() - 86400000), lt: today },
-        status: { not: 'cancelled' }
+        status: { not: "cancelled" },
       },
-      _sum: { totalKiss: true, totalHug: true }
+      _sum: { totalKiss: true, totalHug: true },
     });
 
-    const pointsToday = (ordersTodayData._sum.totalKiss || 0) + (ordersTodayData._sum.totalHug || 0);
-    const pointsYesterday = (ordersYesterdayData._sum.totalKiss || 0) + (ordersYesterdayData._sum.totalHug || 0);
+    const pointsToday =
+      (ordersTodayData._sum.totalKiss || 0) +
+      (ordersTodayData._sum.totalHug || 0);
+    const pointsYesterday =
+      (ordersYesterdayData._sum.totalKiss || 0) +
+      (ordersYesterdayData._sum.totalHug || 0);
 
-    const getTrend = (today: number, yesterday: number): 'up' | 'down' | 'neutral' => {
-      if (today > yesterday) return 'up';
-      if (today < yesterday) return 'down';
-      return 'neutral';
+    const getTrend = (
+      today: number,
+      yesterday: number
+    ): "up" | "down" | "neutral" => {
+      if (today > yesterday) return "up";
+      if (today < yesterday) return "down";
+      return "neutral";
     };
 
     return NextResponse.json({
@@ -108,11 +115,15 @@ export async function GET() {
       wishlistTrend: getTrend(newWishlistCount, wishlistYesterday),
     });
   } catch (error) {
-    console.error('Stats API error:', error);
-    await logApiError({ scope: '/api/dashboard/stats[GET]', path: '/api/dashboard/stats', method: 'GET' }, error);
-    return NextResponse.json(
-      { message: '获取统计数据失败' },
-      { status: 500 }
+    console.error("Stats API error:", error);
+    await logApiError(
+      {
+        scope: "/api/dashboard/stats[GET]",
+        path: "/api/dashboard/stats",
+        method: "GET",
+      },
+      error
     );
+    return NextResponse.json({ message: "获取统计数据失败" }, { status: 500 });
   }
 }

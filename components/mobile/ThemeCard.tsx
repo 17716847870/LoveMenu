@@ -15,16 +15,19 @@ interface ThemeCardProps {
   onSelect: (theme: ThemeName) => void;
 }
 
-const themeConfigs: Record<ThemeName, {
-  previewClass: string;
-  icon: string;
-  activeBorder: string;
-  activeBg: string;
-  checkBg: string;
-  checkText: string;
-  textClass: string;
-  descClass: string;
-}> = {
+const themeConfigs: Record<
+  ThemeName,
+  {
+    previewClass: string;
+    icon: string;
+    activeBorder: string;
+    activeBg: string;
+    checkBg: string;
+    checkText: string;
+    textClass: string;
+    descClass: string;
+  }
+> = {
   couple: {
     previewClass: "bg-gradient-to-br from-pink-100 to-white border-pink-200",
     icon: "💗",
@@ -68,12 +71,15 @@ const themeConfigs: Record<ThemeName, {
 };
 
 // Styles for the card background when NOT active (based on current active theme)
-const inactiveStyles: Record<ThemeName, {
-  bg: string;
-  hover: string;
-  text: string;
-  desc: string;
-}> = {
+const inactiveStyles: Record<
+  ThemeName,
+  {
+    bg: string;
+    hover: string;
+    text: string;
+    desc: string;
+  }
+> = {
   couple: {
     bg: "bg-pink-50",
     hover: "hover:bg-pink-100",
@@ -100,16 +106,17 @@ const inactiveStyles: Record<ThemeName, {
   },
 };
 
-export default function ThemeCard({ 
-  theme, 
+export default function ThemeCard({
+  theme,
   activeTheme,
-  name, 
-  description, 
-  isActive, 
-  onSelect 
+  name,
+  description,
+  isActive,
+  onSelect,
 }: ThemeCardProps) {
   const config = themeConfigs[theme];
-  const currentInactiveStyle = inactiveStyles[activeTheme] || inactiveStyles.couple;
+  const currentInactiveStyle =
+    inactiveStyles[activeTheme] || inactiveStyles.couple;
 
   return (
     <motion.button
@@ -118,42 +125,54 @@ export default function ThemeCard({
       onClick={() => onSelect(theme)}
       className={cn(
         "relative flex flex-col items-start p-4 rounded-xl border-2 transition-all w-full text-left overflow-hidden",
-        isActive 
+        isActive
           ? cn(config.activeBorder, config.activeBg, "ring-2")
-          : cn("border-transparent", currentInactiveStyle.bg, currentInactiveStyle.hover)
+          : cn(
+              "border-transparent",
+              currentInactiveStyle.bg,
+              currentInactiveStyle.hover
+            )
       )}
     >
       {/* Preview Area */}
-      <div className={cn(
-        "w-full h-24 rounded-lg mb-3 flex items-center justify-center text-3xl border shadow-sm",
-        config.previewClass
-      )}>
+      <div
+        className={cn(
+          "w-full h-24 rounded-lg mb-3 flex items-center justify-center text-3xl border shadow-sm",
+          config.previewClass
+        )}
+      >
         {config.icon}
       </div>
 
       {/* Info */}
       <div className="flex flex-col gap-1 w-full">
         <div className="flex items-center justify-between w-full">
-          <span className={cn(
-            "font-bold text-sm",
-            isActive ? config.textClass : currentInactiveStyle.text
-          )}>
+          <span
+            className={cn(
+              "font-bold text-sm",
+              isActive ? config.textClass : currentInactiveStyle.text
+            )}
+          >
             {name}
           </span>
           {isActive && (
-            <div className={cn(
-              "p-1 rounded-full",
-              config.checkBg,
-              config.checkText
-            )}>
+            <div
+              className={cn(
+                "p-1 rounded-full",
+                config.checkBg,
+                config.checkText
+              )}
+            >
               <Check className="w-3 h-3" />
             </div>
           )}
         </div>
-        <span className={cn(
-          "text-xs line-clamp-1",
-          isActive ? config.descClass : currentInactiveStyle.desc
-        )}>
+        <span
+          className={cn(
+            "text-xs line-clamp-1",
+            isActive ? config.descClass : currentInactiveStyle.desc
+          )}
+        >
           {description}
         </span>
       </div>

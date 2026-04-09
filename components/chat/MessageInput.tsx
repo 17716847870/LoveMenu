@@ -34,9 +34,9 @@ export default function MessageInput({ onSend }: MessageInputProps) {
         className="flex-1 rounded-full bg-muted/50 border-transparent focus:bg-background"
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
       />
-      <Button 
-        size="icon" 
-        className="rounded-full" 
+      <Button
+        size="icon"
+        className="rounded-full"
         onClick={handleSend}
         disabled={!text.trim()}
       >

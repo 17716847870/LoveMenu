@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useRef, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import FlyToCart from "@/components/animation/FlyToCart";
 import { AnimatePresence } from "framer-motion";
 
@@ -17,11 +23,17 @@ interface FlyItem {
 interface FlyToCartContextType {
   flyToCart: (rect: DOMRect, imageSrc: string, onComplete?: () => void) => void;
   cartRef: React.RefObject<HTMLDivElement | null>;
-  addToCartWithAnimation: (rect: DOMRect, imageSrc: string, onComplete?: () => void) => void;
+  addToCartWithAnimation: (
+    rect: DOMRect,
+    imageSrc: string,
+    onComplete?: () => void
+  ) => void;
   isCartAnimating: boolean;
 }
 
-const FlyToCartContext = createContext<FlyToCartContextType | undefined>(undefined);
+const FlyToCartContext = createContext<FlyToCartContextType | undefined>(
+  undefined
+);
 
 export function FlyToCartProvider({ children }: { children: React.ReactNode }) {
   const [flyingItems, setFlyingItems] = useState<FlyItem[]>([]);

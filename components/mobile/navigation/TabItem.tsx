@@ -66,8 +66,9 @@ export default function TabItem({
   };
 
   const getItemStyles = () => {
-    const baseStyles = "flex flex-col items-center justify-center gap-1 w-full h-full relative p-2 transition-colors duration-300 rounded-xl";
-    
+    const baseStyles =
+      "flex flex-col items-center justify-center gap-1 w-full h-full relative p-2 transition-colors duration-300 rounded-xl";
+
     switch (theme) {
       case "couple":
         return cn(
@@ -82,19 +83,26 @@ export default function TabItem({
       case "night":
         return cn(
           baseStyles,
-          isActive ? "text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" : "text-slate-500 hover:text-slate-400"
+          isActive
+            ? "text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]"
+            : "text-slate-500 hover:text-slate-400"
         );
       case "minimal":
       default:
         return cn(
           baseStyles,
-          isActive ? "text-black font-medium" : "text-gray-400 hover:text-gray-600"
+          isActive
+            ? "text-black font-medium"
+            : "text-gray-400 hover:text-gray-600"
         );
     }
   };
 
   return (
-    <Link href={path} className="flex-1 h-full flex items-center justify-center">
+    <Link
+      href={path}
+      className="flex-1 h-full flex items-center justify-center"
+    >
       <motion.div
         className={getItemStyles()}
         whileHover={{ scale: 1.1 }}
@@ -106,16 +114,16 @@ export default function TabItem({
             className={cn(
               "transition-all duration-300",
               isActive && theme === "couple" && "fill-current",
-              isActive && theme === "night" && "drop-shadow-[0_0_5px_currentColor]"
+              isActive &&
+                theme === "night" &&
+                "drop-shadow-[0_0_5px_currentColor]"
             )}
             strokeWidth={isActive ? 2.5 : 2}
           />
         </motion.div>
-        
-        <span className="text-[10px] font-medium tracking-wide">
-          {label}
-        </span>
-        
+
+        <span className="text-[10px] font-medium tracking-wide">{label}</span>
+
         {/* Active Indicator for minimal theme */}
         {isActive && theme === "minimal" && (
           <motion.div

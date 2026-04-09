@@ -2,19 +2,11 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Smile, 
-  Clock, 
-  CheckCircle2,
-  Sparkles,
-  Zap
-} from "lucide-react";
+import { Heart, Smile, Clock, CheckCircle2, Sparkles, Zap } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { formatDateTime } from "@/utils/format";
-
 
 export interface Order {
   id: string;
@@ -39,13 +31,16 @@ interface OrderItemCardProps {
   onRecordMemory?: (orderId: string) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  icon: React.ElementType;
-  timeText: string;
-  priceText: string;
-  statusBadge: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    icon: React.ElementType;
+    timeText: string;
+    priceText: string;
+    statusBadge: string;
+  }
+> = {
   couple: {
     container: "bg-white border-pink-100 hover:border-pink-200 shadow-sm",
     icon: Heart,
@@ -54,7 +49,8 @@ const themeStyles: Record<ThemeName, {
     statusBadge: "bg-pink-100 text-pink-600",
   },
   cute: {
-    container: "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
+    container:
+      "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
     icon: Sparkles,
     timeText: "text-orange-400",
     priceText: "text-orange-600",
@@ -76,7 +72,11 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function OrderItemCard({ order, index = 0, onRecordMemory }: OrderItemCardProps) {
+export default function OrderItemCard({
+  order,
+  index = 0,
+  onRecordMemory,
+}: OrderItemCardProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
@@ -99,14 +99,21 @@ export default function OrderItemCard({ order, index = 0, onRecordMemory }: Orde
             </span>
           )}
         </div>
-        <div className={cn(
-          "text-xs px-2 py-0.5 rounded-full font-medium ml-2",
-          currentTheme.statusBadge
-        )}>
-          {order.status === "pending" ? "待接单" : 
-           order.status === "preparing" ? "制作中" : 
-           order.status === "completed" ? "已完成" : 
-           order.status === "cancelled" ? "已取消" : "进行中"}
+        <div
+          className={cn(
+            "text-xs px-2 py-0.5 rounded-full font-medium ml-2",
+            currentTheme.statusBadge
+          )}
+        >
+          {order.status === "pending"
+            ? "待接单"
+            : order.status === "preparing"
+              ? "制作中"
+              : order.status === "completed"
+                ? "已完成"
+                : order.status === "cancelled"
+                  ? "已取消"
+                  : "进行中"}
         </div>
       </div>
 
@@ -118,41 +125,55 @@ export default function OrderItemCard({ order, index = 0, onRecordMemory }: Orde
       )}
 
       <div className="flex items-center justify-between text-sm mt-1">
-        <div className={cn("flex items-center gap-1 text-xs", currentTheme.timeText)}>
+        <div
+          className={cn(
+            "flex items-center gap-1 text-xs",
+            currentTheme.timeText
+          )}
+        >
           <Clock className="w-3 h-3" />
           {formatDateTime(order.createdAt)}
         </div>
-        
+
         <div className="flex items-center gap-3">
-          {order.status === "completed" && onRecordMemory && !order.hasMemory && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRecordMemory(order.id);
-              }}
+          {order.status === "completed" &&
+            onRecordMemory &&
+            !order.hasMemory && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRecordMemory(order.id);
+                }}
+                className={cn(
+                  "text-[10px] px-2 py-1 rounded-full font-medium transition-colors border",
+                  theme === "night"
+                    ? "bg-slate-700/50 text-blue-300 border-slate-600 hover:bg-slate-700"
+                    : theme === "minimal"
+                      ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                      : theme === "cute"
+                        ? "bg-orange-50 text-orange-500 border-orange-100 hover:bg-orange-100"
+                        : "bg-pink-50 text-pink-500 border-pink-100 hover:bg-pink-100"
+                )}
+              >
+                ✍️ 记录回忆
+              </button>
+            )}
+          {order.hasMemory && (
+            <span
               className={cn(
-                "text-[10px] px-2 py-1 rounded-full font-medium transition-colors border",
-                theme === 'night' 
-                  ? "bg-slate-700/50 text-blue-300 border-slate-600 hover:bg-slate-700" 
-                  : theme === 'minimal'
-                    ? "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
-                    : theme === 'cute'
-                      ? "bg-orange-50 text-orange-500 border-orange-100 hover:bg-orange-100"
-                      : "bg-pink-50 text-pink-500 border-pink-100 hover:bg-pink-100"
+                "text-[10px] flex items-center gap-1",
+                theme === "night" ? "text-slate-400" : "text-gray-400"
               )}
             >
-              ✍️ 记录回忆
-            </button>
-          )}
-          {order.hasMemory && (
-            <span className={cn(
-              "text-[10px] flex items-center gap-1",
-              theme === 'night' ? 'text-slate-400' : 'text-gray-400'
-            )}>
               <Heart className="w-3 h-3 fill-current" /> 已记录
             </span>
           )}
-          <div className={cn("flex items-center gap-2 font-medium", currentTheme.priceText)}>
+          <div
+            className={cn(
+              "flex items-center gap-2 font-medium",
+              currentTheme.priceText
+            )}
+          >
             {order.kissPrice > 0 && (
               <span className="flex items-center gap-0.5">
                 <Heart className="w-3 h-3" /> {order.kissPrice}

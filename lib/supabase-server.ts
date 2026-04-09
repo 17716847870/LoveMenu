@@ -13,7 +13,9 @@ function getSupabaseAdminClient() {
 
   if (!url || !serviceRoleKey) {
     if (!hasLoggedMissingEnv) {
-      console.warn("[chat] Supabase Realtime broadcast is disabled because NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing.");
+      console.warn(
+        "[chat] Supabase Realtime broadcast is disabled because NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing."
+      );
       hasLoggedMissingEnv = true;
     }
     return null;
@@ -29,9 +31,14 @@ function getSupabaseAdminClient() {
   return adminClient;
 }
 
-async function waitForSubscription(channel: ReturnType<SupabaseClient["channel"]>) {
+async function waitForSubscription(
+  channel: ReturnType<SupabaseClient["channel"]>
+) {
   await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("Supabase Realtime subscribe timeout")), 5000);
+    const timer = setTimeout(
+      () => reject(new Error("Supabase Realtime subscribe timeout")),
+      5000
+    );
 
     channel.subscribe((status) => {
       if (status === "SUBSCRIBED") {

@@ -71,10 +71,7 @@ export async function api<T = any>(
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(
-      error instanceof Error ? error.message : "网络错误",
-      0
-    );
+    throw new ApiError(error instanceof Error ? error.message : "网络错误", 0);
   }
 }
 

@@ -29,12 +29,15 @@ interface MessageBubbleProps {
   avatarInfo: AvatarInfo;
 }
 
-const themeStyles: Record<ThemeName, {
-  me: string;
-  partner: string;
-  textMe: string;
-  textPartner: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    me: string;
+    partner: string;
+    textMe: string;
+    textPartner: string;
+  }
+> = {
   couple: {
     me: "bg-pink-500 rounded-tr-sm shadow-pink-200",
     partner: "bg-white rounded-tl-sm border-gray-100 shadow-sm",
@@ -61,14 +64,19 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function MessageBubble({ message, avatarInfo }: MessageBubbleProps) {
+export default function MessageBubble({
+  message,
+  avatarInfo,
+}: MessageBubbleProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const isMe = message.sender === "me";
 
   const { myAvatar, myName, partnerAvatar, partnerName } = avatarInfo;
   const avatarSrc = isMe ? myAvatar : partnerAvatar;
-  const avatarFallback = isMe ? myName.charAt(0).toUpperCase() : partnerName.charAt(0).toUpperCase();
+  const avatarFallback = isMe
+    ? myName.charAt(0).toUpperCase()
+    : partnerName.charAt(0).toUpperCase();
 
   return (
     <motion.div
@@ -84,17 +92,23 @@ export default function MessageBubble({ message, avatarInfo }: MessageBubbleProp
         <AvatarFallback>{avatarFallback}</AvatarFallback>
       </Avatar>
 
-      <div className={cn(
-        "max-w-[70%] flex flex-col gap-1",
-        isMe ? "items-end" : "items-start"
-      )}>
+      <div
+        className={cn(
+          "max-w-[70%] flex flex-col gap-1",
+          isMe ? "items-end" : "items-start"
+        )}
+      >
         {message.type === "text" ? (
-          <div className={cn(
-            "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words",
-            isMe ? currentTheme.me : currentTheme.partner,
-            isMe ? currentTheme.textMe : currentTheme.textPartner
-          )}>
-            {message.content.startsWith("quick:") ? message.content.slice(6) : message.content}
+          <div
+            className={cn(
+              "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words",
+              isMe ? currentTheme.me : currentTheme.partner,
+              isMe ? currentTheme.textMe : currentTheme.textPartner
+            )}
+          >
+            {message.content.startsWith("quick:")
+              ? message.content.slice(6)
+              : message.content}
           </div>
         ) : message.type === "image" ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -107,7 +121,7 @@ export default function MessageBubble({ message, avatarInfo }: MessageBubbleProp
         ) : (
           <LoveMessage type={message.content as "kiss" | "hug"} />
         )}
-        
+
         {message.isPending && isMe ? (
           <span className="inline-flex items-center gap-1 text-[10px] text-pink-400 px-1">
             <Loader2 className="w-3 h-3 animate-spin" />

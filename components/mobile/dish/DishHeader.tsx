@@ -27,7 +27,9 @@ export default function DishHeader({
             onClick={onFavorite}
             className={cn(
               "p-2 rounded-full bg-white/50 backdrop-blur-md shadow-sm transition-colors",
-              isFavorite ? "text-red-500 bg-pink-100" : "text-gray-600 hover:bg-white/80"
+              isFavorite
+                ? "text-red-500 bg-pink-100"
+                : "text-gray-600 hover:bg-white/80"
             )}
           >
             <Heart className={cn("w-6 h-6", isFavorite && "fill-current")} />
@@ -58,7 +60,9 @@ export default function DishHeader({
             onClick={onFavorite}
             className={cn(
               "p-2 rounded-full bg-gray-800 border border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]",
-              isFavorite ? "shadow-[0_0_15px_rgba(236,72,153,0.8)] border-pink-500" : ""
+              isFavorite
+                ? "shadow-[0_0_15px_rgba(236,72,153,0.8)] border-pink-500"
+                : ""
             )}
           >
             <Heart
@@ -76,7 +80,9 @@ export default function DishHeader({
             onClick={onFavorite}
             className={cn(
               "p-2 rounded-full bg-white border border-gray-200 shadow-sm transition-colors",
-              isFavorite ? "bg-black text-white" : "text-black hover:bg-gray-100"
+              isFavorite
+                ? "bg-black text-white"
+                : "text-black hover:bg-gray-100"
             )}
           >
             <Heart className={cn("w-6 h-6", isFavorite && "fill-current")} />

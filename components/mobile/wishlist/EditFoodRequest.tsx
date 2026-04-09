@@ -15,23 +15,28 @@ interface EditFoodRequestProps {
   onSubmit: (data: Partial<FoodRequest> & { id: string }) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  overlay: string;
-  sheet: string;
-  title: string;
-  input: string;
-  label: string;
-  submitBtn: string;
-  uploadZone: string;
-  uploadText: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    overlay: string;
+    sheet: string;
+    title: string;
+    input: string;
+    label: string;
+    submitBtn: string;
+    uploadZone: string;
+    uploadText: string;
+  }
+> = {
   couple: {
     overlay: "bg-black/40",
     sheet: "bg-white",
     title: "text-pink-900",
-    input: "bg-pink-50/50 border-pink-100 focus:border-pink-300 focus:ring-pink-100 text-pink-900 placeholder:text-pink-300",
+    input:
+      "bg-pink-50/50 border-pink-100 focus:border-pink-300 focus:ring-pink-100 text-pink-900 placeholder:text-pink-300",
     label: "text-pink-700",
-    submitBtn: "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-pink-200",
+    submitBtn:
+      "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-pink-200",
     uploadZone: "border-pink-200 bg-pink-50/50",
     uploadText: "text-pink-400",
   },
@@ -39,9 +44,11 @@ const themeStyles: Record<ThemeName, {
     overlay: "bg-black/50",
     sheet: "bg-[#fff5fb]",
     title: "text-orange-900",
-    input: "bg-white border-2 border-orange-100 focus:border-orange-300 focus:ring-orange-100 text-orange-900 placeholder:text-orange-300 rounded-xl",
+    input:
+      "bg-white border-2 border-orange-100 focus:border-orange-300 focus:ring-orange-100 text-orange-900 placeholder:text-orange-300 rounded-xl",
     label: "text-orange-800",
-    submitBtn: "bg-orange-400 text-white shadow-orange-200 border-b-4 border-orange-600 active:border-b-0 active:translate-y-1",
+    submitBtn:
+      "bg-orange-400 text-white shadow-orange-200 border-b-4 border-orange-600 active:border-b-0 active:translate-y-1",
     uploadZone: "border-orange-200 bg-orange-50/30",
     uploadText: "text-orange-400",
   },
@@ -49,7 +56,8 @@ const themeStyles: Record<ThemeName, {
     overlay: "bg-black/60",
     sheet: "bg-white",
     title: "text-gray-900",
-    input: "bg-white border-gray-200 focus:border-black focus:ring-gray-100 text-gray-900 placeholder:text-gray-400 rounded-lg",
+    input:
+      "bg-white border-gray-200 focus:border-black focus:ring-gray-100 text-gray-900 placeholder:text-gray-400 rounded-lg",
     label: "text-gray-700",
     submitBtn: "bg-black text-white hover:bg-gray-800 rounded-lg",
     uploadZone: "border-gray-200 bg-gray-50",
@@ -59,20 +67,27 @@ const themeStyles: Record<ThemeName, {
     overlay: "bg-black/80",
     sheet: "bg-slate-900 border-t border-slate-800",
     title: "text-white",
-    input: "bg-slate-800 border-slate-700 focus:border-purple-500 focus:ring-purple-900 text-white placeholder:text-slate-500 rounded-xl",
+    input:
+      "bg-slate-800 border-slate-700 focus:border-purple-500 focus:ring-purple-900 text-white placeholder:text-slate-500 rounded-xl",
     label: "text-slate-300",
-    submitBtn: "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-purple-900/50 rounded-xl",
+    submitBtn:
+      "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-purple-900/50 rounded-xl",
     uploadZone: "border-slate-600 bg-slate-800/50",
     uploadText: "text-slate-400",
   },
 };
 
-export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: EditFoodRequestProps) {
+export default function EditFoodRequest({
+  isOpen,
+  onClose,
+  request,
+  onSubmit,
+}: EditFoodRequestProps) {
   const { theme } = useTheme();
   const message = useMessage();
   const styles = themeStyles[theme];
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<string>("");
@@ -92,31 +107,31 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
     if (!file) return;
 
     setIsUploading(true);
-    
+
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('path', 'food-requests');
+      formData.append("file", file);
+      formData.append("path", "food-requests");
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
       const result = await response.json();
-      
+
       if (result.success && result.data?.url) {
         setImage(result.data.url);
       } else {
-        message.error(result.message || '图片上传失败');
+        message.error(result.message || "图片上传失败");
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      message.error('图片上传失败，请重试');
+      console.error("Upload error:", error);
+      message.error("图片上传失败，请重试");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -130,14 +145,14 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
     if (!name.trim() || !request) return;
 
     setIsSubmitting(true);
-    
+
     onSubmit({
       ...request,
       name,
       description,
       image,
     });
-    
+
     setIsSubmitting(false);
     onClose();
   };
@@ -164,41 +179,58 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
             )}
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className={cn("text-xl font-bold", styles.title)}>编辑提议</h3>
-              <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600">
+              <h3 className={cn("text-xl font-bold", styles.title)}>
+                编辑提议
+              </h3>
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-gray-600"
+              >
                 <X size={24} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>食物名称</label>
+                <label className={cn("font-medium text-sm", styles.label)}>
+                  食物名称
+                </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={cn("w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl", styles.input)}
+                  className={cn(
+                    "w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl",
+                    styles.input
+                  )}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>想吃理由 / 描述</label>
+                <label className={cn("font-medium text-sm", styles.label)}>
+                  想吃理由 / 描述
+                </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className={cn("w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl resize-none", styles.input)}
+                  className={cn(
+                    "w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl resize-none",
+                    styles.input
+                  )}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>参考图片</label>
-                
+                <label className={cn("font-medium text-sm", styles.label)}>
+                  参考图片
+                </label>
+
                 {image ? (
                   <div className="relative rounded-xl overflow-hidden">
-                    <img 
-                      src={image} 
-                      alt="预览" 
+                    <img
+                      src={image}
+                      alt="预览"
                       className="w-full h-48 object-cover"
                     />
                     <div className="absolute top-2 right-2 flex gap-2">
@@ -230,17 +262,21 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
                     {isUploading ? (
                       <>
                         <Loader2 className="w-8 h-8 animate-spin" />
-                        <span className={cn("text-xs", styles.uploadText)}>上传中...</span>
+                        <span className={cn("text-xs", styles.uploadText)}>
+                          上传中...
+                        </span>
                       </>
                     ) : (
                       <>
                         <ImageIcon className="w-8 h-8" />
-                        <span className={cn("text-xs", styles.uploadText)}>点击上传图片</span>
+                        <span className={cn("text-xs", styles.uploadText)}>
+                          点击上传图片
+                        </span>
                       </>
                     )}
                   </div>
                 )}
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -260,12 +296,12 @@ export default function EditFoodRequest({ isOpen, onClose, request, onSubmit }: 
                 )}
               >
                 {isSubmitting ? (
-                    <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        保存修改
-                    </>
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    保存修改
+                  </>
                 ) : (
-                    "保存"
+                  "保存"
                 )}
               </motion.button>
             </form>

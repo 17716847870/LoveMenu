@@ -32,8 +32,8 @@ export interface DishQueryParams {
   search?: string;
   categoryId?: string;
   status?: string;
-  sortBy?: 'createdAt' | 'popularity' | 'price';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "createdAt" | "popularity" | "price";
+  sortOrder?: "asc" | "desc";
 }
 
 export const dishKeys = {
@@ -42,22 +42,30 @@ export const dishKeys = {
   list: (params?: DishQueryParams) => [...dishKeys.lists(), params] as const,
   details: () => [...dishKeys.all, "detail"] as const,
   detail: (id: string) => [...dishKeys.details(), id] as const,
-  byCategory: (categoryId: string) => [...dishKeys.lists(), "category", categoryId] as const,
+  byCategory: (categoryId: string) =>
+    [...dishKeys.lists(), "category", categoryId] as const,
 };
 
 export function useDishes(params?: DishQueryParams) {
-  const cleanParams = params ? Object.fromEntries(
-    Object.entries(params).filter(([, v]) => v !== undefined)
-  ) : undefined;
+  const cleanParams = params
+    ? Object.fromEntries(
+        Object.entries(params).filter(([, v]) => v !== undefined)
+      )
+    : undefined;
 
-  console.log('useDishes - params:', params, 'cleanParams:', cleanParams);
+  console.log("useDishes - params:", params, "cleanParams:", cleanParams);
 
   return useQuery({
     queryKey: dishKeys.list(params),
     queryFn: async (): Promise<Dish[]> => {
-      console.log('useDishes queryFn - calling API with params:', cleanParams);
-      const response = await http.get<Dish[]>("/api/dishes", { params: cleanParams as Record<string, string | number | boolean> });
-      console.log('useDishes queryFn - received data count:', response.data?.length);
+      console.log("useDishes queryFn - calling API with params:", cleanParams);
+      const response = await http.get<Dish[]>("/api/dishes", {
+        params: cleanParams as Record<string, string | number | boolean>,
+      });
+      console.log(
+        "useDishes queryFn - received data count:",
+        response.data?.length
+      );
       return response.data || [];
     },
   });
@@ -95,9 +103,9 @@ export function useCreateDish() {
 
   return useMutation({
     mutationFn: async (data: CreateDishDto) => {
-      console.log('useCreateDish 发送的数据:', data);
+      console.log("useCreateDish 发送的数据:", data);
       const response = await http.post<Dish>("/api/dishes", data);
-      console.log('useCreateDish 接收的响应:', response);
+      console.log("useCreateDish 接收的响应:", response);
       return response.data;
     },
     onSuccess: () => {
@@ -111,14 +119,16 @@ export function useUpdateDish() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateDishDto }) => {
-      console.log('useUpdateDish 发送的数据:', { id, data });
+      console.log("useUpdateDish 发送的数据:", { id, data });
       const response = await http.put<Dish>(`/api/dishes/${id}`, data);
-      console.log('useUpdateDish 接收的响应:', response);
+      console.log("useUpdateDish 接收的响应:", response);
       return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: dishKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: dishKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: dishKeys.detail(variables.id),
+      });
     },
   });
 }

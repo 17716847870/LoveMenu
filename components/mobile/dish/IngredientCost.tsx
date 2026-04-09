@@ -19,7 +19,8 @@ export default function IngredientCost({
   const containerStyles = cn(
     "mx-4 p-4 rounded-xl flex flex-col gap-3",
     theme === "couple" && "bg-white shadow-sm border border-pink-100",
-    theme === "cute" && "bg-white border-2 border-orange-200 border-dashed relative",
+    theme === "cute" &&
+      "bg-white border-2 border-orange-200 border-dashed relative",
     theme === "minimal" && "bg-white border border-gray-200",
     theme === "night" && "bg-gray-800 border border-purple-900/50"
   );

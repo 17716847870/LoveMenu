@@ -36,9 +36,9 @@ export default function CartBadge({ count, theme }: CartBadgeProps) {
         getBadgeStyles()
       )}
       style={{
-        position: 'absolute',
-        top: '-4px',
-        right: '-4px'
+        position: "absolute",
+        top: "-4px",
+        right: "-4px",
       }}
     >
       {count > 99 ? "99+" : count}

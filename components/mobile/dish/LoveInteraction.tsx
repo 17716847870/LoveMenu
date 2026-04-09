@@ -57,12 +57,18 @@ export default function LoveInteraction({
               theme === "couple" && "bg-pink-100 text-pink-500",
               theme === "cute" && "bg-yellow-100 text-yellow-600",
               theme === "minimal" && "bg-gray-100 text-gray-800",
-              theme === "night" && "bg-gray-800 text-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+              theme === "night" &&
+                "bg-gray-800 text-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.3)]"
             )}
           >
             <Heart className="w-5 h-5 fill-current" />
           </motion.div>
-          <span className={cn("text-xs", theme === "night" ? "text-gray-400" : "text-gray-500")}>
+          <span
+            className={cn(
+              "text-xs",
+              theme === "night" ? "text-gray-400" : "text-gray-500"
+            )}
+          >
             {popularity}
           </span>
         </div>
@@ -75,12 +81,18 @@ export default function LoveInteraction({
               theme === "couple" && "bg-blue-50 text-blue-500",
               theme === "cute" && "bg-blue-100 text-blue-600",
               theme === "minimal" && "bg-gray-100 text-gray-800",
-              theme === "night" && "bg-gray-800 text-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.3)]"
+              theme === "night" &&
+                "bg-gray-800 text-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.3)]"
             )}
           >
             <Send className="w-5 h-5" />
           </motion.div>
-          <span className={cn("text-xs", theme === "night" ? "text-gray-400" : "text-gray-500")}>
+          <span
+            className={cn(
+              "text-xs",
+              theme === "night" ? "text-gray-400" : "text-gray-500"
+            )}
+          >
             {shareCount}
           </span>
         </div>

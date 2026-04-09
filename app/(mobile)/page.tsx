@@ -10,7 +10,6 @@ import UrgentCravingCard from "@/components/mobile/UrgentCravingCard";
 import RecentFeedbackCard from "@/components/mobile/RecentFeedbackCard";
 
 export default function HomePage() {
-
   return (
     <div className="flex flex-col gap-6 p-4 pt-8 w-full pb-24">
       {/* Mood Card */}

@@ -13,13 +13,16 @@ interface EmergencyFoodItemProps {
   onQuickOrder: (dish: Dish) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  card: string;
-  title: string;
-  price: string;
-  btn: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    card: string;
+    title: string;
+    price: string;
+    btn: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
     card: "bg-white border border-pink-100 shadow-sm rounded-2xl",
     title: "text-pink-900",
@@ -50,7 +53,10 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function EmergencyFoodItem({ dish, onQuickOrder }: EmergencyFoodItemProps) {
+export default function EmergencyFoodItem({
+  dish,
+  onQuickOrder,
+}: EmergencyFoodItemProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
   const Icon = styles.icon;
@@ -58,7 +64,7 @@ export default function EmergencyFoodItem({ dish, onQuickOrder }: EmergencyFoodI
 
   const handleOrder = async () => {
     setIsOrdering(true);
-    await new Promise(resolve => setTimeout(resolve, 600)); // Simulate slight delay for effect
+    await new Promise((resolve) => setTimeout(resolve, 600)); // Simulate slight delay for effect
     onQuickOrder(dish);
     // Don't reset isOrdering here, page will navigate away
   };
@@ -92,7 +98,9 @@ export default function EmergencyFoodItem({ dish, onQuickOrder }: EmergencyFoodI
           <h3 className={cn("font-bold text-base line-clamp-1", styles.title)}>
             {dish.name}
           </h3>
-          <div className={cn("text-sm font-medium mt-1 flex gap-2", styles.price)}>
+          <div
+            className={cn("text-sm font-medium mt-1 flex gap-2", styles.price)}
+          >
             {dish.kissPrice > 0 && <span>❤️ {dish.kissPrice}</span>}
             {dish.hugPrice > 0 && <span>🤗 {dish.hugPrice}</span>}
           </div>
@@ -112,7 +120,10 @@ export default function EmergencyFoodItem({ dish, onQuickOrder }: EmergencyFoodI
             {isOrdering ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              <Icon size={16} className={theme === 'couple' ? "fill-current" : ""} />
+              <Icon
+                size={16}
+                className={theme === "couple" ? "fill-current" : ""}
+              />
             )}
             <span>立即点</span>
           </motion.button>

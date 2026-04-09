@@ -13,7 +13,9 @@ export function getSupabaseBrowserClient() {
 
   if (!url || !anonKey) {
     if (!hasLoggedMissingEnv) {
-      console.warn("[chat] Supabase Realtime is disabled because NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing.");
+      console.warn(
+        "[chat] Supabase Realtime is disabled because NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing."
+      );
       hasLoggedMissingEnv = true;
     }
     return null;

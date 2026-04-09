@@ -12,12 +12,15 @@ interface CategoryTabsProps {
   onSelect: (category: string) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  item: string;
-  activeItem: string;
-  activeIndicator: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    item: string;
+    activeItem: string;
+    activeIndicator: string;
+  }
+> = {
   couple: {
     container: "bg-white/80 backdrop-blur-sm border-b border-pink-100",
     item: "text-pink-300 hover:text-pink-500",
@@ -44,15 +47,21 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function CategoryTabs({ categories, activeCategory, onSelect }: CategoryTabsProps) {
+export default function CategoryTabs({
+  categories,
+  activeCategory,
+  onSelect,
+}: CategoryTabsProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   return (
-    <div className={cn(
-      "sticky top-0 z-20 w-full overflow-x-auto no-scrollbar",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "sticky top-0 z-20 w-full overflow-x-auto no-scrollbar",
+        currentTheme.container
+      )}
+    >
       <div className="flex items-center px-4 gap-6 h-14 min-w-max">
         {categories.map((category) => {
           const isActive = activeCategory === category;
@@ -66,7 +75,7 @@ export default function CategoryTabs({ categories, activeCategory, onSelect }: C
               )}
             >
               {category}
-              
+
               {isActive && (
                 <motion.div
                   layoutId="activeCategory"

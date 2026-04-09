@@ -2,12 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Plus, 
-  Sparkles,
-  ShoppingBag
-} from "lucide-react";
+import { Heart, Plus, Sparkles, ShoppingBag } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName, Dish } from "@/types";
@@ -22,18 +17,21 @@ interface FoodRecommendationItemProps {
   onItemClick?: (dish: Dish) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  imageBg: string;
-  title: string;
-  desc: string;
-  reason: string;
-  price: string;
-  addButton: string;
-  favButton: string;
-  favButtonActive: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    imageBg: string;
+    title: string;
+    desc: string;
+    reason: string;
+    price: string;
+    addButton: string;
+    favButton: string;
+    favButtonActive: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
     container: "bg-white/80 backdrop-blur-sm border-pink-100 shadow-sm",
     imageBg: "bg-pink-50",
@@ -47,7 +45,8 @@ const themeStyles: Record<ThemeName, {
     icon: Heart,
   },
   cute: {
-    container: "bg-white border-2 border-orange-100 shadow-[4px_4px_0px_0px_rgba(254,215,170,0.5)] rounded-3xl",
+    container:
+      "bg-white border-2 border-orange-100 shadow-[4px_4px_0px_0px_rgba(254,215,170,0.5)] rounded-3xl",
     imageBg: "bg-orange-50",
     title: "text-orange-900",
     desc: "text-orange-600/80",
@@ -90,25 +89,33 @@ export default function FoodRecommendationItem({
   isFavorite = false,
   onAdd,
   onFavorite,
-  onItemClick
+  onItemClick,
 }: FoodRecommendationItemProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("flex gap-3 p-3 rounded-2xl border transition-all relative overflow-hidden", currentTheme.container)}
+      className={cn(
+        "flex gap-3 p-3 rounded-2xl border transition-all relative overflow-hidden",
+        currentTheme.container
+      )}
       onClick={() => onItemClick?.(dish)}
     >
       {/* Image */}
-      <div className={cn("w-24 h-24 rounded-xl shrink-0 relative overflow-hidden", currentTheme.imageBg)}>
+      <div
+        className={cn(
+          "w-24 h-24 rounded-xl shrink-0 relative overflow-hidden",
+          currentTheme.imageBg
+        )}
+      >
         {dish.image ? (
-          <Image 
-            src={dish.image} 
-            alt={dish.name} 
-            fill 
+          <Image
+            src={dish.image}
+            alt={dish.name}
+            fill
             className="object-cover"
           />
         ) : (
@@ -122,7 +129,12 @@ export default function FoodRecommendationItem({
       <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
         <div>
           <div className="flex justify-between items-start">
-            <h3 className={cn("font-bold text-base truncate pr-6", currentTheme.title)}>
+            <h3
+              className={cn(
+                "font-bold text-base truncate pr-6",
+                currentTheme.title
+              )}
+            >
               {dish.name}
             </h3>
             {/* Favorite Button */}
@@ -131,19 +143,26 @@ export default function FoodRecommendationItem({
                 e.stopPropagation();
                 onFavorite(dish.id);
               }}
-              className={cn("transition-colors absolute right-3 top-3", isFavorite ? currentTheme.favButtonActive : currentTheme.favButton)}
+              className={cn(
+                "transition-colors absolute right-3 top-3",
+                isFavorite
+                  ? currentTheme.favButtonActive
+                  : currentTheme.favButton
+              )}
             >
               <Heart className={cn("w-5 h-5", isFavorite && "fill-current")} />
             </button>
           </div>
-          
+
           <p className={cn("text-xs line-clamp-1 mt-0.5", currentTheme.desc)}>
             {dish.description || "暂无描述"}
           </p>
 
           {/* Reason Badge */}
           <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium w-fit max-w-full truncate">
-            <span className={cn("px-2 py-0.5 rounded-full", currentTheme.reason)}>
+            <span
+              className={cn("px-2 py-0.5 rounded-full", currentTheme.reason)}
+            >
               {reason}
             </span>
           </div>
@@ -151,7 +170,12 @@ export default function FoodRecommendationItem({
 
         <div className="flex items-center justify-between mt-2">
           {/* Price */}
-          <div className={cn("text-xs font-bold flex items-center gap-2", currentTheme.price)}>
+          <div
+            className={cn(
+              "text-xs font-bold flex items-center gap-2",
+              currentTheme.price
+            )}
+          >
             {dish.kissPrice > 0 && <span>🍬 {dish.kissPrice}</span>}
             {dish.hugPrice > 0 && <span>🤗 {dish.hugPrice}</span>}
           </div>
@@ -162,7 +186,10 @@ export default function FoodRecommendationItem({
               e.stopPropagation();
               onAdd(dish);
             }}
-            className={cn("p-1.5 rounded-lg transition-transform active:scale-95", currentTheme.addButton)}
+            className={cn(
+              "p-1.5 rounded-lg transition-transform active:scale-95",
+              currentTheme.addButton
+            )}
           >
             <Plus className="w-4 h-4" />
           </button>

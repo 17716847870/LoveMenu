@@ -15,9 +15,7 @@ export default function Modal({ open, title, children, onClose }: ModalProps) {
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
           <button
-            className={cn(
-              "rounded-full bg-accent px-3 py-1 text-sm",
-            )}
+            className={cn("rounded-full bg-accent px-3 py-1 text-sm")}
             onClick={onClose}
           >
             关闭
@@ -27,4 +25,4 @@ export default function Modal({ open, title, children, onClose }: ModalProps) {
       </div>
     </div>
   );
-};
+}

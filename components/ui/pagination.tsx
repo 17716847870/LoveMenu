@@ -1,8 +1,8 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+import * as React from "react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants, ButtonProps } from "@/components/ui/Button"
+import { cn } from "@/lib/utils";
+import { buttonVariants, ButtonProps } from "@/components/ui/Button";
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -11,8 +11,8 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
     className={cn("mx-auto flex w-full justify-center", className)}
     {...props}
   />
-)
-Pagination.displayName = "Pagination"
+);
+Pagination.displayName = "Pagination";
 
 const PaginationContent = React.forwardRef<
   HTMLUListElement,
@@ -23,39 +23,38 @@ const PaginationContent = React.forwardRef<
     className={cn("flex flex-row items-center gap-1", className)}
     {...props}
   />
-))
-PaginationContent.displayName = "PaginationContent"
+));
+PaginationContent.displayName = "PaginationContent";
 
 const PaginationItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentProps<"li">
 >(({ className, ...props }, ref) => (
   <li ref={ref} className={cn("", className)} {...props} />
-))
-PaginationItem.displayName = "PaginationItem"
+));
+PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = ButtonProps & {
-  isActive?: boolean
-}
+  isActive?: boolean;
+};
 
-const PaginationLink = React.forwardRef<
-  HTMLButtonElement,
-  PaginationLinkProps
->(({ className, isActive, ...props }, ref) => (
-  <button
-    ref={ref}
-    className={cn(
-      buttonVariants({
-        variant: isActive ? "default" : "ghost",
-        size: "icon",
-      }),
-      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
-      className
-    )}
-    {...props}
-  />
-))
-PaginationLink.displayName = "PaginationLink"
+const PaginationLink = React.forwardRef<HTMLButtonElement, PaginationLinkProps>(
+  ({ className, isActive, ...props }, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        buttonVariants({
+          variant: isActive ? "default" : "ghost",
+          size: "icon",
+        }),
+        isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+PaginationLink.displayName = "PaginationLink";
 
 const PaginationPrevious = ({
   className,
@@ -63,14 +62,17 @@ const PaginationPrevious = ({
 }: React.ComponentProps<"button">) => (
   <button
     aria-label="上一页"
-    className={cn("gap-1 pl-2.5 hover:bg-pink-50 hover:text-pink-600 flex items-center", className)}
+    className={cn(
+      "gap-1 pl-2.5 hover:bg-pink-50 hover:text-pink-600 flex items-center",
+      className
+    )}
     {...props}
   >
     <ChevronLeft className="h-4 w-4" />
     <span>上一页</span>
   </button>
-)
-PaginationPrevious.displayName = "PaginationPrevious"
+);
+PaginationPrevious.displayName = "PaginationPrevious";
 
 const PaginationNext = ({
   className,
@@ -78,14 +80,17 @@ const PaginationNext = ({
 }: React.ComponentProps<"button">) => (
   <button
     aria-label="下一页"
-    className={cn("gap-1 pr-2.5 hover:bg-pink-50 hover:text-pink-600 flex items-center", className)}
+    className={cn(
+      "gap-1 pr-2.5 hover:bg-pink-50 hover:text-pink-600 flex items-center",
+      className
+    )}
     {...props}
   >
     <span>下一页</span>
     <ChevronRight className="h-4 w-4" />
   </button>
-)
-PaginationNext.displayName = "PaginationNext"
+);
+PaginationNext.displayName = "PaginationNext";
 
 const PaginationEllipsis = ({
   className,
@@ -99,8 +104,8 @@ const PaginationEllipsis = ({
     <MoreHorizontal className="h-4 w-4" />
     <span className="sr-only">More pages</span>
   </span>
-)
-PaginationEllipsis.displayName = "PaginationEllipsis"
+);
+PaginationEllipsis.displayName = "PaginationEllipsis";
 
 export {
   Pagination,
@@ -110,4 +115,4 @@ export {
   PaginationLink,
   PaginationPrevious,
   PaginationNext,
-}
+};

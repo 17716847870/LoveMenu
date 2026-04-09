@@ -59,13 +59,16 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages, sendMessage.isPending, scrollToBottom]);
 
-  const handleSend = async (content: string, type: "text" | "love" | "image" | "emoji") => {
+  const handleSend = async (
+    content: string,
+    type: "text" | "love" | "image" | "emoji"
+  ) => {
     try {
       let msgType: "text" | "image" | "voice" | "emoji" = "text";
       if (type === "love") msgType = "emoji";
       else if (type === "image") msgType = "image";
       else if (type === "emoji") msgType = "emoji";
-      
+
       await sendMessage.mutateAsync({
         type: msgType,
         content,
@@ -76,9 +79,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div
-      className={cn("flex flex-col h-dvh", currentTheme.bg)}
-    >
+    <div className={cn("flex flex-col h-dvh", currentTheme.bg)}>
       <ChatHeader />
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth">

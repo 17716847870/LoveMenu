@@ -7,7 +7,11 @@ interface DishCategoryProps {
   onClick: (id: string) => void;
 }
 
-export default function DishCategory({ category, isActive, onClick }: DishCategoryProps) {
+export default function DishCategory({
+  category,
+  isActive,
+  onClick,
+}: DishCategoryProps) {
   return (
     <Button
       variant={isActive ? "default" : "secondary"}

@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logApiError } from '@/lib/error-log';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logApiError } from "@/lib/error-log";
 
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
-  pending: ['preparing', 'cancelled'],
-  preparing: ['completed'],
+  pending: ["preparing", "cancelled"],
+  preparing: ["completed"],
   completed: [],
   cancelled: [],
 };
@@ -19,7 +19,7 @@ export async function PUT(
     const nextStatus = body.status;
 
     if (!nextStatus) {
-      return NextResponse.json({ message: '状态不能为空' }, { status: 400 });
+      return NextResponse.json({ message: "状态不能为空" }, { status: 400 });
     }
 
     const updatedOrder = await prisma.$transaction(async (tx) => {
@@ -35,7 +35,7 @@ export async function PUT(
       });
 
       if (!order) {
-        throw new Error('ORDER_NOT_FOUND');
+        throw new Error("ORDER_NOT_FOUND");
       }
 
       if (order.status === nextStatus) {
@@ -44,10 +44,10 @@ export async function PUT(
 
       const allowedNextStatuses = ALLOWED_TRANSITIONS[order.status] ?? [];
       if (!allowedNextStatuses.includes(nextStatus)) {
-        throw new Error('INVALID_STATUS_TRANSITION');
+        throw new Error("INVALID_STATUS_TRANSITION");
       }
 
-      if (nextStatus === 'cancelled') {
+      if (nextStatus === "cancelled") {
         await tx.user.update({
           where: { id: order.userId },
           data: {
@@ -66,21 +66,27 @@ export async function PUT(
     });
 
     if (!updatedOrder) {
-      return NextResponse.json({ message: '订单不存在' }, { status: 404 });
+      return NextResponse.json({ message: "订单不存在" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: updatedOrder });
   } catch (error) {
-    if (error instanceof Error && error.message === 'ORDER_NOT_FOUND') {
-      return NextResponse.json({ message: '订单不存在' }, { status: 404 });
+    if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+      return NextResponse.json({ message: "订单不存在" }, { status: 404 });
     }
 
-    if (error instanceof Error && error.message === 'INVALID_STATUS_TRANSITION') {
-      return NextResponse.json({ message: '当前订单状态不允许这样修改' }, { status: 400 });
+    if (
+      error instanceof Error &&
+      error.message === "INVALID_STATUS_TRANSITION"
+    ) {
+      return NextResponse.json(
+        { message: "当前订单状态不允许这样修改" },
+        { status: 400 }
+      );
     }
 
-    console.error('[api/orders/:id][PUT] 更新订单失败', error);
-    await logApiError({ req, scope: '/api/orders/[id][PUT]' }, error);
-    return NextResponse.json({ message: '更新订单失败' }, { status: 500 });
+    console.error("[api/orders/:id][PUT] 更新订单失败", error);
+    await logApiError({ req, scope: "/api/orders/[id][PUT]" }, error);
+    return NextResponse.json({ message: "更新订单失败" }, { status: 500 });
   }
 }

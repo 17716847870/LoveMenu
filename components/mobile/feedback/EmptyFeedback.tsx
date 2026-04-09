@@ -12,13 +12,16 @@ interface EmptyFeedbackProps {
   onAdd: () => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  icon: string;
-  title: string;
-  desc: string;
-  button: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    icon: string;
+    title: string;
+    desc: string;
+    button: string;
+  }
+> = {
   couple: {
     container: "bg-pink-50",
     icon: "bg-pink-100 text-pink-500",
@@ -59,7 +62,10 @@ export default function EmptyFeedback({ onAdd }: EmptyFeedbackProps) {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className={cn("w-24 h-24 rounded-full flex items-center justify-center mb-6", styles.icon)}
+        className={cn(
+          "w-24 h-24 rounded-full flex items-center justify-center mb-6",
+          styles.icon
+        )}
       >
         <MessageCircle size={40} />
       </motion.div>
@@ -74,7 +80,10 @@ export default function EmptyFeedback({ onAdd }: EmptyFeedbackProps) {
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={onAdd}
-        className={cn("w-full max-w-[200px] py-3 rounded-full font-semibold shadow-lg transition-all", styles.button)}
+        className={cn(
+          "w-full max-w-[200px] py-3 rounded-full font-semibold shadow-lg transition-all",
+          styles.button
+        )}
       >
         提交第一条反馈
       </motion.button>

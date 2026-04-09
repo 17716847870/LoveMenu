@@ -1,4 +1,4 @@
-import OSS from 'ali-oss';
+import OSS from "ali-oss";
 
 const client = new OSS({
   region: process.env.OSS_REGION!,
@@ -21,34 +21,34 @@ export async function uploadImage(
     filename?: string;
   } = {}
 ): Promise<UploadResult> {
-  const { path = 'uploads', filename } = options;
-  
+  const { path = "uploads", filename } = options;
+
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
-  const ext = file instanceof File ? file.name.split('.').pop() : 'jpg';
+  const ext = file instanceof File ? file.name.split(".").pop() : "jpg";
   const finalFilename = filename || `${timestamp}-${randomStr}.${ext}`;
-  
+
   const objectPath = `${path}/${finalFilename}`;
-  
+
   let buffer: Buffer;
   let contentType: string;
-  
+
   if (file instanceof File) {
     const arrayBuffer = await file.arrayBuffer();
     buffer = Buffer.from(arrayBuffer);
-    contentType = file.type || 'image/jpeg';
+    contentType = file.type || "image/jpeg";
   } else {
     buffer = file;
-    contentType = 'image/jpeg';
+    contentType = "image/jpeg";
   }
-  
+
   try {
     const result = await client.put(objectPath, buffer, {
       headers: {
-        'Content-Type': contentType,
+        "Content-Type": contentType,
       },
     });
-    
+
     return {
       url: result.url,
       name: finalFilename,
@@ -56,8 +56,8 @@ export async function uploadImage(
       contentType,
     };
   } catch (error) {
-    console.error('OSS upload error:', error);
-    throw new Error('图片上传失败');
+    console.error("OSS upload error:", error);
+    throw new Error("图片上传失败");
   }
 }
 
@@ -67,12 +67,15 @@ export async function deleteImage(url: string): Promise<void> {
     const objectPath = urlObj.pathname.substring(1);
     await client.delete(objectPath);
   } catch (error) {
-    console.error('OSS delete error:', error);
-    throw new Error('图片删除失败');
+    console.error("OSS delete error:", error);
+    throw new Error("图片删除失败");
   }
 }
 
-export function getImageUrl(filename: string, path: string = 'uploads'): string {
+export function getImageUrl(
+  filename: string,
+  path: string = "uploads"
+): string {
   return `https://${process.env.OSS_BUCKET}.${process.env.OSS_REGION}.aliyuncs.com/${path}/${filename}`;
 }
 

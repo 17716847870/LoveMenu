@@ -1,6 +1,6 @@
-import { DishCategory } from '@/types';
-import { Edit2, Trash2 } from 'lucide-react';
-import { TableRow, TableCell } from '@/components/ui/table';
+import { DishCategory } from "@/types";
+import { Edit2, Trash2 } from "lucide-react";
+import { TableRow, TableCell } from "@/components/ui/table";
 
 interface CategoryWithCount extends DishCategory {
   dishCount: number;
@@ -47,7 +47,11 @@ function SkeletonRow() {
   );
 }
 
-export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDataTableProps) {
+export default function CategoryDataTable({
+  data,
+  onEdit,
+  onDelete,
+}: CategoryDataTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6 hidden md:block">
       <table className="w-full text-left border-collapse">
@@ -60,16 +64,19 @@ export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDa
           </tr>
         </thead>
         <tbody className="divide-y divide-pink-50/50">
-          {
-
-          }
+          {}
           {data.map((category) => (
-            <tr key={category.id} className="hover:bg-pink-50/30 transition-colors group">
+            <tr
+              key={category.id}
+              className="hover:bg-pink-50/30 transition-colors group"
+            >
               <td className="py-4 px-6 font-medium text-gray-900">
                 {category.name}
               </td>
               <td className="py-4 px-6 text-gray-600">
-                <span className="bg-gray-100 px-2 py-1 rounded text-sm">{category.sortOrder}</span>
+                <span className="bg-gray-100 px-2 py-1 rounded text-sm">
+                  {category.sortOrder}
+                </span>
               </td>
               <td className="py-4 px-6">
                 <span className="text-pink-500 font-medium bg-pink-50 px-2 py-1 rounded-md">
@@ -78,15 +85,17 @@ export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDa
               </td>
               <td className="py-4 px-6 text-right">
                 <div className="flex justify-end gap-2">
-                  <button 
+                  <button
                     onClick={() => onEdit?.(category)}
-                    className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="编辑"
+                    className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="编辑"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => onDelete?.(category.id)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="删除"
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="删除"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -97,9 +106,7 @@ export default function CategoryDataTable({ data, onEdit, onDelete }: CategoryDa
         </tbody>
       </table>
       {data.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          暂无分类数据
-        </div>
+        <div className="p-8 text-center text-gray-500">暂无分类数据</div>
       )}
     </div>
   );

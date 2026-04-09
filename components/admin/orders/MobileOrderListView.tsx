@@ -1,39 +1,73 @@
-import React from 'react';
-import { Order } from '@/types';
-import { Clock, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Order } from "@/types";
+import { Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MobileOrderListViewProps {
   data: Order[];
   onView?: (order: Order) => void;
-  onUpdateStatus?: (orderId: string, newStatus: Order['status']) => void;
+  onUpdateStatus?: (orderId: string, newStatus: Order["status"]) => void;
 }
 
 const statusConfig = {
-  pending: { label: "待处理", color: "text-orange-500 bg-orange-50", icon: Clock },
-  preparing: { label: "制作中", color: "text-blue-500 bg-blue-50", icon: AlertCircle },
-  completed: { label: "已完成", color: "text-green-500 bg-green-50", icon: CheckCircle2 },
-  cancelled: { label: "已取消", color: "text-gray-500 bg-gray-50", icon: XCircle },
+  pending: {
+    label: "待处理",
+    color: "text-orange-500 bg-orange-50",
+    icon: Clock,
+  },
+  preparing: {
+    label: "制作中",
+    color: "text-blue-500 bg-blue-50",
+    icon: AlertCircle,
+  },
+  completed: {
+    label: "已完成",
+    color: "text-green-500 bg-green-50",
+    icon: CheckCircle2,
+  },
+  cancelled: {
+    label: "已取消",
+    color: "text-gray-500 bg-gray-50",
+    icon: XCircle,
+  },
 };
 
-export default function MobileOrderListView({ data, onView, onUpdateStatus }: MobileOrderListViewProps) {
+export default function MobileOrderListView({
+  data,
+  onView,
+  onUpdateStatus,
+}: MobileOrderListViewProps) {
   return (
     <div className="flex flex-col gap-3 mb-6 md:hidden">
       {data.map((order) => {
-        const StatusIcon = statusConfig[order.status as keyof typeof statusConfig]?.icon || Clock;
+        const StatusIcon =
+          statusConfig[order.status as keyof typeof statusConfig]?.icon ||
+          Clock;
         return (
-          <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-pink-50/50 p-4 space-y-3">
+          <div
+            key={order.id}
+            className="bg-white rounded-2xl shadow-sm border border-pink-50/50 p-4 space-y-3"
+          >
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-gray-800">{order.id}</span>
                   {order.isEmergency && (
-                    <span className="px-2 py-0.5 text-xs bg-red-100 text-red-500 rounded-full font-medium">紧急</span>
+                    <span className="px-2 py-0.5 text-xs bg-red-100 text-red-500 rounded-full font-medium">
+                      紧急
+                    </span>
                   )}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">{order.createdAt}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {order.createdAt}
+                </div>
               </div>
-              <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium", statusConfig[order.status as keyof typeof statusConfig]?.color)}>
+              <div
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                  statusConfig[order.status as keyof typeof statusConfig]?.color
+                )}
+              >
                 <StatusIcon className="w-3.5 h-3.5" />
                 {statusConfig[order.status as keyof typeof statusConfig]?.label}
               </div>
@@ -41,9 +75,15 @@ export default function MobileOrderListView({ data, onView, onUpdateStatus }: Mo
 
             <div className="py-2 border-t border-b border-gray-50">
               <div className="text-sm text-gray-700 font-medium line-clamp-2">
-                {order.items.map(item => `${item.dish.name} x${item.quantity}`).join(", ")}
+                {order.items
+                  .map((item) => `${item.dish.name} x${item.quantity}`)
+                  .join(", ")}
               </div>
-              {order.reason && <div className="text-xs text-gray-400 mt-1.5 bg-gray-50 p-2 rounded-lg">备注: {order.reason}</div>}
+              {order.reason && (
+                <div className="text-xs text-gray-400 mt-1.5 bg-gray-50 p-2 rounded-lg">
+                  备注: {order.reason}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-between items-center">
@@ -52,23 +92,23 @@ export default function MobileOrderListView({ data, onView, onUpdateStatus }: Mo
                 <span className="text-blue-500">🤗 {order.totalHug}</span>
               </div>
               <div className="flex items-center gap-2">
-                {order.status === 'pending' && (
-                  <button 
-                    onClick={() => onUpdateStatus?.(order.id, 'preparing')}
+                {order.status === "pending" && (
+                  <button
+                    onClick={() => onUpdateStatus?.(order.id, "preparing")}
                     className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 font-medium rounded-xl hover:bg-blue-100 transition-colors"
                   >
                     开始制作
                   </button>
                 )}
-                {order.status === 'preparing' && (
-                  <button 
-                    onClick={() => onUpdateStatus?.(order.id, 'completed')}
+                {order.status === "preparing" && (
+                  <button
+                    onClick={() => onUpdateStatus?.(order.id, "completed")}
                     className="px-3 py-1.5 text-xs bg-green-50 text-green-600 font-medium rounded-xl hover:bg-green-100 transition-colors"
                   >
                     标记完成
                   </button>
                 )}
-                <button 
+                <button
                   onClick={() => onView?.(order)}
                   className="px-4 py-1.5 text-sm bg-pink-50 text-pink-600 font-medium rounded-xl hover:bg-pink-100 transition-colors"
                 >

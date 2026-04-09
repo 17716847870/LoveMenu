@@ -1,10 +1,10 @@
-import { prisma } from '@/lib/db';
+import { prisma } from "@/lib/db";
 
-export type ErrorLogSource = 'api' | 'frontend';
+export type ErrorLogSource = "api" | "frontend";
 
 export interface CreateErrorLogInput {
   source: ErrorLogSource;
-  level?: 'error' | 'warn';
+  level?: "error" | "warn";
   scope?: string;
   path?: string;
   method?: string;
@@ -28,7 +28,7 @@ export async function createErrorLog(input: CreateErrorLogInput) {
     await (prisma as any).errorLog.create({
       data: {
         source: input.source,
-        level: input.level ?? 'error',
+        level: input.level ?? "error",
         scope: input.scope ?? null,
         path: input.path ?? null,
         method: input.method ?? null,
@@ -40,7 +40,7 @@ export async function createErrorLog(input: CreateErrorLogInput) {
       },
     });
   } catch (error) {
-    console.error('[error-log] 写入失败', error);
+    console.error("[error-log] 写入失败", error);
   }
 }
 
@@ -53,7 +53,7 @@ export function normalizeError(error: unknown) {
   }
 
   return {
-    message: typeof error === 'string' ? error : 'Unknown error',
+    message: typeof error === "string" ? error : "Unknown error",
     stack: undefined,
   };
 }
@@ -62,13 +62,13 @@ export async function logApiError(context: ApiErrorLogContext, error: unknown) {
   const normalized = normalizeError(error);
 
   await createErrorLog({
-    source: 'api',
+    source: "api",
     scope: context.scope,
     path: context.req ? new URL(context.req.url).pathname : context.path,
     method: context.req?.method ?? context.method,
     message: normalized.message,
     stack: normalized.stack,
-    userAgent: context.req?.headers.get('user-agent') ?? undefined,
+    userAgent: context.req?.headers.get("user-agent") ?? undefined,
     url: context.req?.url,
     metadata: context.metadata ?? null,
   });

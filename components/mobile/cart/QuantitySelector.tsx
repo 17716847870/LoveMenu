@@ -13,11 +13,14 @@ interface QuantitySelectorProps {
   onDecrease: () => void;
 }
 
-const themeStyles: Record<ThemeName, { 
-  btn: string; 
-  text: string; 
-  container: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    btn: string;
+    text: string;
+    container: string;
+  }
+> = {
   couple: {
     btn: "bg-pink-100 text-pink-600 hover:bg-pink-200 active:bg-pink-300",
     text: "text-pink-900",
@@ -40,28 +43,43 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function QuantitySelector({ quantity, onIncrease, onDecrease }: QuantitySelectorProps) {
+export default function QuantitySelector({
+  quantity,
+  onIncrease,
+  onDecrease,
+}: QuantitySelectorProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
 
   return (
-    <div className={cn("flex items-center gap-3 rounded-full px-1 py-1", styles.container)}>
+    <div
+      className={cn(
+        "flex items-center gap-3 rounded-full px-1 py-1",
+        styles.container
+      )}
+    >
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={(e) => {
           e.stopPropagation();
           onDecrease();
         }}
-        className={cn("w-6 h-6 rounded-full flex items-center justify-center", styles.btn)}
+        className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center",
+          styles.btn
+        )}
       >
         <Minus size={14} />
       </motion.button>
-      
-      <motion.span 
+
+      <motion.span
         key={quantity}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className={cn("font-semibold min-w-[1ch] text-center text-sm", styles.text)}
+        className={cn(
+          "font-semibold min-w-[1ch] text-center text-sm",
+          styles.text
+        )}
       >
         {quantity}
       </motion.span>
@@ -72,7 +90,10 @@ export default function QuantitySelector({ quantity, onIncrease, onDecrease }: Q
           e.stopPropagation();
           onIncrease();
         }}
-        className={cn("w-6 h-6 rounded-full flex items-center justify-center", styles.btn)}
+        className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center",
+          styles.btn
+        )}
       >
         <Plus size={14} />
       </motion.button>

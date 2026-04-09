@@ -2,12 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Sparkles, 
-  Zap, 
-  Plus
-} from "lucide-react";
+import { Heart, Sparkles, Zap, Plus } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useFlyToCart } from "@/context/FlyToCartContext";
 import { cn } from "@/lib/utils";
@@ -21,16 +16,19 @@ interface DishCardProps {
   onAdd?: (dish: Dish) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  card: string;
-  imageContainer: string;
-  title: string;
-  desc: string;
-  price: string;
-  button: string;
-  hotBadge: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    card: string;
+    imageContainer: string;
+    title: string;
+    desc: string;
+    price: string;
+    button: string;
+    hotBadge: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
     card: "bg-white border-pink-100 shadow-sm hover:shadow-md border rounded-2xl",
     imageContainer: "bg-pink-50",
@@ -92,30 +90,36 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       )}
     >
       <Link href={`/menu/${dish.id}`} className="absolute inset-0 z-0" />
-      
+
       {/* Hot Badge */}
       <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
         {!!(dish.popularity && dish.popularity > 80) && (
-          <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-md bg-opacity-90 flex items-center gap-1", currentTheme.hotBadge)}>
+          <span
+            className={cn(
+              "px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-md bg-opacity-90 flex items-center gap-1",
+              currentTheme.hotBadge
+            )}
+          >
             🔥 热销
           </span>
         )}
       </div>
 
       {/* Image */}
-      <div 
+      <div
         ref={imageRef}
         className={cn(
-        "aspect-4/3 relative w-full overflow-hidden",
-        currentTheme.imageContainer
-      )}>
+          "aspect-4/3 relative w-full overflow-hidden",
+          currentTheme.imageContainer
+        )}
+      >
         {dish.image ? (
-           <Image 
-             src={dish.image} 
-             alt={dish.name}
-             fill
-             className="object-cover"
-           />
+          <Image
+            src={dish.image}
+            alt={dish.name}
+            fill
+            className="object-cover"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl">
             🥘
@@ -126,7 +130,9 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
       {/* Info */}
       <div className="p-3 flex flex-col flex-1 gap-2 relative z-10 pointer-events-none">
         <div>
-          <h3 className={cn("font-bold text-sm line-clamp-1", currentTheme.title)}>
+          <h3
+            className={cn("font-bold text-sm line-clamp-1", currentTheme.title)}
+          >
             {dish.name}
           </h3>
           <p className={cn("text-xs line-clamp-1 mt-0.5", currentTheme.desc)}>
@@ -136,7 +142,12 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
 
         <div className="mt-auto flex items-center justify-between">
           {/* Price */}
-          <div className={cn("flex items-center gap-2 text-xs font-medium", currentTheme.price)}>
+          <div
+            className={cn(
+              "flex items-center gap-2 text-xs font-medium",
+              currentTheme.price
+            )}
+          >
             {dish.kissPrice > 0 && (
               <span className="flex items-center gap-0.5">
                 ❤️ {dish.kissPrice}
@@ -155,14 +166,14 @@ export default function DishCard({ dish, onAdd }: DishCardProps) {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              
+
               if (imageRef.current) {
                 const rect = imageRef.current.getBoundingClientRect();
                 addToCartWithAnimation(rect, dish.image || "", () => {
-                   onAdd?.(dish);
+                  onAdd?.(dish);
                 });
               } else {
-                 onAdd?.(dish);
+                onAdd?.(dish);
               }
             }}
             className={cn(

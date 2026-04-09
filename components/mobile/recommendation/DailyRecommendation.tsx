@@ -2,7 +2,14 @@
 
 import React, { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Heart, Sparkles, Target, Zap, ArrowRight } from "lucide-react";
+import {
+  RefreshCw,
+  Heart,
+  Sparkles,
+  Target,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
@@ -11,32 +18,43 @@ import FoodRecommendationItem from "./FoodRecommendationItem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RecommendationItem, useRecommendations } from "@/apis/recommendations";
-import { useAddFavorite, useFavorites, useRemoveFavorite } from "@/apis/favorites";
+import {
+  useAddFavorite,
+  useFavorites,
+  useRemoveFavorite,
+} from "@/apis/favorites";
 import { useUser } from "@/context/UserContext";
 
 interface DailyRecommendationProps {
   compact?: boolean;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  header: string;
-  refreshButton: string;
-  viewAll: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    header: string;
+    refreshButton: string;
+    viewAll: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
-    container: "bg-gradient-to-br from-pink-50 to-white border-pink-100 shadow-sm",
+    container:
+      "bg-gradient-to-br from-pink-50 to-white border-pink-100 shadow-sm",
     header: "text-pink-600",
     refreshButton: "text-pink-400 hover:text-pink-600 hover:bg-pink-100",
-    viewAll: "text-pink-500 hover:text-pink-600 bg-pink-50/50 hover:bg-pink-100",
+    viewAll:
+      "text-pink-500 hover:text-pink-600 bg-pink-50/50 hover:bg-pink-100",
     icon: Heart,
   },
   cute: {
-    container: "bg-orange-50 border-orange-100 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
+    container:
+      "bg-orange-50 border-orange-100 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
     header: "text-orange-500",
     refreshButton: "text-orange-400 hover:text-orange-600 hover:bg-orange-100",
-    viewAll: "text-orange-500 hover:text-orange-600 bg-orange-100/50 hover:bg-orange-200/50",
+    viewAll:
+      "text-orange-500 hover:text-orange-600 bg-orange-100/50 hover:bg-orange-200/50",
     icon: Sparkles,
   },
   minimal: {
@@ -47,27 +65,39 @@ const themeStyles: Record<ThemeName, {
     icon: Target,
   },
   night: {
-    container: "bg-slate-900 border-slate-800 shadow-[0_0_15px_rgba(59,130,246,0.15)]",
+    container:
+      "bg-slate-900 border-slate-800 shadow-[0_0_15px_rgba(59,130,246,0.15)]",
     header: "text-blue-400",
     refreshButton: "text-blue-500 hover:text-blue-300 hover:bg-blue-900/50",
-    viewAll: "text-blue-400 hover:text-blue-300 bg-blue-900/20 hover:bg-blue-900/40",
+    viewAll:
+      "text-blue-400 hover:text-blue-300 bg-blue-900/20 hover:bg-blue-900/40",
     icon: Zap,
   },
 };
 
-export default function DailyRecommendation({ compact = false }: DailyRecommendationProps) {
+export default function DailyRecommendation({
+  compact = false,
+}: DailyRecommendationProps) {
   const { theme } = useTheme();
   const { addItem } = useCart();
   const { user } = useUser();
   const router = useRouter();
-  const { data: allRecommendations = [], isLoading, refetch, isFetching } = useRecommendations();
+  const {
+    data: allRecommendations = [],
+    isLoading,
+    refetch,
+    isFetching,
+  } = useRecommendations();
   const { data: favorites = [] } = useFavorites(user?.id);
   const addFavoriteMutation = useAddFavorite(user?.id);
   const removeFavoriteMutation = useRemoveFavorite(user?.id);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const Icon = currentTheme.icon;
 
-  const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.dishId)), [favorites]);
+  const favoriteIds = useMemo(
+    () => new Set(favorites.map((item) => item.dishId)),
+    [favorites]
+  );
 
   const recommendations = useMemo(() => {
     const count = compact ? 3 : 6;
@@ -125,11 +155,19 @@ export default function DailyRecommendation({ compact = false }: DailyRecommenda
 
         <button
           onClick={handleRefresh}
-          className={cn("p-2 rounded-full transition-all", currentTheme.refreshButton)}
+          className={cn(
+            "p-2 rounded-full transition-all",
+            currentTheme.refreshButton
+          )}
           disabled={isLoading || isFetching}
           aria-label="Refresh recommendations"
         >
-          <RefreshCw className={cn("w-4 h-4", (isLoading || isFetching) && "animate-spin")} />
+          <RefreshCw
+            className={cn(
+              "w-4 h-4",
+              (isLoading || isFetching) && "animate-spin"
+            )}
+          />
         </button>
       </div>
 

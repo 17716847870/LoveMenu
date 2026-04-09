@@ -57,22 +57,29 @@ export default function AnniversaryLogsPage({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    log.status === "success"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      log.status === "success"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
                     {log.status === "success" ? "发送成功" : "发送失败"}
                   </span>
                   <span className="text-sm text-gray-500">
-                    {new Date(log.sentAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+                    {new Date(log.sentAt).toLocaleString("zh-CN", {
+                      timeZone: "Asia/Shanghai",
+                    })}
                   </span>
                   <span className="text-sm text-gray-400 flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5" />{log.emailTo}
+                    <Mail className="w-3.5 h-3.5" />
+                    {log.emailTo}
                   </span>
                 </div>
                 {log.error && (
-                  <p className="mt-1 text-sm text-red-500 truncate">{log.error}</p>
+                  <p className="mt-1 text-sm text-red-500 truncate">
+                    {log.error}
+                  </p>
                 )}
               </div>
             </div>

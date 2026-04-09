@@ -1,11 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Smile, 
-  Quote,
-} from "lucide-react";
+import { Heart, Smile, Quote } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
@@ -31,18 +27,22 @@ interface MemoryOrderCardProps {
   index: number;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  time: string;
-  dish: string;
-  price: string;
-  note: string;
-  noteIcon: string;
-  dot: string;
-  line: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    time: string;
+    dish: string;
+    price: string;
+    note: string;
+    noteIcon: string;
+    dot: string;
+    line: string;
+  }
+> = {
   couple: {
-    container: "bg-white border-pink-100 hover:border-pink-300 shadow-sm hover:shadow-md",
+    container:
+      "bg-white border-pink-100 hover:border-pink-300 shadow-sm hover:shadow-md",
     time: "text-pink-300",
     dish: "text-pink-900",
     price: "text-pink-500",
@@ -52,7 +52,8 @@ const themeStyles: Record<ThemeName, {
     line: "bg-pink-100",
   },
   cute: {
-    container: "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
+    container:
+      "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
     time: "text-orange-300",
     dish: "text-orange-900",
     price: "text-orange-500",
@@ -72,7 +73,8 @@ const themeStyles: Record<ThemeName, {
     line: "bg-gray-200",
   },
   night: {
-    container: "bg-slate-800 border-slate-700 shadow-[0_0_15px_rgba(96,165,250,0.15)]",
+    container:
+      "bg-slate-800 border-slate-700 shadow-[0_0_15px_rgba(96,165,250,0.15)]",
     time: "text-slate-500",
     dish: "text-blue-100",
     price: "text-blue-400",
@@ -83,24 +85,33 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) {
+export default function MemoryOrderCard({
+  order,
+  index,
+}: MemoryOrderCardProps) {
   const { theme } = useTheme();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
-  const memoryImages = Array.isArray(order.memory?.image) ? order.memory.image : null;
+  const memoryImages = Array.isArray(order.memory?.image)
+    ? order.memory.image
+    : null;
 
   return (
     <div className="relative pl-8 pb-8 last:pb-0">
       {/* Timeline Line */}
-      <div className={cn(
-        "absolute left-2.75 top-2 bottom-0 w-0.5",
-        currentTheme.line
-      )} />
-      
+      <div
+        className={cn(
+          "absolute left-2.75 top-2 bottom-0 w-0.5",
+          currentTheme.line
+        )}
+      />
+
       {/* Timeline Dot */}
-      <div className={cn(
-        "absolute left-1.5 top-2 w-3 h-3 rounded-full border-2 box-content z-10",
-        currentTheme.dot
-      )} />
+      <div
+        className={cn(
+          "absolute left-1.5 top-2 w-3 h-3 rounded-full border-2 box-content z-10",
+          currentTheme.dot
+        )}
+      />
 
       <motion.div
         initial={{ opacity: 0, x: 20 }}
@@ -114,7 +125,12 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
-            <h3 className={cn("text-lg font-bold line-clamp-1", currentTheme.dish)}>
+            <h3
+              className={cn(
+                "text-lg font-bold line-clamp-1",
+                currentTheme.dish
+              )}
+            >
               {order.dishes.join(" + ")}
             </h3>
             {order.isEmergency && (
@@ -124,12 +140,17 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
             )}
           </div>
           <span className={cn("text-xs font-medium", currentTheme.time)}>
-            {formatDateTime(order.createdAt, 'HH:mm')}
+            {formatDateTime(order.createdAt, "HH:mm")}
           </span>
         </div>
 
         {/* Price */}
-        <div className={cn("flex items-center gap-3 font-medium", currentTheme.price)}>
+        <div
+          className={cn(
+            "flex items-center gap-3 font-medium",
+            currentTheme.price
+          )}
+        >
           {order.kissPrice > 0 && (
             <span className="flex items-center gap-1">
               <Heart className="w-4 h-4" /> {order.kissPrice}
@@ -144,14 +165,18 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
 
         {/* Reason / Memory Note */}
         {(order.reason || order.memoryNote || order.memory) && (
-          <div className={cn(
-            "mt-1 p-3 rounded-xl text-sm relative border",
-            currentTheme.note
-          )}>
-            <Quote className={cn(
-              "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-0.5",
-              currentTheme.noteIcon
-            )} />
+          <div
+            className={cn(
+              "mt-1 p-3 rounded-xl text-sm relative border",
+              currentTheme.note
+            )}
+          >
+            <Quote
+              className={cn(
+                "absolute -top-2 -left-1 w-4 h-4 rotate-180 bg-white rounded-full p-0.5",
+                currentTheme.noteIcon
+              )}
+            />
             <div className="flex flex-col gap-2">
               {order.reason && (
                 <div className="font-medium opacity-90">
@@ -159,25 +184,32 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
                   {order.reason}
                 </div>
               )}
-              
+
               {/* 图片展示 */}
               {order.memory?.image && (
-                <div className={cn(
-                  "mt-1",
-                  memoryImages && memoryImages.length > 1
-                    ? "grid grid-cols-2 gap-2"
-                    : ""
-                )}>
+                <div
+                  className={cn(
+                    "mt-1",
+                    memoryImages && memoryImages.length > 1
+                      ? "grid grid-cols-2 gap-2"
+                      : ""
+                  )}
+                >
                   {memoryImages ? (
                     memoryImages.map((img, idx) => (
-                      <div key={idx} className={cn(
-                        "rounded-lg overflow-hidden relative",
-                        memoryImages.length === 1 ? "w-full h-32" : "w-full aspect-square"
-                      )}>
+                      <div
+                        key={idx}
+                        className={cn(
+                          "rounded-lg overflow-hidden relative",
+                          memoryImages.length === 1
+                            ? "w-full h-32"
+                            : "w-full aspect-square"
+                        )}
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img 
-                          src={img} 
-                          alt={`回忆照片 ${idx + 1}`} 
+                        <img
+                          src={img}
+                          alt={`回忆照片 ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -185,9 +217,13 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
                   ) : (
                     <div className="w-full h-32 rounded-lg overflow-hidden relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src={typeof order.memory.image === 'string' ? order.memory.image : ''} 
-                        alt="回忆照片" 
+                      <img
+                        src={
+                          typeof order.memory.image === "string"
+                            ? order.memory.image
+                            : ""
+                        }
+                        alt="回忆照片"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -197,10 +233,14 @@ export default function MemoryOrderCard({ order, index }: MemoryOrderCardProps) 
 
               {/* 回忆文字 */}
               {(order.memoryNote || order.memory?.text) && (
-                <div className={cn(
-                  "text-sm leading-relaxed",
-                  (order.reason || order.memory?.image) ? "mt-1 pt-2 border-t border-current/10" : ""
-                )}>
+                <div
+                  className={cn(
+                    "text-sm leading-relaxed",
+                    order.reason || order.memory?.image
+                      ? "mt-1 pt-2 border-t border-current/10"
+                      : ""
+                  )}
+                >
                   {order.memory?.text || order.memoryNote}
                 </div>
               )}

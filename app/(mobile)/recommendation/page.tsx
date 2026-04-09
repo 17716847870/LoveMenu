@@ -29,18 +29,24 @@ export default function RecommendationPage() {
   const currentHeader = headerStyles[theme] || headerStyles.couple;
 
   return (
-    <div className={cn("min-h-screen p-4 transition-colors duration-300", currentTheme)}>
+    <div
+      className={cn(
+        "min-h-screen p-4 transition-colors duration-300",
+        currentTheme
+      )}
+    >
       {/* Header */}
       <div className="flex items-center gap-4 mb-6 pt-2">
-        <button 
+        <button
           onClick={() => router.back()}
-          className={cn("p-2 rounded-full hover:bg-black/5 transition-colors", currentHeader)}
+          className={cn(
+            "p-2 rounded-full hover:bg-black/5 transition-colors",
+            currentHeader
+          )}
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h1 className={cn("text-xl font-bold", currentHeader)}>
-          更多推荐
-        </h1>
+        <h1 className={cn("text-xl font-bold", currentHeader)}>更多推荐</h1>
       </div>
 
       <DailyRecommendation compact={false} />

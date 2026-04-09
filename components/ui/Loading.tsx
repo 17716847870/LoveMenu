@@ -87,7 +87,9 @@ export const Loading: React.FC<LoadingProps> = ({
   };
 
   const loadingContent = (
-    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center gap-3 ${className}`}
+    >
       {renderLoader()}
       {text && (
         <p className={`${textSizes[size]} text-muted-foreground font-medium`}>
@@ -105,9 +107,7 @@ export const Loading: React.FC<LoadingProps> = ({
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
       >
-        <div className="bg-card rounded-xl shadow-lg p-8">
-          {loadingContent}
-        </div>
+        <div className="bg-card rounded-xl shadow-lg p-8">{loadingContent}</div>
       </motion.div>
     );
   }

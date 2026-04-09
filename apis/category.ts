@@ -64,13 +64,24 @@ export function useUpdateCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateCategoryDto }) => {
-      const response = await http.put<DishCategory>(`/api/categories/${id}`, data);
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateCategoryDto;
+    }) => {
+      const response = await http.put<DishCategory>(
+        `/api/categories/${id}`,
+        data
+      );
       return response.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: categoryKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: categoryKeys.detail(variables.id),
+      });
     },
   });
 }

@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronLeft, 
-  Search, 
+import {
+  ChevronLeft,
+  Search,
   Receipt,
   Sparkles,
   Zap,
@@ -12,7 +12,7 @@ import {
   X,
   Image as ImageIcon,
   Loader2,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
@@ -22,21 +22,24 @@ import { ThemeName } from "@/types";
 import { useOrders, Order as ApiOrder } from "@/apis/orders";
 import OrderItemCard from "@/components/mobile/OrderItemCard";
 
-const themeStyles: Record<ThemeName, {
-  bg: string;
-  headerBg: string;
-  text: string;
-  subText: string;
-  icon: React.ElementType;
-  iconColor: string;
-  backBtn: string;
-  searchBg: string;
-  modalBg: string;
-  primaryBtn: string;
-  textareaBg: string;
-  uploadZone: string;
-  uploadText: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    bg: string;
+    headerBg: string;
+    text: string;
+    subText: string;
+    icon: React.ElementType;
+    iconColor: string;
+    backBtn: string;
+    searchBg: string;
+    modalBg: string;
+    primaryBtn: string;
+    textareaBg: string;
+    uploadZone: string;
+    uploadText: string;
+  }
+> = {
   couple: {
     bg: "bg-pink-50/30",
     headerBg: "bg-white/80 border-pink-100",
@@ -60,9 +63,11 @@ const themeStyles: Record<ThemeName, {
     icon: Sparkles,
     iconColor: "text-orange-500",
     backBtn: "bg-orange-100 text-orange-600 hover:bg-orange-200",
-    searchBg: "bg-orange-50 focus-within:bg-white border-2 border-transparent focus-within:border-orange-200",
+    searchBg:
+      "bg-orange-50 focus-within:bg-white border-2 border-transparent focus-within:border-orange-200",
     modalBg: "bg-[#fff4fb] border-orange-200",
-    primaryBtn: "bg-orange-400 text-white hover:bg-orange-500 shadow-orange-200",
+    primaryBtn:
+      "bg-orange-400 text-white hover:bg-orange-500 shadow-orange-200",
     textareaBg: "bg-white border-orange-200 focus:border-orange-400",
     uploadZone: "border-orange-200 bg-orange-50/30",
     uploadText: "text-orange-400",
@@ -75,7 +80,8 @@ const themeStyles: Record<ThemeName, {
     icon: Clock,
     iconColor: "text-gray-900",
     backBtn: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-    searchBg: "bg-gray-100 focus-within:bg-white border border-transparent focus-within:border-gray-300",
+    searchBg:
+      "bg-gray-100 focus-within:bg-white border border-transparent focus-within:border-gray-300",
     modalBg: "bg-white border-gray-200",
     primaryBtn: "bg-gray-900 text-white hover:bg-gray-800 shadow-gray-200",
     textareaBg: "bg-gray-50 border-gray-200 focus:border-gray-400",
@@ -90,10 +96,12 @@ const themeStyles: Record<ThemeName, {
     icon: Zap,
     iconColor: "text-blue-400",
     backBtn: "bg-slate-800 text-slate-300 hover:bg-slate-700",
-    searchBg: "bg-slate-800/50 focus-within:bg-slate-800 border border-transparent focus-within:border-slate-700",
+    searchBg:
+      "bg-slate-800/50 focus-within:bg-slate-800 border border-transparent focus-within:border-slate-700",
     modalBg: "bg-slate-900 border-slate-700",
     primaryBtn: "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/20",
-    textareaBg: "bg-slate-800 border-slate-700 focus:border-blue-500 text-white",
+    textareaBg:
+      "bg-slate-800 border-slate-700 focus:border-blue-500 text-white",
     uploadZone: "border-slate-700 bg-slate-800/50",
     uploadText: "text-slate-400",
   },
@@ -125,7 +133,7 @@ export default function OrdersPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStatus, setActiveStatus] = useState("all");
-  
+
   const [recordingOrderId, setRecordingOrderId] = useState<string | null>(null);
   const [memoryText, setMemoryText] = useState("");
   const [memoryImage, setMemoryImage] = useState<string>("");
@@ -133,12 +141,14 @@ export default function OrdersPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: apiOrders = [], isLoading } = useOrders();
-  const [localMemoryOrders, setLocalMemoryOrders] = useState<Set<string>>(new Set());
+  const [localMemoryOrders, setLocalMemoryOrders] = useState<Set<string>>(
+    new Set()
+  );
 
   const transformedOrders: OrderForCard[] = useMemo(() => {
-    return apiOrders.map(order => ({
+    return apiOrders.map((order) => ({
       id: order.id,
-      dishes: order.items.map(item => item.dish?.name || '未知菜品'),
+      dishes: order.items.map((item) => item.dish?.name || "未知菜品"),
       kissPrice: order.totalKiss,
       hugPrice: order.totalHug,
       status: order.status,
@@ -150,11 +160,11 @@ export default function OrdersPage() {
     }));
   }, [apiOrders, localMemoryOrders]);
 
-  const filteredOrders = transformedOrders.filter(order => {
+  const filteredOrders = transformedOrders.filter((order) => {
     if (activeStatus !== "all" && order.status !== activeStatus) return false;
     if (!searchQuery) return true;
     return (
-      order.dishes.some(d => d.includes(searchQuery)) ||
+      order.dishes.some((d) => d.includes(searchQuery)) ||
       order.reason?.includes(searchQuery)
     );
   });
@@ -164,31 +174,31 @@ export default function OrdersPage() {
     if (!file) return;
 
     setIsUploading(true);
-    
+
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('path', 'order-memories');
+      formData.append("file", file);
+      formData.append("path", "order-memories");
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
       const result = await response.json();
-      
+
       if (result.success && result.data?.url) {
         setMemoryImage(result.data.url);
       } else {
-        message.error(result.message || '图片上传失败');
+        message.error(result.message || "图片上传失败");
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      message.error('图片上传失败，请重试');
+      console.error("Upload error:", error);
+      message.error("图片上传失败，请重试");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -201,13 +211,13 @@ export default function OrdersPage() {
 
   const handleSubmitMemory = async () => {
     if (!recordingOrderId || (!memoryText.trim() && !memoryImage)) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch('/api/orders/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/orders/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: recordingOrderId,
           text: memoryText,
@@ -216,16 +226,16 @@ export default function OrdersPage() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
-        setLocalMemoryOrders(prev => new Set([...prev, recordingOrderId]));
+        setLocalMemoryOrders((prev) => new Set([...prev, recordingOrderId]));
         setRecordingOrderId(null);
       } else {
-        message.error(result.message || '保存回忆失败');
+        message.error(result.message || "保存回忆失败");
       }
     } catch (error) {
-      console.error('Save memory error:', error);
-      message.error('保存回忆失败，请重试');
+      console.error("Save memory error:", error);
+      message.error("保存回忆失败，请重试");
     } finally {
       setIsSubmitting(false);
     }
@@ -233,15 +243,19 @@ export default function OrdersPage() {
 
   return (
     <div className={cn("h-screen overflow-auto", currentTheme.bg)}>
-      <header className={cn(
-        "sticky top-0 z-40 backdrop-blur-md border-b pt-4",
-        currentTheme.headerBg
-      )}>
+      <header
+        className={cn(
+          "sticky top-0 z-40 backdrop-blur-md border-b pt-4",
+          currentTheme.headerBg
+        )}
+      >
         <div className="px-4 pb-4 flex flex-col gap-3">
-          <div className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all",
-            currentTheme.searchBg
-          )}>
+          <div
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all",
+              currentTheme.searchBg
+            )}
+          >
             <Search className={cn("w-4 h-4", currentTheme.subText)} />
             <input
               type="text"
@@ -257,26 +271,26 @@ export default function OrdersPage() {
 
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {[
-              { id: 'all', label: '全部' },
-              { id: 'pending', label: '待接单' },
-              { id: 'preparing', label: '制作中' },
-              { id: 'completed', label: '已完成' },
-              { id: 'cancelled', label: '已取消' },
-            ].map(status => (
+              { id: "all", label: "全部" },
+              { id: "pending", label: "待接单" },
+              { id: "preparing", label: "制作中" },
+              { id: "completed", label: "已完成" },
+              { id: "cancelled", label: "已取消" },
+            ].map((status) => (
               <button
                 key={status.id}
                 onClick={() => setActiveStatus(status.id)}
                 className={cn(
                   "whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
                   activeStatus === status.id
-                    ? theme === 'night' 
-                      ? "bg-blue-600 text-white border-blue-500" 
-                      : theme === 'cute'
+                    ? theme === "night"
+                      ? "bg-blue-600 text-white border-blue-500"
+                      : theme === "cute"
                         ? "bg-orange-400 text-white border-orange-400 shadow-sm"
-                        : theme === 'minimal'
+                        : theme === "minimal"
                           ? "bg-gray-900 text-white border-gray-900"
                           : "bg-pink-500 text-white border-pink-500 shadow-sm"
-                    : theme === 'night'
+                    : theme === "night"
                       ? "bg-slate-800 text-slate-400 border-slate-700"
                       : "bg-white text-gray-500 border-gray-200"
                 )}
@@ -297,9 +311,9 @@ export default function OrdersPage() {
           <AnimatePresence mode="popLayout">
             {filteredOrders.length > 0 ? (
               filteredOrders.map((order, index) => (
-                <OrderItemCard 
-                  key={order.id} 
-                  order={order} 
+                <OrderItemCard
+                  key={order.id}
+                  order={order}
                   index={index}
                   onRecordMemory={handleRecordMemory}
                 />
@@ -311,10 +325,12 @@ export default function OrdersPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="py-20 flex flex-col items-center justify-center gap-3"
               >
-                <div className={cn(
-                  "w-16 h-16 rounded-full flex items-center justify-center opacity-50",
-                  currentTheme.searchBg
-                )}>
+                <div
+                  className={cn(
+                    "w-16 h-16 rounded-full flex items-center justify-center opacity-50",
+                    currentTheme.searchBg
+                  )}
+                >
                   <Search className={cn("w-8 h-8", currentTheme.subText)} />
                 </div>
                 <p className={currentTheme.subText}>没有找到相关订单哦</p>
@@ -327,7 +343,7 @@ export default function OrdersPage() {
       <AnimatePresence>
         {recordingOrderId && (
           <>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -340,13 +356,17 @@ export default function OrdersPage() {
               exit={{ opacity: 0, y: 100, scale: 0.95 }}
               className="fixed bottom-0 left-0 right-0 z-100 p-4 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md w-full"
             >
-              <div className={cn(
-                "rounded-3xl p-5 md:p-6 shadow-2xl border flex flex-col gap-4",
-                currentTheme.modalBg
-              )}>
+              <div
+                className={cn(
+                  "rounded-3xl p-5 md:p-6 shadow-2xl border flex flex-col gap-4",
+                  currentTheme.modalBg
+                )}
+              >
                 <div className="flex justify-between items-center">
-                  <h3 className={cn("font-bold text-lg", currentTheme.text)}>记录这顿美味回忆 ✨</h3>
-                  <button 
+                  <h3 className={cn("font-bold text-lg", currentTheme.text)}>
+                    记录这顿美味回忆 ✨
+                  </h3>
+                  <button
                     onClick={() => setRecordingOrderId(null)}
                     className={cn("p-2 rounded-full", currentTheme.searchBg)}
                   >
@@ -365,12 +385,12 @@ export default function OrdersPage() {
                       currentTheme.textareaBg
                     )}
                   />
-                  
+
                   {memoryImage ? (
                     <div className="relative rounded-xl overflow-hidden">
-                      <img 
-                        src={memoryImage} 
-                        alt="预览" 
+                      <img
+                        src={memoryImage}
+                        alt="预览"
                         className="w-full h-32 object-cover"
                       />
                       <button
@@ -393,17 +413,25 @@ export default function OrdersPage() {
                       {isUploading ? (
                         <>
                           <Loader2 className="w-6 h-6 animate-spin" />
-                          <span className={cn("text-xs", currentTheme.uploadText)}>上传中...</span>
+                          <span
+                            className={cn("text-xs", currentTheme.uploadText)}
+                          >
+                            上传中...
+                          </span>
                         </>
                       ) : (
                         <>
                           <ImageIcon className="w-6 h-6" />
-                          <span className={cn("text-xs", currentTheme.uploadText)}>添加照片</span>
+                          <span
+                            className={cn("text-xs", currentTheme.uploadText)}
+                          >
+                            添加照片
+                          </span>
                         </>
                       )}
                     </div>
                   )}
-                  
+
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -413,13 +441,17 @@ export default function OrdersPage() {
                   />
                 </div>
 
-                <button 
+                <button
                   onClick={handleSubmitMemory}
-                  disabled={(!memoryText.trim() && !memoryImage) || isSubmitting}
+                  disabled={
+                    (!memoryText.trim() && !memoryImage) || isSubmitting
+                  }
                   className={cn(
                     "w-full py-3.5 rounded-2xl font-bold mt-2 shadow-lg transition-all flex items-center justify-center gap-2",
                     currentTheme.primaryBtn,
-                    (!memoryText.trim() && !memoryImage) && "opacity-50 cursor-not-allowed"
+                    !memoryText.trim() &&
+                      !memoryImage &&
+                      "opacity-50 cursor-not-allowed"
                   )}
                 >
                   {isSubmitting ? (

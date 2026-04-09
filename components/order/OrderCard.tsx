@@ -8,7 +8,6 @@ interface OrderCardProps {
   order: Order;
 }
 
-
 export default function OrderCard({ order }: OrderCardProps) {
   return (
     <Card className="flex flex-col gap-3 p-4">
@@ -18,14 +17,20 @@ export default function OrderCard({ order }: OrderCardProps) {
         </span>
         <OrderStatusTag status={order.status} />
       </div>
-      
+
       <div className="flex flex-col gap-1">
         {order.items.map((item) => (
           <div key={item.id} className="flex justify-between text-sm">
-            <span>{item.dish.name} × {item.quantity}</span>
+            <span>
+              {item.dish.name} × {item.quantity}
+            </span>
             <div className="flex gap-2 text-muted-foreground text-xs">
-                {item.dish.kissPrice > 0 && <span>❤️ {item.dish.kissPrice * item.quantity}</span>}
-                {item.dish.hugPrice > 0 && <span>🤗 {item.dish.hugPrice * item.quantity}</span>}
+              {item.dish.kissPrice > 0 && (
+                <span>❤️ {item.dish.kissPrice * item.quantity}</span>
+              )}
+              {item.dish.hugPrice > 0 && (
+                <span>🤗 {item.dish.hugPrice * item.quantity}</span>
+              )}
             </div>
           </div>
         ))}

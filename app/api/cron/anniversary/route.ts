@@ -1,22 +1,33 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { sendEmail } from '@/lib/email';
-import { calcNextRemindAt, renderEmailContent, CalendarType, RepeatType } from '@/lib/anniversary';
-import { logApiError } from '@/lib/error-log';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import {
+  calcNextRemindAt,
+  renderEmailContent,
+  CalendarType,
+  RepeatType,
+} from "@/lib/anniversary";
+import { logApiError } from "@/lib/error-log";
 
 // Cron 鉴权：支持手动 Bearer 调用，也兼容 Vercel Cron 请求头
 function isAuthorized(req: Request): boolean {
-  if (process.env.NODE_ENV === 'development') return true;
+  if (process.env.NODE_ENV === "development") return true;
 
-  const authorization = req.headers.get('authorization');
-  if (process.env.CRON_SECRET && authorization === `Bearer ${process.env.CRON_SECRET}`) {
+  const authorization = req.headers.get("authorization");
+  if (
+    process.env.CRON_SECRET &&
+    authorization === `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return true;
   }
 
-  const vercelCronHeader = req.headers.get('x-vercel-cron');
-  const userAgent = req.headers.get('user-agent') ?? '';
+  const vercelCronHeader = req.headers.get("x-vercel-cron");
+  const userAgent = req.headers.get("user-agent") ?? "";
 
-  if (vercelCronHeader === '1' || userAgent.toLowerCase().includes('vercel-cron')) {
+  if (
+    vercelCronHeader === "1" ||
+    userAgent.toLowerCase().includes("vercel-cron")
+  ) {
     return true;
   }
 
@@ -25,12 +36,12 @@ function isAuthorized(req: Request): boolean {
 
 async function runAnniversaryCron(req: Request) {
   if (!isAuthorized(req)) {
-    console.warn('[cron/anniversary] unauthorized request', {
-      userAgent: req.headers.get('user-agent'),
-      hasAuthorization: Boolean(req.headers.get('authorization')),
-      vercelCronHeader: req.headers.get('x-vercel-cron'),
+    console.warn("[cron/anniversary] unauthorized request", {
+      userAgent: req.headers.get("user-agent"),
+      hasAuthorization: Boolean(req.headers.get("authorization")),
+      vercelCronHeader: req.headers.get("x-vercel-cron"),
     });
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -38,24 +49,27 @@ async function runAnniversaryCron(req: Request) {
     const now = new Date();
     const due = await (prisma as any).anniversary.findMany({
       where: {
-        status: 'active',
+        status: "active",
         nextRemindAt: { lte: now },
       },
     });
 
     const results = await Promise.allSettled(
-      due.map(async (ann:any) => {
+      due.map(async (ann: any) => {
         // 渲染邮件内容
         const dateStr = ann.nextRemindAt
-          ? ann.nextRemindAt.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' })
-          : '';
+          ? ann.nextRemindAt.toLocaleDateString("zh-CN", {
+              timeZone: "Asia/Shanghai",
+            })
+          : "";
         const subject = renderEmailContent(ann.emailSubject, {
-          title: ann.title, date: dateStr,
+          title: ann.title,
+          date: dateStr,
         });
-        const html = `<div style="font-family:sans-serif;line-height:1.8">${
-          renderEmailContent(ann.emailContent, { title: ann.title, date: dateStr })
-            .replace(/\n/g, '<br/>')
-        }</div>`;
+        const html = `<div style="font-family:sans-serif;line-height:1.8">${renderEmailContent(
+          ann.emailContent,
+          { title: ann.title, date: dateStr }
+        ).replace(/\n/g, "<br/>")}</div>`;
 
         const result = await sendEmail({ to: ann.emailTo, subject, html });
 
@@ -64,45 +78,61 @@ async function runAnniversaryCron(req: Request) {
           data: {
             anniversaryId: ann.id,
             emailTo: ann.emailTo,
-            status: result.success ? 'success' : 'failed',
+            status: result.success ? "success" : "failed",
             error: result.error ?? null,
           },
         });
 
         // 更新下次提醒时间
-        if (ann.repeatType === 'once') {
+        if (ann.repeatType === "once") {
           // 单次：变为 done
           await (prisma as any).anniversary.update({
             where: { id: ann.id },
-            data: { status: 'done', nextRemindAt: null },
+            data: { status: "done", nextRemindAt: null },
           });
         } else {
           // 循环：重新计算下次提醒时间（从明天开始算，避免重复触发）
           const tomorrow = new Date(now.getTime() + 86400000);
-          const nextRemindAt = calcNextRemindAt({
-            calendarType: ann.calendarType as CalendarType,
-            month: ann.month,
-            day: ann.day,
-            weekday: ann.weekday,
-            repeatType: ann.repeatType as RepeatType,
-            advanceDays: ann.advanceDays,
-          }, tomorrow);
+          const nextRemindAt = calcNextRemindAt(
+            {
+              calendarType: ann.calendarType as CalendarType,
+              month: ann.month,
+              day: ann.day,
+              weekday: ann.weekday,
+              repeatType: ann.repeatType as RepeatType,
+              advanceDays: ann.advanceDays,
+            },
+            tomorrow
+          );
           await (prisma as any).anniversary.update({
             where: { id: ann.id },
             data: { nextRemindAt },
           });
         }
 
-        return { id: ann.id, success: result.success, error: result.error ?? null };
+        return {
+          id: ann.id,
+          success: result.success,
+          error: result.error ?? null,
+        };
       })
     );
 
-    const succeeded = results.filter((r:any) => r.status === 'fulfilled').length;
+    const succeeded = results.filter(
+      (r: any) => r.status === "fulfilled"
+    ).length;
     return NextResponse.json({ processed: due.length, succeeded, results });
   } catch (error) {
-    console.error('[cron/anniversary]', error);
-    await logApiError({ scope: '/api/cron/anniversary[None]', path: '/api/cron/anniversary', method: 'None' }, error);
-    return NextResponse.json({ message: '执行失败' }, { status: 500 });
+    console.error("[cron/anniversary]", error);
+    await logApiError(
+      {
+        scope: "/api/cron/anniversary[None]",
+        path: "/api/cron/anniversary",
+        method: "None",
+      },
+      error
+    );
+    return NextResponse.json({ message: "执行失败" }, { status: 500 });
   }
 }
 

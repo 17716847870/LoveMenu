@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useMessage } from '@/components/ui/Message';
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useMessage } from "@/components/ui/Message";
 
 export interface UploadResponse {
   url: string;
@@ -22,40 +22,43 @@ export function useImageUpload() {
       filename?: string;
     }): Promise<UploadResponse> => {
       const formData = new FormData();
-      formData.append('file', params.file);
+      formData.append("file", params.file);
       if (params.path) {
-        formData.append('path', params.path);
+        formData.append("path", params.path);
       }
       if (params.filename) {
-        formData.append('filename', params.filename);
+        formData.append("filename", params.filename);
       }
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || '上传失败');
+        throw new Error(error.message || "上传失败");
       }
 
-      return response.json().then(res => res.data);
+      return response.json().then((res) => res.data);
     },
     onSuccess: () => {
       setUploadProgress(100);
-      message.success('图片上传成功');
+      message.success("图片上传成功");
     },
     onError: (error: Error) => {
       message.error(error.message);
     },
   });
 
-  const upload = async (file: File, options?: { path?: string; filename?: string }) => {
+  const upload = async (
+    file: File,
+    options?: { path?: string; filename?: string }
+  ) => {
     setUploadProgress(0);
-    
+
     const fakeProgress = setInterval(() => {
-      setUploadProgress(prev => {
+      setUploadProgress((prev) => {
         if (prev >= 90) {
           clearInterval(fakeProgress);
           return prev;

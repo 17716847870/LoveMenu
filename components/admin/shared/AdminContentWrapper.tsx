@@ -3,14 +3,18 @@
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export default function AdminContentWrapper({ children }: { children: React.ReactNode }) {
+export default function AdminContentWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  
+
   // 聊天页面在移动端不需要外层 padding，以便全屏铺满
   const isChatPage = pathname === "/admin/chat";
 
   return (
-    <div 
+    <div
       className={cn(
         "flex-1 md:ml-64",
         // PC端总是保持 padding

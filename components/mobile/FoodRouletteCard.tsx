@@ -12,16 +12,19 @@ interface FoodRouletteCardProps {
   dishes?: Dish[];
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  title: string;
-  wheel: string;
-  wheelBorder: string;
-  wheelText: string;
-  button: string;
-  result: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    title: string;
+    wheel: string;
+    wheelBorder: string;
+    wheelText: string;
+    button: string;
+    result: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
     container: "bg-pink-50 border-pink-100",
     title: "text-pink-600",
@@ -64,7 +67,9 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCardProps) {
+export default function FoodRouletteCard({
+  dishes: propDishes,
+}: FoodRouletteCardProps) {
   const { theme } = useTheme();
   const { data: apiDishes = [] } = useDishes();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
@@ -75,17 +80,18 @@ export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCar
   const [result, setResult] = useState<string | null>(null);
 
   const dishes = propDishes?.length ? propDishes : apiDishes;
-  const displayDishes = dishes.length > 0 ? dishes : [{ id: "1", name: "暂无菜品" }];
+  const displayDishes =
+    dishes.length > 0 ? dishes : [{ id: "1", name: "暂无菜品" }];
 
   const spinWheel = async () => {
     if (isSpinning || displayDishes.length <= 1) return;
-    
+
     setIsSpinning(true);
     setResult(null);
 
     const segmentAngle = 360 / displayDishes.length;
     const randomSegment = Math.floor(Math.random() * displayDishes.length);
-    
+
     const extraRotation = -90 - (randomSegment + 0.5) * segmentAngle;
     const totalRotation = 1800 + extraRotation;
 
@@ -103,23 +109,28 @@ export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCar
   };
 
   return (
-    <div className={cn(
-      "rounded-4xl p-6 shadow-sm border flex flex-col items-center gap-6 overflow-hidden relative",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "rounded-4xl p-6 shadow-sm border flex flex-col items-center gap-6 overflow-hidden relative",
+        currentTheme.container
+      )}
+    >
       <div className="flex items-center gap-2 font-bold text-lg self-start">
         <Icon className={cn("w-5 h-5", currentTheme.title)} />
         <span className={currentTheme.title}>
-          {theme === 'minimal' ? "随机选择" : "今天吃什么？"}
+          {theme === "minimal" ? "随机选择" : "今天吃什么？"}
         </span>
       </div>
 
       <div className="relative w-48 h-48">
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-          <div className={cn(
-            "w-4 h-6",
-            theme === 'minimal' ? "bg-black" : "bg-red-500"
-          )} style={{ clipPath: "polygon(50% 100%, 0 0, 100% 0)" }} />
+          <div
+            className={cn(
+              "w-4 h-6",
+              theme === "minimal" ? "bg-black" : "bg-red-500"
+            )}
+            style={{ clipPath: "polygon(50% 100%, 0 0, 100% 0)" }}
+          />
         </div>
 
         <motion.div
@@ -131,19 +142,27 @@ export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCar
           )}
         >
           <div className="absolute inset-0">
-             {displayDishes.map((_, index) => (
-                <div 
-                    key={index}
-                    className="absolute top-1/2 left-1/2 w-1/2 h-px bg-gray-200/50 origin-left"
-                    style={{ transform: `rotate(${index * (360 / displayDishes.length)}deg)` }}
-                />
-             ))}
+            {displayDishes.map((_, index) => (
+              <div
+                key={index}
+                className="absolute top-1/2 left-1/2 w-1/2 h-px bg-gray-200/50 origin-left"
+                style={{
+                  transform: `rotate(${index * (360 / displayDishes.length)}deg)`,
+                }}
+              />
+            ))}
           </div>
 
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-             <span className="text-xs font-bold opacity-50 bg-white/80 rounded-full px-1">
-               {theme === 'cute' ? "🍭" : theme === 'couple' ? "❤️" : theme === 'night' ? "⚡" : "Start"}
-             </span>
+            <span className="text-xs font-bold opacity-50 bg-white/80 rounded-full px-1">
+              {theme === "cute"
+                ? "🍭"
+                : theme === "couple"
+                  ? "❤️"
+                  : theme === "night"
+                    ? "⚡"
+                    : "Start"}
+            </span>
           </div>
 
           {displayDishes.map((dish, i) => {
@@ -156,7 +175,7 @@ export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCar
                   "absolute top-0 left-0 w-full h-full text-[10px] font-medium text-center pt-3 origin-center",
                   currentTheme.wheelText
                 )}
-                style={{ 
+                style={{
                   transform: `rotate(${angle + 90}deg)`,
                 }}
               >
@@ -169,13 +188,15 @@ export default function FoodRouletteCard({ dishes: propDishes }: FoodRouletteCar
 
       <div className="flex flex-col items-center gap-4 w-full">
         {result && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
             <p className="text-sm text-gray-500">决定好了！</p>
-            <p className={cn("text-xl font-bold", currentTheme.result)}>{result}</p>
+            <p className={cn("text-xl font-bold", currentTheme.result)}>
+              {result}
+            </p>
           </motion.div>
         )}
 

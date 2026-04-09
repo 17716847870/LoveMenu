@@ -2,14 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Heart, 
-  Sparkles, 
-  Smile, 
-  Zap, 
-  Calendar,
-  Camera,
-} from "lucide-react";
+import { Heart, Sparkles, Smile, Zap, Calendar, Camera } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useUser } from "@/context/UserContext";
 import { useUsers } from "@/apis/user";
@@ -41,25 +34,29 @@ const defaultProfile: CoupleProfile = {
   todayKiss: 3,
   todayHug: 2,
   todayInteraction: 5,
-  moodText: "今天也要开心哦"
+  moodText: "今天也要开心哦",
 };
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  avatarRing: string;
-  heartIcon: string;
-  nameText: string;
-  daysText: string;
-  moodBadge: string;
-  statBox: string;
-  statLabel: string;
-  statValue: string;
-  icon: React.ElementType;
-  uploadOverlay: string;
-  roleBadge: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    avatarRing: string;
+    heartIcon: string;
+    nameText: string;
+    daysText: string;
+    moodBadge: string;
+    statBox: string;
+    statLabel: string;
+    statValue: string;
+    icon: React.ElementType;
+    uploadOverlay: string;
+    roleBadge: string;
+  }
+> = {
   couple: {
-    container: "bg-gradient-to-br from-pink-50 to-white border-pink-100 shadow-sm",
+    container:
+      "bg-gradient-to-br from-pink-50 to-white border-pink-100 shadow-sm",
     avatarRing: "ring-pink-200",
     heartIcon: "text-pink-500 fill-pink-500",
     nameText: "text-pink-900",
@@ -73,7 +70,8 @@ const themeStyles: Record<ThemeName, {
     roleBadge: "bg-pink-100 text-pink-600",
   },
   cute: {
-    container: "bg-orange-50 border-orange-100 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
+    container:
+      "bg-orange-50 border-orange-100 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
     avatarRing: "ring-orange-200",
     heartIcon: "text-orange-500 fill-orange-500",
     nameText: "text-orange-900",
@@ -101,7 +99,8 @@ const themeStyles: Record<ThemeName, {
     roleBadge: "bg-gray-100 text-gray-600 border border-gray-200",
   },
   night: {
-    container: "bg-slate-900 border-slate-800 shadow-[0_0_20px_rgba(139,92,246,0.15)]",
+    container:
+      "bg-slate-900 border-slate-800 shadow-[0_0_20px_rgba(139,92,246,0.15)]",
     avatarRing: "ring-violet-500/50",
     heartIcon: "text-violet-500 fill-violet-500",
     nameText: "text-violet-100",
@@ -124,17 +123,21 @@ const calculateDays = (startDate: string) => {
   const start = new Date(startDate);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - start.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 };
 
-export default function CoupleProfileCard({ profile = defaultProfile }: CoupleProfileCardProps) {
+export default function CoupleProfileCard({
+  profile = defaultProfile,
+}: CoupleProfileCardProps) {
   const { theme } = useTheme();
   const { user, setUser } = useUser();
   const { data: users = [], isLoading: usersLoading } = useUsers();
   const currentTheme = themeStyles[theme] || themeStyles.couple;
-  
-  const [loveStartDate, setLoveStartDate] = useState<string>(profile.loveStartDate);
+
+  const [loveStartDate, setLoveStartDate] = useState<string>(
+    profile.loveStartDate
+  );
   const days = calculateDays(loveStartDate);
 
   // 页面加载时从 API 获取配置的在一起日期
@@ -174,11 +177,10 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
   }, [isCoupleView, modeReady]);
 
   const emotion = useMemo(() => {
-    if(isCoupleView){
-      return '情侣模式'
-    }
-    else return '普通模式'
-  }, [isCoupleView])
+    if (isCoupleView) {
+      return "情侣模式";
+    } else return "普通模式";
+  }, [isCoupleView]);
 
   const toggleMode = () => {
     const next = !isCoupleView;
@@ -220,11 +222,15 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
       const fd = new FormData();
       fd.append("file", file);
       fd.append("path", "avatars");
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: fd,
+      });
       const uploadJson = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadJson.message || "上传失败");
       const avatarUrl: string = uploadJson.data?.url || uploadJson.data;
-      if (!avatarUrl || typeof avatarUrl !== "string") throw new Error("获取上传地址失败");
+      if (!avatarUrl || typeof avatarUrl !== "string")
+        throw new Error("获取上传地址失败");
 
       // 统一转为 https
       const secureUrl = avatarUrl.replace(/^http:\/\//, "https://");
@@ -254,10 +260,12 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
   // ── 未就绪时显示骨架屏 ──────────────────────────────
   if (!isReady) {
     return (
-      <div className={cn(
-        "rounded-[24px] p-5 flex flex-col gap-6 overflow-hidden border animate-pulse",
-        currentTheme.container
-      )}>
+      <div
+        className={cn(
+          "rounded-[24px] p-5 flex flex-col gap-6 overflow-hidden border animate-pulse",
+          currentTheme.container
+        )}
+      >
         {/* 头像骨架 */}
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center justify-center relative h-16 w-32">
@@ -272,8 +280,11 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
         </div>
         {/* stats 骨架 */}
         <div className="grid grid-cols-3 gap-3">
-          {[0,1,2].map((i) => (
-            <div key={i} className="rounded-xl p-3 flex flex-col items-center gap-2 border border-gray-100">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="rounded-xl p-3 flex flex-col items-center gap-2 border border-gray-100"
+            >
               <div className="h-3 w-12 bg-gray-200 rounded-full" />
               <div className="h-5 w-10 bg-gray-200 rounded-full" />
             </div>
@@ -304,14 +315,23 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             onClick={handleAvatarClick}
           >
             {displayAvatar ? (
-              <Image src={displayAvatar} alt="User" fill className="object-cover" />
+              <Image
+                src={displayAvatar}
+                alt="User"
+                fill
+                className="object-cover"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>
+              <div className="w-full h-full flex items-center justify-center text-3xl">
+                👤
+              </div>
             )}
-            <div className={cn(
-              "absolute inset-0 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity",
-              currentTheme.uploadOverlay
-            )}>
+            <div
+              className={cn(
+                "absolute inset-0 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity",
+                currentTheme.uploadOverlay
+              )}
+            >
               {isUploading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -320,13 +340,19 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             </div>
           </motion.div>
 
-          <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
 
           <div className="text-center flex flex-col items-center gap-2">
             <h2 className={cn("text-lg font-bold", currentTheme.nameText)}>
               {user?.name || profile.userName}
             </h2>
-            <span 
+            <span
               className={cn(
                 "px-3 py-1 rounded-full text-xs font-medium",
                 currentTheme.moodBadge
@@ -343,17 +369,44 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>亲亲余额</span>
-            <span className={cn("text-lg font-bold", currentTheme.statValue)}>❤️ {user?.kissBalance ?? 0}</span>
+          <div
+            className={cn(
+              "rounded-xl p-3 flex flex-col items-center gap-1 border",
+              currentTheme.statBox
+            )}
+          >
+            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>
+              亲亲余额
+            </span>
+            <span className={cn("text-lg font-bold", currentTheme.statValue)}>
+              ❤️ {user?.kissBalance ?? 0}
+            </span>
           </div>
-          <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>贴贴余额</span>
-            <span className={cn("text-lg font-bold", currentTheme.statValue)}>🤗 {user?.hugBalance ?? 0}</span>
+          <div
+            className={cn(
+              "rounded-xl p-3 flex flex-col items-center gap-1 border",
+              currentTheme.statBox
+            )}
+          >
+            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>
+              贴贴余额
+            </span>
+            <span className={cn("text-lg font-bold", currentTheme.statValue)}>
+              🤗 {user?.hugBalance ?? 0}
+            </span>
           </div>
-          <div className={cn("rounded-xl p-3 flex flex-col items-center gap-1 border", currentTheme.statBox)}>
-            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>今日互动</span>
-            <span className={cn("text-lg font-bold", currentTheme.statValue)}>✨ {profile.todayInteraction}</span>
+          <div
+            className={cn(
+              "rounded-xl p-3 flex flex-col items-center gap-1 border",
+              currentTheme.statBox
+            )}
+          >
+            <span className={cn("text-xs font-medium", currentTheme.statLabel)}>
+              今日互动
+            </span>
+            <span className={cn("text-lg font-bold", currentTheme.statValue)}>
+              ✨ {profile.todayInteraction}
+            </span>
           </div>
         </div>
       </motion.div>
@@ -375,7 +428,7 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
         {/* Double Avatar */}
         <div className="flex items-center justify-center relative h-16 w-32">
           {/* 我的头像（可点击上传） */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05, zIndex: 10 }}
             className={cn(
               "w-16 h-16 rounded-full overflow-hidden border-2 bg-gray-100 absolute left-0 ring-4 transition-all cursor-pointer group",
@@ -384,15 +437,24 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             onClick={handleAvatarClick}
           >
             {displayAvatar ? (
-              <Image src={displayAvatar} alt="User" fill className="object-cover" />
+              <Image
+                src={displayAvatar}
+                alt="User"
+                fill
+                className="object-cover"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl">👦</div>
+              <div className="w-full h-full flex items-center justify-center text-2xl">
+                👦
+              </div>
             )}
             {/* 上传遮罩 */}
-            <div className={cn(
-              "absolute inset-0 flex flex-col items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity",
-              currentTheme.uploadOverlay
-            )}>
+            <div
+              className={cn(
+                "absolute inset-0 flex flex-col items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity",
+                currentTheme.uploadOverlay
+              )}
+            >
               {isUploading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -408,13 +470,13 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             className="hidden"
             onChange={handleAvatarChange}
           />
-          
+
           <div className={cn("z-10 relative -mt-1", currentTheme.heartIcon)}>
             <Heart className="w-6 h-6 animate-pulse" />
           </div>
 
           {/* 伴侣头像（展示用） */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05, zIndex: 10 }}
             className={cn(
               "w-16 h-16 rounded-full overflow-hidden border-2 bg-gray-100 absolute right-0 ring-4 transition-all",
@@ -422,9 +484,16 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
             )}
           >
             {partnerAvatar ? (
-              <Image src={partnerAvatar} alt="Partner" fill className="object-cover" />
+              <Image
+                src={partnerAvatar}
+                alt="Partner"
+                fill
+                className="object-cover"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl">👧</div>
+              <div className="w-full h-full flex items-center justify-center text-2xl">
+                👧
+              </div>
             )}
           </motion.div>
         </div>
@@ -434,7 +503,12 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
           <h2 className={cn("text-lg font-bold", currentTheme.nameText)}>
             {user?.name || profile.userName} & {partnerName}
           </h2>
-          <div className={cn("text-sm font-medium flex items-center justify-center gap-1.5", currentTheme.daysText)}>
+          <div
+            className={cn(
+              "text-sm font-medium flex items-center justify-center gap-1.5",
+              currentTheme.daysText
+            )}
+          >
             <Calendar className="w-3.5 h-3.5" />
             <span>在一起 {days} 天</span>
           </div>
@@ -442,18 +516,18 @@ export default function CoupleProfileCard({ profile = defaultProfile }: CouplePr
 
         {/* Mood & Emotion */}
         <div className="flex flex-col items-center gap-2">
-           <button
-             onClick={toggleMode}
-             className={cn(
-               "px-3 py-1 rounded-full text-xs font-medium transition-opacity hover:opacity-70 active:scale-95",
-               currentTheme.moodBadge
-             )}
-           >
-             {emotion} · 切换单人
-           </button>
-           <p className={cn("text-sm opacity-80", currentTheme.nameText)}>
-             &quot;{moodText}&quot;
-           </p>
+          <button
+            onClick={toggleMode}
+            className={cn(
+              "px-3 py-1 rounded-full text-xs font-medium transition-opacity hover:opacity-70 active:scale-95",
+              currentTheme.moodBadge
+            )}
+          >
+            {emotion} · 切换单人
+          </button>
+          <p className={cn("text-sm opacity-80", currentTheme.nameText)}>
+            &quot;{moodText}&quot;
+          </p>
         </div>
       </div>
     </motion.div>

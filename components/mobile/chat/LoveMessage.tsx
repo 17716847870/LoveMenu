@@ -11,11 +11,14 @@ interface LoveMessageProps {
   count?: number;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  icon: string;
-  text: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    icon: string;
+    text: string;
+  }
+> = {
   couple: {
     container: "bg-pink-50 border-pink-100",
     icon: "text-pink-500",
@@ -43,10 +46,12 @@ export default function LoveMessage({ type, count = 1 }: LoveMessageProps) {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   return (
-    <div className={cn(
-      "flex items-center gap-3 p-3 rounded-xl border shadow-sm",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-xl border shadow-sm",
+        currentTheme.container
+      )}
+    >
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -62,7 +67,7 @@ export default function LoveMessage({ type, count = 1 }: LoveMessageProps) {
           <Smile className="w-6 h-6" />
         )}
       </motion.div>
-      
+
       <div className="flex flex-col">
         <span className={cn("font-bold text-sm", currentTheme.text)}>
           发送了一个{type === "kiss" ? "亲亲" : "贴贴"}

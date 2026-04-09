@@ -10,6 +10,7 @@ import MobileRequestFilterBar from "@/components/admin/requests/MobileRequestFil
 import RequestDataTable from "@/components/admin/requests/RequestDataTable";
 import MobileRequestListView from "@/components/admin/requests/MobileRequestListView";
 import LovePagination from "@/components/admin/ui/LovePagination/LovePagination";
+import { asyncSetState } from "@/lib/utils";
 
 export default function AdminRequestsPage() {
   const message = useMessage();
@@ -21,57 +22,63 @@ export default function AdminRequestsPage() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch('/api/requests');
+      const res = await fetch("/api/requests");
       const data = await res.json();
       if (data.data) setRequests(data.data);
-    } catch (error) {
-      console.error('Failed to fetch requests');
+    } catch {
+      console.error("Failed to fetch requests");
     }
   };
 
   useEffect(() => {
-    fetchRequests();
+    asyncSetState(() => {
+      fetchRequests();
+    });
   }, []);
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await fetch(`/api/requests/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
       fetchRequests();
-    } catch (error) {
-      message.error('更新状态失败');
+    } catch {
+      message.error("更新状态失败");
     }
   };
 
-  const handleApprove = (id: string) => handleUpdateStatus(id, 'approved');
-  const handleReject = (id: string) => handleUpdateStatus(id, 'rejected');
+  const handleApprove = (id: string) => handleUpdateStatus(id, "approved");
+  const handleReject = (id: string) => handleUpdateStatus(id, "rejected");
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`/api/requests/${id}`, { method: 'DELETE' });
+      await fetch(`/api/requests/${id}`, { method: "DELETE" });
       fetchRequests();
-    } catch (error) {
-      message.error('删除失败');
+    } catch {
+      message.error("删除失败");
     }
   };
 
   const processedData = useMemo(() => {
-    return requests.filter(req => 
-      (req.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-       req.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterStatus === "all" || req.status === filterStatus)
+    return requests.filter(
+      (req) =>
+        (req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          req.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (filterStatus === "all" || req.status === filterStatus)
     );
   }, [requests, searchTerm, filterStatus]);
 
   const totalItems = processedData.length;
   const totalPages = Math.ceil(totalItems / pageSize);
-  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1));
-  
+  const validCurrentPage = Math.max(
+    1,
+    Math.min(currentPage, totalPages > 0 ? totalPages : 1)
+  );
+
   const currentData = processedData.slice(
-    (validCurrentPage - 1) * pageSize, 
+    (validCurrentPage - 1) * pageSize,
     validCurrentPage * pageSize
   );
 
@@ -81,7 +88,7 @@ export default function AdminRequestsPage() {
         <PageHeader title="食物请求" subtitle="处理用户的点餐心愿" />
 
         <div className="hidden md:block">
-          <RequestFilterBar 
+          <RequestFilterBar
             onSearch={(term) => {
               setSearchTerm(term);
               setCurrentPage(1);
@@ -98,7 +105,7 @@ export default function AdminRequestsPage() {
           />
         </div>
 
-        <MobileRequestFilterBar 
+        <MobileRequestFilterBar
           onSearch={(term) => {
             setSearchTerm(term);
             setCurrentPage(1);
@@ -110,7 +117,7 @@ export default function AdminRequestsPage() {
         />
 
         <div className="hidden md:block">
-          <RequestDataTable 
+          <RequestDataTable
             data={currentData}
             onApprove={handleApprove}
             onReject={handleReject}
@@ -118,14 +125,14 @@ export default function AdminRequestsPage() {
           />
         </div>
 
-        <MobileRequestListView 
+        <MobileRequestListView
           data={currentData}
           onApprove={handleApprove}
           onReject={handleReject}
           onDelete={handleDelete}
         />
 
-        <LovePagination 
+        <LovePagination
           total={totalItems}
           page={currentPage}
           pageSize={pageSize}

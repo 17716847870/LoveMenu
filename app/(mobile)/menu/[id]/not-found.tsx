@@ -9,15 +9,18 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 // Theme Configurations
-const themeStyles: Record<ThemeName, {
-  container: string;
-  iconColor: string;
-  textColor: string;
-  button: string;
-  icon: React.ElementType;
-  message: string;
-  subMessage: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    iconColor: string;
+    textColor: string;
+    button: string;
+    icon: React.ElementType;
+    message: string;
+    subMessage: string;
+  }
+> = {
   couple: {
     container: "bg-pink-50",
     iconColor: "text-pink-400",
@@ -31,7 +34,8 @@ const themeStyles: Record<ThemeName, {
     container: "bg-purple-50",
     iconColor: "text-purple-400",
     textColor: "text-purple-600",
-    button: "bg-purple-400 text-white shadow-purple-200 hover:bg-purple-500 rounded-full",
+    button:
+      "bg-purple-400 text-white shadow-purple-200 hover:bg-purple-500 rounded-full",
     icon: Sparkles,
     message: "找不到这道菜啦～",
     subMessage: "要不要试试别的？🍭",
@@ -49,7 +53,8 @@ const themeStyles: Record<ThemeName, {
     container: "bg-slate-900",
     iconColor: "text-blue-500",
     textColor: "text-blue-100",
-    button: "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500",
+    button:
+      "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500",
     icon: Frown,
     message: "无法找到此商品",
     subMessage: "尝试其他选择吧 ⚡",
@@ -63,20 +68,30 @@ export default function NotFound() {
   const Icon = currentTheme.icon;
 
   return (
-    <div className={cn(
-      "min-h-screen flex flex-col items-center justify-center p-6 transition-colors duration-300",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "min-h-screen flex flex-col items-center justify-center p-6 transition-colors duration-300",
+        currentTheme.container
+      )}
+    >
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5, type: "spring" }}
         className="flex flex-col items-center gap-6 text-center"
       >
-        <div className={cn("p-6 rounded-full bg-white/50 backdrop-blur-sm shadow-sm", theme === 'night' && "bg-slate-800/50")}>
-          <Icon className={cn("w-16 h-16", currentTheme.iconColor)} strokeWidth={1.5} />
+        <div
+          className={cn(
+            "p-6 rounded-full bg-white/50 backdrop-blur-sm shadow-sm",
+            theme === "night" && "bg-slate-800/50"
+          )}
+        >
+          <Icon
+            className={cn("w-16 h-16", currentTheme.iconColor)}
+            strokeWidth={1.5}
+          />
         </div>
-        
+
         <div className="flex flex-col gap-2">
           <h2 className={cn("text-xl font-bold", currentTheme.textColor)}>
             {currentTheme.message}

@@ -18,7 +18,7 @@ export const Tabs = ({ items, activeId, onChange, children }: TabsProps) => {
               "rounded-full px-4 py-1.5 text-sm",
               activeId === item.id
                 ? "bg-[var(--color-primary)] text-white"
-                : "bg-[var(--color-accent)] text-[var(--color-text)]",
+                : "bg-[var(--color-accent)] text-[var(--color-text)]"
             )}
             onClick={() => onChange(item.id)}
           >

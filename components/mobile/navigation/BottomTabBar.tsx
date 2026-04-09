@@ -2,12 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  Home, 
-  Menu, 
-  Receipt, 
-  User 
-} from "lucide-react";
+import { Home, Menu, Receipt, User } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
@@ -19,13 +14,13 @@ const leftTabs = [
   {
     label: "首页",
     path: "/",
-    icon: Home
+    icon: Home,
   },
   {
     label: "菜单",
     path: "/menu",
-    icon: Menu
-  }
+    icon: Menu,
+  },
 ];
 
 // Right tabs (after cart)
@@ -33,13 +28,13 @@ const rightTabs = [
   {
     label: "订单",
     path: "/orders",
-    icon: Receipt
+    icon: Receipt,
   },
   {
     label: "我的",
     path: "/profile",
-    icon: User
-  }
+    icon: User,
+  },
 ];
 
 const visiblePaths = ["/", "/menu", "/orders", "/profile"];
@@ -48,7 +43,7 @@ export default function BottomTabBar() {
   const pathname = usePathname();
   const { theme } = useTheme();
   const { items } = useCart();
-  
+
   const shouldShow = visiblePaths.includes(pathname);
 
   if (!shouldShow) {
@@ -80,7 +75,6 @@ export default function BottomTabBar() {
       )}
     >
       <div className="flex items-center justify-between h-full px-2 relative">
-        
         {/* Left Tabs */}
         <div className="flex flex-1 justify-around">
           {leftTabs.map((tab) => (
@@ -95,11 +89,11 @@ export default function BottomTabBar() {
 
         {/* Center Space for Floating Cart Button */}
         <div className="w-16 flex justify-center relative">
-           <CartButton 
-             isActive={pathname === "/cart"} 
-             theme={theme} 
-             cartCount={items.length} 
-           />
+          <CartButton
+            isActive={pathname === "/cart"}
+            theme={theme}
+            cartCount={items.length}
+          />
         </div>
 
         {/* Right Tabs */}
@@ -113,7 +107,6 @@ export default function BottomTabBar() {
             />
           ))}
         </div>
-
       </div>
     </motion.div>
   );

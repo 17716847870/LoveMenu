@@ -15,7 +15,12 @@ export const ImageUploader = ({ onSelect }: ImageUploaderProps) => {
 
   return (
     <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--color-muted)]">
-      <input type="file" accept="image/*" className="hidden" onChange={handleChange} />
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleChange}
+      />
       <Button variant="secondary" size="sm">
         上传图片
       </Button>

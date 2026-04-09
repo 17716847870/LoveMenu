@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 type TokenPayload = {
   id: string;
@@ -43,7 +43,14 @@ export const GET = async () => {
     return NextResponse.json({ data: { count } });
   } catch (error) {
     console.error("[api/chat/unread][GET] 获取未读数失败", error);
-    await logApiError({ scope: '/api/chat/unread[GET]', path: '/api/chat/unread', method: 'GET' }, error);
+    await logApiError(
+      {
+        scope: "/api/chat/unread[GET]",
+        path: "/api/chat/unread",
+        method: "GET",
+      },
+      error
+    );
     return NextResponse.json({ message: "获取未读数失败" }, { status: 500 });
   }
 };

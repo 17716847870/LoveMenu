@@ -1,14 +1,8 @@
-"use client"
+"use client";
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
-  Info, 
-  X 
-} from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Info, X } from "lucide-react";
 
 export type MessageType = "success" | "error" | "warning" | "info";
 

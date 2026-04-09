@@ -37,20 +37,25 @@ export interface Order {
 export const orderKeys = {
   all: ["orders"] as const,
   lists: () => [...orderKeys.all, "list"] as const,
-  list: (params?: Record<string, string | number | boolean>) => [...orderKeys.lists(), params] as const,
+  list: (params?: Record<string, string | number | boolean>) =>
+    [...orderKeys.lists(), params] as const,
   details: () => [...orderKeys.all, "detail"] as const,
   detail: (id: string) => [...orderKeys.details(), id] as const,
 };
 
 export function useOrders(params?: Record<string, string | number | boolean>) {
-  const cleanParams = params ? Object.fromEntries(
-    Object.entries(params).filter(([, v]) => v !== undefined)
-  ) : undefined;
+  const cleanParams = params
+    ? Object.fromEntries(
+        Object.entries(params).filter(([, v]) => v !== undefined)
+      )
+    : undefined;
 
   return useQuery({
     queryKey: orderKeys.list(params),
     queryFn: async (): Promise<Order[]> => {
-      const response = await http.get<Order[]>("/api/orders", { params: cleanParams });
+      const response = await http.get<Order[]>("/api/orders", {
+        params: cleanParams,
+      });
       return response.data || [];
     },
   });
@@ -72,7 +77,7 @@ export function useOrder(id: string) {
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: {
       userId: string;
@@ -94,9 +99,16 @@ export function useCreateOrder() {
 
 export function useUpdateOrder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; status?: Order['status']; note?: string }) => {
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      status?: Order["status"];
+      note?: string;
+    }) => {
       const response = await http.put<Order>(`/api/orders/${id}`, data);
       return response.data;
     },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("[api/feedback][GET] 获取反馈失败", error);
-    await logApiError({ req, scope: '[api/feedback][GET]' }, error);
+    await logApiError({ req, scope: "[api/feedback][GET]" }, error);
     return NextResponse.json({ message: "获取反馈失败" }, { status: 500 });
   }
 }
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[api/feedback][POST] 创建反馈失败", error);
-    await logApiError({ req, scope: '[api/feedback][POST]' }, error);
+    await logApiError({ req, scope: "[api/feedback][POST]" }, error);
     return NextResponse.json({ message: "创建反馈失败" }, { status: 500 });
   }
 }

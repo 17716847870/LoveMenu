@@ -7,7 +7,8 @@ import { Feedback } from "@/types";
 export const feedbackKeys = {
   all: ["feedback"] as const,
   lists: () => [...feedbackKeys.all, "list"] as const,
-  list: (params?: Record<string, string | number | boolean>) => [...feedbackKeys.lists(), params] as const,
+  list: (params?: Record<string, string | number | boolean>) =>
+    [...feedbackKeys.lists(), params] as const,
   details: () => [...feedbackKeys.all, "detail"] as const,
   detail: (id: string) => [...feedbackKeys.details(), id] as const,
 };
@@ -28,7 +29,12 @@ export function useCreateFeedback() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { type: Feedback["type"]; title: string; content: string; image?: string }) => {
+    mutationFn: async (data: {
+      type: Feedback["type"];
+      title: string;
+      content: string;
+      image?: string;
+    }) => {
       const response = await http.post<Feedback>("/api/feedback", data);
       return response.data;
     },
@@ -48,7 +54,9 @@ export function useUpdateFeedback() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: feedbackKeys.all });
-      queryClient.invalidateQueries({ queryKey: feedbackKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: feedbackKeys.detail(variables.id),
+      });
     },
   });
 }

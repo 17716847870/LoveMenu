@@ -7,7 +7,15 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { User } from "@/types";
-import { Plus, Edit2, Trash2, Shield, User as UserIcon, Coins, Camera } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Shield,
+  User as UserIcon,
+  Coins,
+  Camera,
+} from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import LoveSelect from "@/components/admin/ui/LoveSelect/LoveSelect";
 import { PageLoading } from "@/components/ui/Loading";
@@ -35,7 +43,9 @@ export default function AccountsPage() {
 
   useEffect(() => {
     if (!lightboxSrc) return;
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxSrc(null); };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxSrc(null);
+    };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [lightboxSrc]);
@@ -156,7 +166,7 @@ export default function AccountsPage() {
 
   const handleBalanceSave = async () => {
     if (!balanceUser) return;
-    
+
     if (balanceData.kissAmount === 0 && balanceData.hugAmount === 0) {
       message.warning("请输入要充值的金额");
       return;
@@ -257,7 +267,9 @@ export default function AccountsPage() {
                         <AvatarImage src={user.avatar} alt={user.name} />
                       ) : (
                         <AvatarFallback className="bg-pink-100 text-pink-500 text-sm font-medium">
-                          {(user.name || user.username || "?").charAt(0).toUpperCase()}
+                          {(user.name || user.username || "?")
+                            .charAt(0)
+                            .toUpperCase()}
                         </AvatarFallback>
                       )}
                     </Avatar>
@@ -348,7 +360,9 @@ export default function AccountsPage() {
                       <AvatarImage src={user.avatar} alt={user.name} />
                     ) : (
                       <AvatarFallback className="bg-pink-100 text-pink-500 text-sm font-medium">
-                        {(user.name || user.username || "?").charAt(0).toUpperCase()}
+                        {(user.name || user.username || "?")
+                          .charAt(0)
+                          .toUpperCase()}
                       </AvatarFallback>
                     )}
                   </Avatar>
@@ -356,7 +370,9 @@ export default function AccountsPage() {
                     <div className="font-medium text-gray-800 text-lg">
                       {user.username}
                     </div>
-                    <div className="text-gray-500 text-sm mt-1">{user.name}</div>
+                    <div className="text-gray-500 text-sm mt-1">
+                      {user.name}
+                    </div>
                   </div>
                 </div>
                 <span
@@ -376,8 +392,12 @@ export default function AccountsPage() {
               </div>
               {user.role !== "admin" && (
                 <div className="flex items-center gap-3 mb-3 text-sm">
-                  <span className="text-pink-500">❤️ {user.kissBalance ?? 0}</span>
-                  <span className="text-orange-500">🤗 {user.hugBalance ?? 0}</span>
+                  <span className="text-pink-500">
+                    ❤️ {user.kissBalance ?? 0}
+                  </span>
+                  <span className="text-orange-500">
+                    🤗 {user.hugBalance ?? 0}
+                  </span>
                 </div>
               )}
               <div className="flex gap-2 justify-end border-t border-gray-100 pt-3">
@@ -428,52 +448,58 @@ export default function AccountsPage() {
         >
           <div className="space-y-4 py-4">
             {/* 头像上传：仅编辑当前登录账号时显示 */}
-            {editingUser && currentUser && editingUser.id === currentUser.id && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  头像
-                </label>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Avatar className="w-16 h-16">
-                      {avatarPreview ? (
-                        <AvatarImage src={avatarPreview} alt="头像预览" />
-                      ) : (
-                        <AvatarFallback className="bg-pink-100 text-pink-500 text-xl font-medium">
-                          {(formData.name || formData.username || "?").charAt(0).toUpperCase()}
-                        </AvatarFallback>
+            {editingUser &&
+              currentUser &&
+              editingUser.id === currentUser.id && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    头像
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Avatar className="w-16 h-16">
+                        {avatarPreview ? (
+                          <AvatarImage src={avatarPreview} alt="头像预览" />
+                        ) : (
+                          <AvatarFallback className="bg-pink-100 text-pink-500 text-xl font-medium">
+                            {(formData.name || formData.username || "?")
+                              .charAt(0)
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      {isUploadingAvatar && (
+                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        </div>
                       )}
-                    </Avatar>
-                    {isUploadingAvatar && (
-                      <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      ref={avatarInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={isUploadingAvatar}
-                      onClick={() => avatarInputRef.current?.click()}
-                      className="flex items-center gap-2"
-                    >
-                      <Camera className="w-4 h-4" />
-                      {isUploadingAvatar ? "上传中..." : "更换头像"}
-                    </Button>
-                    <p className="text-xs text-gray-400 mt-1">支持 JPG、PNG，最大 5MB</p>
+                    </div>
+                    <div>
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarChange}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isUploadingAvatar}
+                        onClick={() => avatarInputRef.current?.click()}
+                        className="flex items-center gap-2"
+                      >
+                        <Camera className="w-4 h-4" />
+                        {isUploadingAvatar ? "上传中..." : "更换头像"}
+                      </Button>
+                      <p className="text-xs text-gray-400 mt-1">
+                        支持 JPG、PNG，最大 5MB
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 登录账号
@@ -503,9 +529,7 @@ export default function AccountsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                placeholder={
-                  editingUser ? "不修改请留空" : "请输入登录密码"
-                }
+                placeholder={editingUser ? "不修改请留空" : "请输入登录密码"}
                 className="w-full"
               />
               {editingUser && (
@@ -555,7 +579,7 @@ export default function AccountsPage() {
                 disabled={createUser.isPending || updateUser.isPending}
                 className="bg-pink-500 hover:bg-pink-600 text-white"
               >
-                {(createUser.isPending || updateUser.isPending)
+                {createUser.isPending || updateUser.isPending
                   ? "保存中..."
                   : "保存"}
               </Button>
@@ -638,7 +662,10 @@ export default function AccountsPage() {
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button variant="outline" onClick={() => setIsBalanceModalOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsBalanceModalOpen(false)}
+                >
                   取消
                 </Button>
                 <Button

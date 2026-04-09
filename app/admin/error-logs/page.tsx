@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   Bug,
@@ -9,42 +9,54 @@ import {
   Search,
   ServerCrash,
   Trash2,
-} from 'lucide-react';
-import { PageContainer } from '@/components/ui/PageContainer';
-import PageHeader from '@/components/admin/shared/PageHeader';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { PageLoading } from '@/components/ui/Loading';
-import { Input } from '@/components/ui/Input';
-import ConfirmDialog from '@/components/admin/common/ConfirmDialog';
-import { useClearErrorLogs, useDeleteErrorLog, useErrorLogs } from '@/apis/error-log';
+} from "lucide-react";
+import { PageContainer } from "@/components/ui/PageContainer";
+import PageHeader from "@/components/admin/shared/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/Loading";
+import { Input } from "@/components/ui/Input";
+import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
+import {
+  useClearErrorLogs,
+  useDeleteErrorLog,
+  useErrorLogs,
+} from "@/apis/error-log";
 
 const FILTERS = [
-  { label: '全部', value: 'all' },
-  { label: 'API 报错', value: 'api' },
-  { label: '前端报错', value: 'frontend' },
+  { label: "全部", value: "all" },
+  { label: "API 报错", value: "api" },
+  { label: "前端报错", value: "frontend" },
 ] as const;
 
-type FilterValue = (typeof FILTERS)[number]['value'];
+type FilterValue = (typeof FILTERS)[number]["value"];
 
 export default function ErrorLogsPage() {
-  const [filter, setFilter] = useState<FilterValue>('all');
-  const [keywordInput, setKeywordInput] = useState('');
-  const [keyword, setKeyword] = useState('');
+  const [filter, setFilter] = useState<FilterValue>("all");
+  const [keywordInput, setKeywordInput] = useState("");
+  const [keyword, setKeyword] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isClearOpen, setIsClearOpen] = useState(false);
 
-  const source = filter === 'all' ? undefined : filter;
+  const source = filter === "all" ? undefined : filter;
   const query = { source, keyword, limit: 100 } as const;
-  const { data: logs = [], isLoading, refetch, isRefetching } = useErrorLogs(query);
+  const {
+    data: logs = [],
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useErrorLogs(query);
   const deleteMutation = useDeleteErrorLog();
   const clearMutation = useClearErrorLogs();
 
-  const stats = useMemo(() => ({
-    total: logs.length,
-    api: logs.filter((item) => item.source === 'api').length,
-    frontend: logs.filter((item) => item.source === 'frontend').length,
-  }), [logs]);
+  const stats = useMemo(
+    () => ({
+      total: logs.length,
+      api: logs.filter((item) => item.source === "api").length,
+      frontend: logs.filter((item) => item.source === "frontend").length,
+    }),
+    [logs]
+  );
 
   const handleSearch = () => {
     setKeyword(keywordInput.trim());
@@ -75,7 +87,9 @@ export default function ErrorLogsPage() {
               className="flex items-center gap-2"
               disabled={isRefetching}
             >
-              <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isRefetching ? "animate-spin" : ""}`}
+              />
               刷新
             </Button>
             <Button
@@ -94,37 +108,49 @@ export default function ErrorLogsPage() {
       <div className="grid gap-3 md:grid-cols-3 mb-6">
         <Card className="p-4 bg-white/90 border-pink-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600
-              flex items-center justify-center">
+            <div
+              className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600
+              flex items-center justify-center"
+            >
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
               <p className="text-sm text-gray-500">当前结果数</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {stats.total}
+              </p>
             </div>
           </div>
         </Card>
         <Card className="p-4 bg-white/90 border-blue-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-600
-              flex items-center justify-center">
+            <div
+              className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-600
+              flex items-center justify-center"
+            >
               <ServerCrash className="w-5 h-5" />
             </div>
             <div>
               <p className="text-sm text-gray-500">API 报错</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.api}</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {stats.api}
+              </p>
             </div>
           </div>
         </Card>
         <Card className="p-4 bg-white/90 border-violet-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-violet-100 text-violet-600
-              flex items-center justify-center">
+            <div
+              className="w-10 h-10 rounded-2xl bg-violet-100 text-violet-600
+              flex items-center justify-center"
+            >
               <MonitorSmartphone className="w-5 h-5" />
             </div>
             <div>
               <p className="text-sm text-gray-500">前端报错</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.frontend}</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {stats.frontend}
+              </p>
             </div>
           </div>
         </Card>
@@ -138,11 +164,11 @@ export default function ErrorLogsPage() {
                 key={item.value}
                 onClick={() => setFilter(item.value)}
                 className={[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+                  "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                   filter === item.value
-                    ? 'bg-pink-500 text-white shadow-md shadow-pink-200'
-                    : 'bg-white text-gray-600 border border-pink-100 hover:bg-pink-50',
-                ].join(' ')}
+                    ? "bg-pink-500 text-white shadow-md shadow-pink-200"
+                    : "bg-white text-gray-600 border border-pink-100 hover:bg-pink-50",
+                ].join(" ")}
               >
                 {item.label}
               </button>
@@ -156,7 +182,7 @@ export default function ErrorLogsPage() {
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSearch();
+                  if (e.key === "Enter") handleSearch();
                 }}
                 placeholder="搜索 message / scope / path / method / url"
                 className="pl-9"
@@ -166,8 +192,8 @@ export default function ErrorLogsPage() {
             <Button
               variant="outline"
               onClick={() => {
-                setKeywordInput('');
-                setKeyword('');
+                setKeywordInput("");
+                setKeyword("");
               }}
             >
               重置
@@ -185,7 +211,7 @@ export default function ErrorLogsPage() {
         )}
 
         {logs.map((log) => {
-          const isApi = log.source === 'api';
+          const isApi = log.source === "api";
           return (
             <Card key={log.id} className="p-4 bg-white/95">
               <div className="flex flex-col gap-3">
@@ -193,10 +219,12 @@ export default function ErrorLogsPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        isApi ? 'bg-blue-100 text-blue-700' : 'bg-violet-100 text-violet-700'
+                        isApi
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-violet-100 text-violet-700"
                       }`}
                     >
-                      {isApi ? 'API' : '前端'}
+                      {isApi ? "API" : "前端"}
                     </span>
                     {log.method && (
                       <span
@@ -215,8 +243,8 @@ export default function ErrorLogsPage() {
                       </span>
                     )}
                     <span className="text-xs text-gray-400">
-                      {new Date(log.createdAt).toLocaleString('zh-CN', {
-                        timeZone: 'Asia/Shanghai',
+                      {new Date(log.createdAt).toLocaleString("zh-CN", {
+                        timeZone: "Asia/Shanghai",
                       })}
                     </span>
                   </div>
@@ -233,13 +261,19 @@ export default function ErrorLogsPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 wrap-break-word">{log.message}</p>
+                  <p className="text-sm font-semibold text-gray-900 wrap-break-word">
+                    {log.message}
+                  </p>
                   {log.path && (
                     <p className="mt-1 text-sm text-gray-500 break-all">
                       路径：{log.path}
                     </p>
                   )}
-                  {log.url && <p className="mt-1 text-xs text-gray-400 break-all">URL：{log.url}</p>}
+                  {log.url && (
+                    <p className="mt-1 text-xs text-gray-400 break-all">
+                      URL：{log.url}
+                    </p>
+                  )}
                 </div>
 
                 {log.stack && (
@@ -253,7 +287,9 @@ export default function ErrorLogsPage() {
 
                 {log.metadata && (
                   <div className="rounded-2xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-xs font-semibold text-slate-500 mb-2">附加信息</p>
+                    <p className="text-xs font-semibold text-slate-500 mb-2">
+                      附加信息
+                    </p>
                     <pre className="text-xs text-slate-700 whitespace-pre-wrap wrap-break-word">
                       {JSON.stringify(log.metadata, null, 2)}
                     </pre>

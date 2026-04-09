@@ -24,12 +24,15 @@ const themes: {
   { id: "night", name: "夜间模式", description: "深色护眼主题，科技霓虹" },
 ];
 
-const themeStyles: Record<ThemeName, {
-  drawer: string;
-  closeButton: string;
-  title: string;
-  subtitle: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    drawer: string;
+    closeButton: string;
+    title: string;
+    subtitle: string;
+  }
+> = {
   couple: {
     drawer: "bg-white",
     closeButton: "bg-pink-50 text-pink-500 hover:bg-pink-100",
@@ -94,7 +97,7 @@ export default function ThemeDrawer({ isOpen, onClose }: ThemeDrawerProps) {
                   选择你喜欢的主题风格 🎨
                 </p>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className={cn(
                   "p-2 rounded-full transition-colors",
@@ -118,7 +121,7 @@ export default function ThemeDrawer({ isOpen, onClose }: ThemeDrawerProps) {
                   onSelect={(newTheme) => {
                     setTheme(newTheme);
                     // Optional: Close drawer on select
-                    // onClose(); 
+                    // onClose();
                   }}
                 />
               ))}

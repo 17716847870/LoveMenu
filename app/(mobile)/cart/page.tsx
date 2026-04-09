@@ -26,7 +26,8 @@ const pageStyles: Record<ThemeName, string> = {
 };
 
 export default function CartPage() {
-  const { items, totals, updateQuantity, removeItem, clearCart, isLoading } = useCart();
+  const { items, totals, updateQuantity, removeItem, clearCart, isLoading } =
+    useCart();
   const { user, isLoading: isUserLoading } = useUser();
   const { theme } = useTheme();
   const router = useRouter();
@@ -97,7 +98,12 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className={cn("min-h-screen flex items-center justify-center", pageStyles[theme])}>
+      <div
+        className={cn(
+          "min-h-screen flex items-center justify-center",
+          pageStyles[theme]
+        )}
+      >
         <div className="animate-pulse text-pink-500">加载中...</div>
       </div>
     );
@@ -113,20 +119,25 @@ export default function CartPage() {
   }
 
   return (
-    <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
+    <div
+      className={cn(
+        "min-h-screen pb-24 transition-colors duration-300",
+        pageStyles[theme]
+      )}
+    >
       <CartHeader />
       <CartLoveTip />
-      
-      <CartList 
-        items={items} 
-        onUpdateQuantity={updateQuantity} 
-        onRemove={removeItem} 
+
+      <CartList
+        items={items}
+        onUpdateQuantity={updateQuantity}
+        onRemove={removeItem}
       />
-      
+
       <CartSummary totals={totals} />
-      
-      <CheckoutBar 
-        onCheckout={handleCheckoutClick} 
+
+      <CheckoutBar
+        onCheckout={handleCheckoutClick}
         totals={totals}
         isLoading={isSubmitting || isUserLoading}
       />

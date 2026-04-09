@@ -1,6 +1,11 @@
 import { Badge } from "@/components/ui/Badge";
 
-type OrderStatus = "pending" | "preparing" | "ready" | "completed" | "cancelled";
+type OrderStatus =
+  | "pending"
+  | "preparing"
+  | "ready"
+  | "completed"
+  | "cancelled";
 
 export const OrderStatusTag = ({ status }: { status: OrderStatus }) => {
   const variants = {

@@ -2,13 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
-import { 
-  Heart, 
-  Smile, 
-  Zap, 
-  Sparkles,
-  ArrowRight
-} from "lucide-react";
+import { Heart, Smile, Zap, Sparkles, ArrowRight } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
@@ -21,18 +15,21 @@ export interface LoveBalance {
   todayHugGain: number;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  header: string;
-  cardKiss: string;
-  cardHug: string;
-  textKiss: string;
-  textHug: string;
-  label: string;
-  todayText: string;
-  iconKiss: React.ElementType;
-  iconHug: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    header: string;
+    cardKiss: string;
+    cardHug: string;
+    textKiss: string;
+    textHug: string;
+    label: string;
+    todayText: string;
+    iconKiss: React.ElementType;
+    iconHug: React.ElementType;
+  }
+> = {
   couple: {
     container: "bg-white border-pink-100 shadow-sm",
     header: "text-pink-900",
@@ -46,7 +43,8 @@ const themeStyles: Record<ThemeName, {
     iconHug: Smile, // Use Smile instead of User for Hug
   },
   cute: {
-    container: "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
+    container:
+      "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)]",
     header: "text-orange-900",
     cardKiss: "bg-pink-50 border-2 border-pink-200 shadow-sm",
     cardHug: "bg-orange-50 border-2 border-orange-200 shadow-sm",
@@ -70,10 +68,13 @@ const themeStyles: Record<ThemeName, {
     iconHug: Smile,
   },
   night: {
-    container: "bg-slate-900 border-slate-800 shadow-[0_0_20px_rgba(236,72,153,0.15)]",
+    container:
+      "bg-slate-900 border-slate-800 shadow-[0_0_20px_rgba(236,72,153,0.15)]",
     header: "text-pink-100",
-    cardKiss: "bg-slate-800 border-pink-500/30 hover:border-pink-500/50 shadow-[0_0_10px_rgba(236,72,153,0.1)]",
-    cardHug: "bg-slate-800 border-orange-500/30 hover:border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.1)]",
+    cardKiss:
+      "bg-slate-800 border-pink-500/30 hover:border-pink-500/50 shadow-[0_0_10px_rgba(236,72,153,0.1)]",
+    cardHug:
+      "bg-slate-800 border-orange-500/30 hover:border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.1)]",
     textKiss: "text-pink-400",
     textHug: "text-orange-400",
     label: "text-slate-400",
@@ -83,10 +84,16 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-const Counter = ({ value, className }: { value: number; className?: string }) => {
+const Counter = ({
+  value,
+  className,
+}: {
+  value: number;
+  className?: string;
+}) => {
   const spring = useSpring(0, { bounce: 0, duration: 1000 });
   const display = useTransform(spring, (current) => Math.round(current));
-  
+
   useEffect(() => {
     spring.set(value);
   }, [spring, value]);
@@ -121,10 +128,20 @@ export default function LoveBalanceCard() {
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className={cn("text-lg font-bold flex items-center gap-2", currentTheme.header)}>
+        <h2
+          className={cn(
+            "text-lg font-bold flex items-center gap-2",
+            currentTheme.header
+          )}
+        >
           我的余额
         </h2>
-        <div className={cn("text-xs font-medium flex items-center gap-2", currentTheme.todayText)}>
+        <div
+          className={cn(
+            "text-xs font-medium flex items-center gap-2",
+            currentTheme.todayText
+          )}
+        >
           <span>今日获得</span>
           <span className="flex items-center gap-0.5">
             <Heart className="w-3 h-3" /> {displayBalance.todayKissGain}
@@ -148,10 +165,14 @@ export default function LoveBalanceCard() {
         >
           <div className="flex items-center justify-between">
             <IconKiss className={cn("w-6 h-6", currentTheme.textKiss)} />
-            <ArrowRight className={cn("w-4 h-4 opacity-50", currentTheme.label)} />
+            <ArrowRight
+              className={cn("w-4 h-4 opacity-50", currentTheme.label)}
+            />
           </div>
           <div>
-            <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>亲亲余额</div>
+            <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>
+              亲亲余额
+            </div>
             <div className={cn("text-3xl font-bold", currentTheme.textKiss)}>
               <Counter value={displayBalance.kissBalance} />
             </div>
@@ -169,10 +190,14 @@ export default function LoveBalanceCard() {
         >
           <div className="flex items-center justify-between">
             <IconHug className={cn("w-6 h-6", currentTheme.textHug)} />
-            <ArrowRight className={cn("w-4 h-4 opacity-50", currentTheme.label)} />
+            <ArrowRight
+              className={cn("w-4 h-4 opacity-50", currentTheme.label)}
+            />
           </div>
           <div>
-            <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>贴贴余额</div>
+            <div className={cn("text-xs font-medium mb-1", currentTheme.label)}>
+              贴贴余额
+            </div>
             <div className={cn("text-3xl font-bold", currentTheme.textHug)}>
               <Counter value={displayBalance.hugBalance} />
             </div>

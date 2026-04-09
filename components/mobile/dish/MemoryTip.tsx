@@ -12,7 +12,8 @@ interface MemoryTipProps {
 export default function MemoryTip({ theme }: MemoryTipProps) {
   const containerStyles = cn(
     "mx-4 p-4 rounded-xl flex items-start gap-3 mb-20", // margin-bottom for fixed footer
-    theme === "couple" && "bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100",
+    theme === "couple" &&
+      "bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100",
     theme === "cute" && "bg-yellow-50 border-2 border-yellow-200 rounded-3xl",
     theme === "minimal" && "bg-gray-50 border-l-4 border-gray-800 rounded-r-lg",
     theme === "night" && "bg-gray-800/50 border border-gray-700"

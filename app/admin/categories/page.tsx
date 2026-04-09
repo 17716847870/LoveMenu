@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import { PageContainer } from "@/components/ui/PageContainer";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import CategoryDataTable from "@/components/admin/categories/CategoryDataTable";
@@ -22,10 +22,14 @@ import { useDishes } from "@/apis/dishes";
 
 export default function AdminCategoriesPage() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<DishCategory | null>(null);
-  
+  const [editingCategory, setEditingCategory] = useState<DishCategory | null>(
+    null
+  );
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
 
   const message = useMessage();
 
@@ -37,10 +41,12 @@ export default function AdminCategoriesPage() {
   const deleteCategory = useDeleteCategory();
 
   const processedData = useMemo(() => {
-    return categories.map(cat => {
-      const dishCount = dishes.filter(d => d.categoryId === cat.id).length;
-      return { ...cat, dishCount };
-    }).sort((a, b) => a.sortOrder - b.sortOrder);
+    return categories
+      .map((cat) => {
+        const dishCount = dishes.filter((d) => d.categoryId === cat.id).length;
+        return { ...cat, dishCount };
+      })
+      .sort((a, b) => a.sortOrder - b.sortOrder);
   }, [categories, dishes]);
 
   const handleAddClick = () => {
@@ -54,12 +60,14 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDeleteClick = (id: string) => {
-    const dishCount = dishes.filter(d => d.categoryId === id).length;
+    const dishCount = dishes.filter((d) => d.categoryId === id).length;
     if (dishCount > 0) {
-      message.warning(`该分类下还有 ${dishCount} 道菜品，请先删除或转移菜品后再删除分类！`);
+      message.warning(
+        `该分类下还有 ${dishCount} 道菜品，请先删除或转移菜品后再删除分类！`
+      );
       return;
     }
-    
+
     setSelectedCategoryId(id);
     setIsConfirmOpen(true);
   };
@@ -127,9 +135,9 @@ export default function AdminCategoriesPage() {
   return (
     <PageContainer>
       <div className="mx-auto pb-20 md:pb-0">
-        <PageHeader 
-          title="分类管理" 
-          subtitle="管理菜品和菜单分类" 
+        <PageHeader
+          title="分类管理"
+          subtitle="管理菜品和菜单分类"
           action={
             <Button
               onClick={handleAddClick}
@@ -140,19 +148,19 @@ export default function AdminCategoriesPage() {
           }
         />
 
-        <CategoryDataTable 
+        <CategoryDataTable
           data={processedData}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
 
-        <MobileCategoryListView 
+        <MobileCategoryListView
           data={processedData}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
 
-        <button 
+        <button
           onClick={handleAddClick}
           className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors z-50"
         >
@@ -160,7 +168,7 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
-      <CategoryFormModal 
+      <CategoryFormModal
         isOpen={isFormModalOpen}
         onClose={() => setIsFormModalOpen(false)}
         onSave={handleSaveCategory}
@@ -168,8 +176,8 @@ export default function AdminCategoriesPage() {
         isSubmitting={createCategory.isPending || updateCategory.isPending}
       />
 
-      <ConfirmDialog 
-        isOpen={isConfirmOpen} 
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
         title="确认删除"

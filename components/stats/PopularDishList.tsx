@@ -13,7 +13,9 @@ export const PopularDishList = ({ dishes }: PopularDishListProps) => {
         {dishes.map((dish) => (
           <div key={dish.id} className="flex items-center justify-between">
             <span>{dish.name}</span>
-            <span className="text-[var(--color-muted)]">热度 {dish.popularity}</span>
+            <span className="text-[var(--color-muted)]">
+              热度 {dish.popularity}
+            </span>
           </div>
         ))}
       </div>

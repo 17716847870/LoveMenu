@@ -20,12 +20,15 @@ interface ChatInputBarProps {
   onSend: (content: string, type: "text" | "love" | "image" | "emoji") => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  input: string;
-  icon: string;
-  send: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    input: string;
+    icon: string;
+    send: string;
+  }
+> = {
   couple: {
     container: "bg-white/90 backdrop-blur-sm border-t border-pink-100",
     input: "bg-pink-50 border-pink-100 focus:border-pink-300 text-pink-900",
@@ -34,7 +37,8 @@ const themeStyles: Record<ThemeName, {
   },
   cute: {
     container: "bg-white/90 backdrop-blur-sm border-t border-orange-100",
-    input: "bg-orange-50 border-orange-100 focus:border-orange-300 text-orange-900",
+    input:
+      "bg-orange-50 border-orange-100 focus:border-orange-300 text-orange-900",
     icon: "text-orange-400 hover:bg-orange-50",
     send: "bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200",
   },
@@ -73,7 +77,10 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
         const formData = new FormData();
         formData.append("file", imageFile);
         formData.append("path", "chat");
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
         onSend(json.data.url, "image");
@@ -119,9 +126,16 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
         <div className="px-3 pb-2 flex items-center gap-2">
           <div className="relative w-16 h-16">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePreview} alt="预览" className="w-16 h-16 rounded-xl object-cover border border-gray-200" />
+            <img
+              src={imagePreview}
+              alt="预览"
+              className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+            />
             <button
-              onClick={() => { setImagePreview(null); setImageFile(null); }}
+              onClick={() => {
+                setImagePreview(null);
+                setImageFile(null);
+              }}
               className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white rounded-full flex items-center justify-center"
             >
               <X className="w-3 h-3" />
@@ -132,7 +146,12 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
       )}
 
       {/* Emoji Panel */}
-      {showEmoji && <EmojiPanel onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />}
+      {showEmoji && (
+        <EmojiPanel
+          onSelect={handleEmojiSelect}
+          onClose={() => setShowEmoji(false)}
+        />
+      )}
 
       {/* Input Area */}
       <form
@@ -153,8 +172,14 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => { fileInputRef.current?.click(); setShowEmoji(false); }}
-            className={cn("p-2 rounded-full transition-colors", currentTheme.icon)}
+            onClick={() => {
+              fileInputRef.current?.click();
+              setShowEmoji(false);
+            }}
+            className={cn(
+              "p-2 rounded-full transition-colors",
+              currentTheme.icon
+            )}
           >
             <ImageIcon className="w-5 h-5" />
           </button>
@@ -179,7 +204,9 @@ export default function ChatInputBar({ onSend }: ChatInputBarProps) {
         <button
           type="button"
           onClick={() => setShowEmoji((v) => !v)}
-          className={cn("p-2 rounded-full transition-colors", currentTheme.icon,
+          className={cn(
+            "p-2 rounded-full transition-colors",
+            currentTheme.icon,
             showEmoji && "bg-pink-100"
           )}
         >

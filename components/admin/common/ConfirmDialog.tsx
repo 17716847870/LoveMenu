@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -13,8 +13,8 @@ export default function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
-  title = '确认删除',
-  message = '确认删除这个菜品吗？',
+  title = "确认删除",
+  message = "确认删除这个菜品吗？",
   isLoading = false,
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
@@ -31,16 +31,16 @@ export default function ConfirmDialog({
           </div>
           <p className="text-gray-600 ml-13">{message}</p>
         </div>
-        
+
         <div className="bg-pink-50/30 px-6 py-4 flex justify-end gap-3 border-t border-pink-50">
-          <button 
+          <button
             onClick={onClose}
             disabled={isLoading}
             className="px-5 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors font-medium disabled:opacity-50"
           >
             取消
           </button>
-          <button 
+          <button
             onClick={onConfirm}
             disabled={isLoading}
             className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white shadow-sm transition-colors font-medium flex items-center gap-2"
@@ -51,7 +51,7 @@ export default function ConfirmDialog({
                 删除中...
               </>
             ) : (
-              '确认删除'
+              "确认删除"
             )}
           </button>
         </div>

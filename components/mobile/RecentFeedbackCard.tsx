@@ -3,25 +3,28 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  MessageSquare, 
-  Heart, 
-  Sparkles, 
-  Zap, 
-  ChevronRight
+import {
+  MessageSquare,
+  Heart,
+  Sparkles,
+  Zap,
+  ChevronRight,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { useFeedbacks } from "@/apis/feedback";
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  header: string;
-  item: string;
-  viewAll: string;
-  icon: React.ElementType;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    header: string;
+    item: string;
+    viewAll: string;
+    icon: React.ElementType;
+  }
+> = {
   couple: {
     container: "bg-white border-pink-100 shadow-sm hover:shadow-md",
     header: "text-pink-900",
@@ -30,7 +33,8 @@ const themeStyles: Record<ThemeName, {
     icon: Heart,
   },
   cute: {
-    container: "bg-white border-2 border-orange-100 shadow-[4px_4px_0px_0px_rgba(255,237,213,1)]",
+    container:
+      "bg-white border-2 border-orange-100 shadow-[4px_4px_0px_0px_rgba(255,237,213,1)]",
     header: "text-orange-900",
     item: "bg-orange-50 text-orange-700 border border-orange-100",
     viewAll: "text-orange-400 hover:text-orange-600",
@@ -59,35 +63,39 @@ export default function RecentFeedbackCard() {
   const Icon = currentTheme.icon;
 
   const feedbacks = useMemo(() => {
-    return feedbacksData
-      .slice(0, 3)
-      .map((feedback) => ({
-        id: feedback.id,
-        title: feedback.title,
-      }));
+    return feedbacksData.slice(0, 3).map((feedback) => ({
+      id: feedback.id,
+      title: feedback.title,
+    }));
   }, [feedbacksData]);
 
   const getTitle = () => {
     switch (theme) {
-      case 'cute': return "🍓 最近反馈";
-      case 'minimal': return "Recent Feedback";
-      case 'night': return "⚡ Feedback";
-      default: return "❤️ 宝贝的反馈";
+      case "cute":
+        return "🍓 最近反馈";
+      case "minimal":
+        return "Recent Feedback";
+      case "night":
+        return "⚡ Feedback";
+      default:
+        return "❤️ 宝贝的反馈";
     }
   };
 
   return (
-    <div className={cn(
-      "rounded-[2rem] p-6 flex flex-col gap-4 overflow-hidden relative transition-all duration-300",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "rounded-[2rem] p-6 flex flex-col gap-4 overflow-hidden relative transition-all duration-300",
+        currentTheme.container
+      )}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-lg">
           <Icon className={cn("w-5 h-5", currentTheme.header)} />
           <span className={currentTheme.header}>{getTitle()}</span>
         </div>
-        <Link 
-          href="/feedback" 
+        <Link
+          href="/feedback"
           className={cn(
             "text-xs font-medium flex items-center gap-1 transition-colors",
             currentTheme.viewAll
@@ -114,24 +122,31 @@ export default function RecentFeedbackCard() {
             </motion.div>
           ))
         ) : (
-          <div className={cn("text-center py-8 text-sm opacity-60", currentTheme.header)}>
+          <div
+            className={cn(
+              "text-center py-8 text-sm opacity-60",
+              currentTheme.header
+            )}
+          >
             还没有反馈哦 ~
           </div>
         )}
       </div>
-      
+
       <Link href="/feedback" className="mt-1">
         <motion.div
-            whileTap={{ scale: 0.98 }}
-            className={cn(
-              "p-3 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl opacity-80 hover:opacity-100",
-              theme === 'couple' ? "bg-pink-100 text-pink-600" : "",
-              theme === 'cute' ? "bg-orange-100 text-orange-600" : "",
-              theme === 'minimal' ? "bg-gray-100 text-gray-900" : "",
-              theme === 'night' ? "bg-purple-900/30 text-purple-300 border border-purple-500/30" : ""
-            )}
+          whileTap={{ scale: 0.98 }}
+          className={cn(
+            "p-3 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl opacity-80 hover:opacity-100",
+            theme === "couple" ? "bg-pink-100 text-pink-600" : "",
+            theme === "cute" ? "bg-orange-100 text-orange-600" : "",
+            theme === "minimal" ? "bg-gray-100 text-gray-900" : "",
+            theme === "night"
+              ? "bg-purple-900/30 text-purple-300 border border-purple-500/30"
+              : ""
+          )}
         >
-            <span>＋ 提交反馈</span>
+          <span>＋ 提交反馈</span>
         </motion.div>
       </Link>
     </div>

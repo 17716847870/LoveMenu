@@ -15,7 +15,11 @@ interface Config {
 }
 
 export default function ConfigPage() {
-  const [config, setConfig] = useState<Config>({ loveStartDate: "", homeMoodText: "", homeCravingText: "" });
+  const [config, setConfig] = useState<Config>({
+    loveStartDate: "",
+    homeMoodText: "",
+    homeCravingText: "",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -25,7 +29,13 @@ export default function ConfigPage() {
         const res = await fetch("/api/config");
         if (res.ok) {
           const data = await res.json();
-          setConfig(data.data || { loveStartDate: "", homeMoodText: "", homeCravingText: "" });
+          setConfig(
+            data.data || {
+              loveStartDate: "",
+              homeMoodText: "",
+              homeCravingText: "",
+            }
+          );
         }
       } catch (error) {
         console.error("Failed to fetch config:", error);
@@ -76,33 +86,47 @@ export default function ConfigPage() {
       <div className="max-w-2xl">
         <Card className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">在一起的日期</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              在一起的日期
+            </label>
             <input
               type="date"
               value={config.loveStartDate}
-              onChange={(e) => setConfig({ ...config, loveStartDate: e.target.value })}
+              onChange={(e) =>
+                setConfig({ ...config, loveStartDate: e.target.value })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none"
             />
-            <p className="text-xs text-gray-500 mt-2">设置这个日期后，前台页面会自动计算在一起的天数</p>
+            <p className="text-xs text-gray-500 mt-2">
+              设置这个日期后，前台页面会自动计算在一起的天数
+            </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">首页今日心情文案（可选）</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              首页今日心情文案（可选）
+            </label>
             <input
               type="text"
               value={config.homeMoodText}
-              onChange={(e) => setConfig({ ...config, homeMoodText: e.target.value })}
+              onChange={(e) =>
+                setConfig({ ...config, homeMoodText: e.target.value })
+              }
               placeholder="留空则由系统根据真实订单和紧急点单自动生成"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">首页特别想吃文案（可选）</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              首页特别想吃文案（可选）
+            </label>
             <input
               type="text"
               value={config.homeCravingText}
-              onChange={(e) => setConfig({ ...config, homeCravingText: e.target.value })}
+              onChange={(e) =>
+                setConfig({ ...config, homeCravingText: e.target.value })
+              }
               placeholder="留空则优先取最近想吃清单，其次取热门菜品"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none"
             />
@@ -113,7 +137,9 @@ export default function ConfigPage() {
             disabled={isSaving}
             className={cn(
               "w-full py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-all",
-              isSaving ? "bg-gray-300 text-gray-600 cursor-not-allowed" : "bg-pink-500 text-white hover:bg-pink-600"
+              isSaving
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-pink-500 text-white hover:bg-pink-600"
             )}
           >
             {isSaving ? (

@@ -35,7 +35,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme }}>
-      <div data-theme={theme} className="transition-colors duration-300 min-h-screen bg-background text-foreground w-full">
+      <div
+        data-theme={theme}
+        className="transition-colors duration-300 min-h-screen bg-background text-foreground w-full"
+      >
         {children}
       </div>
     </ThemeContext.Provider>

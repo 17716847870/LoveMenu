@@ -75,7 +75,9 @@ export function useUpdateUser() {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(variables.id),
+      });
     },
   });
 }
@@ -98,8 +100,19 @@ export function useTopUpBalance() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, kissAmount, hugAmount }: { id: string; kissAmount?: number; hugAmount?: number }) => {
-      const response = await http.patch<User>(`/api/users/${id}/balance`, { kissAmount, hugAmount });
+    mutationFn: async ({
+      id,
+      kissAmount,
+      hugAmount,
+    }: {
+      id: string;
+      kissAmount?: number;
+      hugAmount?: number;
+    }) => {
+      const response = await http.patch<User>(`/api/users/${id}/balance`, {
+        kissAmount,
+        hugAmount,
+      });
       return response.data;
     },
     onSuccess: (data) => {

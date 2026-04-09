@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
 import { broadcastChatMessage } from "@/lib/supabase-server";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 type TokenPayload = {
   id: string;
@@ -88,7 +88,10 @@ export const GET = async () => {
     return NextResponse.json({ data: formattedMessages });
   } catch (error) {
     console.error("[api/chat][GET] 获取消息失败", error);
-    await logApiError({ scope: '/api/chat[GET]', path: '/api/chat', method: 'GET' }, error);
+    await logApiError(
+      { scope: "/api/chat[GET]", path: "/api/chat", method: "GET" },
+      error
+    );
     return NextResponse.json({ message: "获取消息失败" }, { status: 500 });
   }
 };
@@ -104,15 +107,13 @@ export const POST = async (req: Request) => {
     const { type, content } = body as { type?: string; content?: string };
 
     if (!type || !content || !content.trim()) {
-      return NextResponse.json({ message: "消息内容不能为空" }, { status: 400 });
+      return NextResponse.json(
+        { message: "消息内容不能为空" },
+        { status: 400 }
+      );
     }
 
-    if (![
-      "text",
-      "image",
-      "voice",
-      "emoji",
-    ].includes(type)) {
+    if (!["text", "image", "voice", "emoji"].includes(type)) {
       return NextResponse.json({ message: "消息类型不支持" }, { status: 400 });
     }
 
@@ -159,7 +160,7 @@ export const POST = async (req: Request) => {
     });
   } catch (error) {
     console.error("[api/chat][POST] 发送消息失败", error);
-    await logApiError({ req, scope: '/api/chat[POST]' }, error);
+    await logApiError({ req, scope: "/api/chat[POST]" }, error);
     return NextResponse.json({ message: "发送消息失败" }, { status: 500 });
   }
 };
@@ -185,8 +186,9 @@ export const PATCH = async () => {
 
     if (unreadMessages.length > 0) {
       await Promise.all(
-        unreadMessages.map((item) =>
-          prisma.$executeRaw`
+        unreadMessages.map(
+          (item) =>
+            prisma.$executeRaw`
             INSERT INTO "ChatMessageRead" ("id", "messageId", "userId", "createdAt")
             VALUES (${crypto.randomUUID()}, ${item.id}, ${currentUser.id}, NOW())
             ON CONFLICT ("messageId", "userId") DO NOTHING
@@ -198,7 +200,10 @@ export const PATCH = async () => {
     return NextResponse.json({ success: true, data: { count: 0 } });
   } catch (error) {
     console.error("[api/chat][PATCH] 已读更新失败", error);
-    await logApiError({ scope: '/api/chat[PATCH]', path: '/api/chat', method: 'PATCH' }, error);
+    await logApiError(
+      { scope: "/api/chat[PATCH]", path: "/api/chat", method: "PATCH" },
+      error
+    );
     return NextResponse.json({ message: "已读更新失败" }, { status: 500 });
   }
 };

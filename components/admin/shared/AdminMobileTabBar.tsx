@@ -4,18 +4,36 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LayoutDashboard, Menu as MenuIcon, X, LogOut, Users, Bell, Bug, Settings } from "lucide-react";
+import {
+  Menu,
+  ShoppingBag,
+  List,
+  MessageSquare,
+  MessageCircle,
+  LayoutDashboard,
+  Menu as MenuIcon,
+  X,
+  LogOut,
+  Users,
+  Bell,
+  Bug,
+  Settings,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useRouter } from "next/navigation";
 import { useChatRealtime } from "@/context/ChatRealtimeContext";
 
-export type FloatingButtonPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type FloatingButtonPosition =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
 
 export default function AdminMobileTabBar({
-  buttonPosition = "bottom-left"
+  buttonPosition = "bottom-left",
 }: {
-  buttonPosition?: FloatingButtonPosition
+  buttonPosition?: FloatingButtonPosition;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -24,10 +42,10 @@ export default function AdminMobileTabBar({
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error("Logout failed", error);
     }
   };
 
@@ -35,53 +53,53 @@ export default function AdminMobileTabBar({
     {
       label: "数据看板",
       href: "/admin",
-      icon: LayoutDashboard
+      icon: LayoutDashboard,
     },
     {
       label: "分类管理",
       href: "/admin/categories",
-      icon: List
+      icon: List,
     },
     {
       label: "菜单管理",
       href: "/admin/menu",
-      icon: Menu
+      icon: Menu,
     },
     {
       label: "订单管理",
       href: "/admin/orders",
-      icon: ShoppingBag
+      icon: ShoppingBag,
     },
     {
       label: "食物请求",
       href: "/admin/requests",
-      icon: MessageSquare
+      icon: MessageSquare,
     },
     {
       label: "消息聊天",
       href: "/admin/chat",
-      icon: MessageCircle
+      icon: MessageCircle,
     },
     {
       label: "账号管理",
       href: "/admin/accounts",
-      icon: Users
+      icon: Users,
     },
     {
       label: "纪念日提醒",
       href: "/admin/anniversaries",
-      icon: Bell
+      icon: Bell,
     },
     {
       label: "错误日志",
       href: "/admin/error-logs",
-      icon: Bug
+      icon: Bug,
     },
     {
       label: "系统配置",
       href: "/admin/config",
-      icon: Settings
-    }
+      icon: Settings,
+    },
   ];
 
   const getPositionClasses = () => {
@@ -101,7 +119,7 @@ export default function AdminMobileTabBar({
   return (
     <>
       {/* 悬浮菜单按钮 */}
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className={cn(
           "md:hidden fixed z-40 w-12 h-12 bg-pink-500 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-pink-600 transition-colors",
@@ -116,16 +134,16 @@ export default function AdminMobileTabBar({
         {isOpen && (
           <>
             {/* 遮罩层 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
               className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             />
-            
+
             {/* 抽屉面板 */}
-            <motion.div 
+            <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -138,7 +156,7 @@ export default function AdminMobileTabBar({
                   <h1 className="text-xl font-bold text-pink-600">LoveMenu</h1>
                   <p className="text-xs text-pink-400 mt-1">情侣点餐后台管理</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsOpen(false)}
                   className="w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-400 hover:text-gray-600 shadow-sm"
                 >
@@ -149,28 +167,38 @@ export default function AdminMobileTabBar({
               {/* Menu Items */}
               <div className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1">
                 {menuItems.map((item) => {
-                  const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
+                  const isActive =
+                    item.href === "/admin"
+                      ? pathname === "/admin"
+                      : pathname.startsWith(item.href);
                   const Icon = item.icon;
-                  
+
                   return (
-                    <Link 
+                    <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all font-medium",
-                        isActive 
-                          ? "bg-pink-50 text-pink-600" 
+                        isActive
+                          ? "bg-pink-50 text-pink-600"
                           : "text-gray-600 hover:bg-gray-50"
                       )}
                     >
-                      <Icon className={cn("w-5 h-5", isActive ? "text-pink-500" : "text-gray-400")} />
+                      <Icon
+                        className={cn(
+                          "w-5 h-5",
+                          isActive ? "text-pink-500" : "text-gray-400"
+                        )}
+                      />
                       <span>{item.label}</span>
                       {item.href === "/admin/chat" && unreadCount > 0 && (
-                        <span className={cn(
-                          "ml-auto min-w-5 h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm animate-pulse",
-                          "bg-pink-500 text-white"
-                        )}>
+                        <span
+                          className={cn(
+                            "ml-auto min-w-5 h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm animate-pulse",
+                            "bg-pink-500 text-white"
+                          )}
+                        >
                           {unreadCount > 99 ? "99+" : unreadCount}
                         </span>
                       )}
@@ -181,7 +209,7 @@ export default function AdminMobileTabBar({
 
               {/* Footer / Logout */}
               <div className="p-4 border-t border-gray-50">
-                <button 
+                <button
                   onClick={handleLogout}
                   className="flex items-center gap-3 px-4 py-3 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors font-medium"
                 >

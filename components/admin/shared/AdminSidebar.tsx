@@ -3,7 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, ShoppingBag, List, MessageSquare, MessageCircle, LogOut, LayoutDashboard, Users, Bell, Settings, Bug } from "lucide-react";
+import {
+  Menu,
+  ShoppingBag,
+  List,
+  MessageSquare,
+  MessageCircle,
+  LogOut,
+  LayoutDashboard,
+  Users,
+  Bell,
+  Settings,
+  Bug,
+} from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { useChatRealtime } from "@/context/ChatRealtimeContext";
@@ -15,10 +27,10 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error("Logout failed", error);
     }
   };
 
@@ -26,53 +38,53 @@ export default function AdminSidebar() {
     {
       label: "数据看板",
       href: "/admin",
-      icon: LayoutDashboard
+      icon: LayoutDashboard,
     },
     {
       label: "分类管理",
       href: "/admin/categories",
-      icon: List
+      icon: List,
     },
     {
       label: "菜单管理",
       href: "/admin/menu",
-      icon: Menu
+      icon: Menu,
     },
     {
       label: "订单管理",
       href: "/admin/orders",
-      icon: ShoppingBag
+      icon: ShoppingBag,
     },
     {
       label: "食物请求",
       href: "/admin/requests",
-      icon: MessageSquare
+      icon: MessageSquare,
     },
     {
       label: "消息聊天",
       href: "/admin/chat",
-      icon: MessageCircle
+      icon: MessageCircle,
     },
     {
       label: "账号管理",
       href: "/admin/accounts",
-      icon: Users
+      icon: Users,
     },
     {
       label: "纪念日提醒",
       href: "/admin/anniversaries",
-      icon: Bell
+      icon: Bell,
     },
     {
       label: "错误日志",
       href: "/admin/error-logs",
-      icon: Bug
+      icon: Bug,
     },
     {
       label: "系统配置",
       href: "/admin/config",
-      icon: Settings
-    }
+      icon: Settings,
+    },
   ];
 
   return (
@@ -86,27 +98,34 @@ export default function AdminSidebar() {
       {/* Menu Items */}
       <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
-          const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
+          const isActive =
+            item.href === "/admin"
+              ? pathname === "/admin"
+              : pathname.startsWith(item.href);
           const Icon = item.icon;
-          
+
           return (
-            <Link 
+            <Link
               key={item.href}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                isActive 
-                  ? "bg-pink-500 text-white shadow-lg shadow-pink-200" 
+                isActive
+                  ? "bg-pink-500 text-white shadow-lg shadow-pink-200"
                   : "text-gray-600 hover:bg-pink-100 hover:text-pink-600"
               )}
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>
               {item.href === "/admin/chat" && unreadCount > 0 && (
-                <span className={cn(
-                  "ml-auto min-w-5 h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm animate-pulse",
-                  isActive ? "bg-white text-pink-500" : "bg-pink-500 text-white"
-                )}>
+                <span
+                  className={cn(
+                    "ml-auto min-w-5 h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm animate-pulse",
+                    isActive
+                      ? "bg-white text-pink-500"
+                      : "bg-pink-500 text-white"
+                  )}
+                >
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
@@ -117,7 +136,7 @@ export default function AdminSidebar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-pink-100">
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center gap-2 px-4 py-2 w-full text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
         >

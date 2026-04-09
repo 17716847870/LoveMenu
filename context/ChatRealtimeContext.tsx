@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { chatKeys, fetchChatUnreadCount, markChatAsRead } from "@/apis/chat";
@@ -13,12 +19,18 @@ type ChatRealtimeContextValue = {
   refreshUnreadCount: () => Promise<void>;
 };
 
-const ChatRealtimeContext = createContext<ChatRealtimeContextValue | undefined>(undefined);
+const ChatRealtimeContext = createContext<ChatRealtimeContextValue | undefined>(
+  undefined
+);
 
 const CHAT_PATHS = ["/chat", "/admin/chat"];
 const CHAT_FALLBACK_POLL_INTERVAL = 3000;
 
-export function ChatRealtimeProvider({ children }: { children: React.ReactNode }) {
+export function ChatRealtimeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { user } = useUser();
@@ -50,7 +62,9 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
 
     if (!supabase) {
       if (process.env.NODE_ENV !== "production") {
-        console.info("[chat] using polling fallback (Supabase Realtime unavailable)");
+        console.info(
+          "[chat] using polling fallback (Supabase Realtime unavailable)"
+        );
       }
 
       const timer = setInterval(async () => {
@@ -70,11 +84,19 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
       .on("broadcast", { event: "message" }, async ({ payload }) => {
         queryClient.invalidateQueries({ queryKey: chatKeys.messages() });
 
-        const unreadByUser = Array.isArray((payload as { unreadByUser?: unknown[] })?.unreadByUser)
-          ? ((payload as { unreadByUser: Array<{ userId: string; unreadCount: number }> }).unreadByUser)
+        const unreadByUser = Array.isArray(
+          (payload as { unreadByUser?: unknown[] })?.unreadByUser
+        )
+          ? (
+              payload as {
+                unreadByUser: Array<{ userId: string; unreadCount: number }>;
+              }
+            ).unreadByUser
           : [];
 
-        const unreadEntry = unreadByUser.find((item) => item.userId === user.id);
+        const unreadEntry = unreadByUser.find(
+          (item) => item.userId === user.id
+        );
 
         if (inChatPage) {
           await markChatAsRead();
@@ -110,7 +132,11 @@ export function ChatRealtimeProvider({ children }: { children: React.ReactNode }
     [unreadCount]
   );
 
-  return <ChatRealtimeContext.Provider value={value}>{children}</ChatRealtimeContext.Provider>;
+  return (
+    <ChatRealtimeContext.Provider value={value}>
+      {children}
+    </ChatRealtimeContext.Provider>
+  );
 }
 
 export function useChatRealtime() {

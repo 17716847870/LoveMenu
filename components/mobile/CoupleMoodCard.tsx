@@ -20,41 +20,48 @@ function getGreeting() {
 }
 
 // Theme Styles Configuration
-const cardThemes: Record<ThemeName, {
-  container: string;
-  title: string;
-  greeting: string;
-  sectionTitle: string;
-  content: string;
-  button: string;
-  icon: React.ElementType;
-  animation: any;
-}> = {
+const cardThemes: Record<
+  ThemeName,
+  {
+    container: string;
+    title: string;
+    greeting: string;
+    sectionTitle: string;
+    content: string;
+    button: string;
+    icon: React.ElementType;
+    animation: any;
+  }
+> = {
   couple: {
-    container: "bg-gradient-to-br from-pink-100 to-rose-50 border border-pink-200 shadow-pink-100",
+    container:
+      "bg-gradient-to-br from-pink-100 to-rose-50 border border-pink-200 shadow-pink-100",
     title: "text-pink-600",
     greeting: "text-rose-900",
     sectionTitle: "text-pink-400/80",
     content: "text-rose-800",
-    button: "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300",
+    button:
+      "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300",
     icon: Heart,
     animation: {
       y: [0, -5, 0],
-      transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
-    }
+      transition: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+    },
   },
   cute: {
-    container: "bg-gradient-to-tr from-orange-50 to-yellow-50 border border-orange-100 shadow-orange-50",
+    container:
+      "bg-gradient-to-tr from-orange-50 to-yellow-50 border border-orange-100 shadow-orange-50",
     title: "text-orange-500",
     greeting: "text-orange-900",
     sectionTitle: "text-orange-400/80",
     content: "text-orange-800",
-    button: "bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg shadow-orange-200 hover:shadow-orange-300 rounded-2xl",
+    button:
+      "bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg shadow-orange-200 hover:shadow-orange-300 rounded-2xl",
     icon: Utensils,
     animation: {
       rotate: [0, 10, -10, 0],
-      transition: { repeat: Infinity, duration: 2, ease: "easeInOut" }
-    }
+      transition: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+    },
   },
   minimal: {
     container: "bg-white border border-gray-100 shadow-sm",
@@ -64,21 +71,23 @@ const cardThemes: Record<ThemeName, {
     content: "text-gray-900 font-medium",
     button: "bg-black text-white hover:bg-gray-800",
     icon: Sparkles,
-    animation: {}
+    animation: {},
   },
   night: {
-    container: "bg-slate-900 border border-slate-800 shadow-lg shadow-blue-900/20",
+    container:
+      "bg-slate-900 border border-slate-800 shadow-lg shadow-blue-900/20",
     title: "text-blue-400",
     greeting: "text-slate-100",
     sectionTitle: "text-slate-500",
     content: "text-blue-100",
-    button: "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.6)]",
+    button:
+      "bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.6)]",
     icon: Zap,
     animation: {
       opacity: [0.5, 1, 0.5],
-      transition: { repeat: Infinity, duration: 2 }
-    }
-  }
+      transition: { repeat: Infinity, duration: 2 },
+    },
+  },
 };
 
 export default function CoupleMoodCard() {
@@ -93,7 +102,7 @@ export default function CoupleMoodCard() {
   useEffect(() => {
     asyncSetState(() => {
       setGreeting(getGreeting());
-    })
+    });
   }, []);
 
   return (
@@ -115,21 +124,29 @@ export default function CoupleMoodCard() {
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
-            <span className={cn("text-xs font-bold tracking-wider", currentTheme.title)}>
+            <span
+              className={cn(
+                "text-xs font-bold tracking-wider",
+                currentTheme.title
+              )}
+            >
               LoveMenu ♡
             </span>
-            <h2 className={cn("text-2xl font-bold mt-1", currentTheme.greeting)}>
-              {greeting} {theme === 'couple' && "❤️"}
+            <h2
+              className={cn("text-2xl font-bold mt-1", currentTheme.greeting)}
+            >
+              {greeting} {theme === "couple" && "❤️"}
             </h2>
             <p className={cn("text-sm opacity-80", currentTheme.greeting)}>
               今天想吃什么呀？
             </p>
           </div>
-          
+
           <motion.div
             animate={currentTheme.animation}
-            className={cn("p-2 rounded-full bg-white/50 backdrop-blur-sm", 
-              theme === 'night' ? "bg-slate-800/50" : ""
+            className={cn(
+              "p-2 rounded-full bg-white/50 backdrop-blur-sm",
+              theme === "night" ? "bg-slate-800/50" : ""
             )}
           >
             <Icon className={cn("w-6 h-6", currentTheme.title)} />
@@ -139,16 +156,20 @@ export default function CoupleMoodCard() {
         {/* Content Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <span className={cn("text-xs font-medium", currentTheme.sectionTitle)}>
+            <span
+              className={cn("text-xs font-medium", currentTheme.sectionTitle)}
+            >
               今日心情
             </span>
             <span className={cn("text-lg font-medium", currentTheme.content)}>
               {mood}
             </span>
           </div>
-          
+
           <div className="flex flex-col gap-2">
-            <span className={cn("text-xs font-medium", currentTheme.sectionTitle)}>
+            <span
+              className={cn("text-xs font-medium", currentTheme.sectionTitle)}
+            >
               今天特别想吃
             </span>
             <span className={cn("text-lg font-medium", currentTheme.content)}>
@@ -167,7 +188,9 @@ export default function CoupleMoodCard() {
               currentTheme.button
             )}
           >
-            {theme === 'minimal' ? "查看菜单 →" : (
+            {theme === "minimal" ? (
+              "查看菜单 →"
+            ) : (
               <>
                 <Icon size={16} fill="currentColor" className="opacity-80" />
                 <span>去选好吃的</span>

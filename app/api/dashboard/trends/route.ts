@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logApiError } from '@/lib/error-log';
-import { unstable_noStore as noStore } from 'next/cache';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logApiError } from "@/lib/error-log";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET() {
   noStore();
   try {
-    const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const dayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
     const trends = [];
 
     for (let i = 6; i >= 0; i--) {
@@ -20,35 +20,42 @@ export async function GET() {
       const orders = await prisma.order.findMany({
         where: {
           createdAt: { gte: date, lt: nextDate },
-          status: { not: 'cancelled' }
+          status: { not: "cancelled" },
         },
         select: {
           isEmergency: true,
           totalKiss: true,
-          totalHug: true
-        }
+          totalHug: true,
+        },
       });
 
       const dayName = dayNames[date.getDay()];
       const interactions = orders.length;
-      const priority = orders.filter(o => o.isEmergency).length;
-      const points = orders.reduce((sum, o) => sum + o.totalKiss + o.totalHug, 0);
+      const priority = orders.filter((o) => o.isEmergency).length;
+      const points = orders.reduce(
+        (sum, o) => sum + o.totalKiss + o.totalHug,
+        0
+      );
 
       trends.push({
         name: dayName,
         interactions,
         points,
-        priority
+        priority,
       });
     }
 
     return NextResponse.json(trends);
   } catch (error) {
-    console.error('Trends API error:', error);
-    await logApiError({ scope: '/api/dashboard/trends[GET]', path: '/api/dashboard/trends', method: 'GET' }, error);
-    return NextResponse.json(
-      { message: '获取趋势数据失败' },
-      { status: 500 }
+    console.error("Trends API error:", error);
+    await logApiError(
+      {
+        scope: "/api/dashboard/trends[GET]",
+        path: "/api/dashboard/trends",
+        method: "GET",
+      },
+      error
     );
+    return NextResponse.json({ message: "获取趋势数据失败" }, { status: 500 });
   }
 }

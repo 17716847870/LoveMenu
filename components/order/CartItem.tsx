@@ -4,14 +4,17 @@ import { Input } from "@/components/ui/Input";
 import { Heart, User, Minus, Plus } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
-
 interface CartItemProps {
   item: CartItemType;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onUpdateNote: (id: string, note: string) => void;
 }
 
-export default function CartItem({ item, onUpdateQuantity, onUpdateNote }: CartItemProps) {
+export default function CartItem({
+  item,
+  onUpdateQuantity,
+  onUpdateNote,
+}: CartItemProps) {
   return (
     <Card className="flex flex-col gap-3 p-4">
       <div className="flex justify-between items-start">
@@ -31,18 +34,22 @@ export default function CartItem({ item, onUpdateQuantity, onUpdateNote }: CartI
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
+          <Button
+            variant="outline"
+            size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
+            onClick={() =>
+              onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))
+            }
           >
             <Minus size={14} />
           </Button>
-          <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
-          <Button 
-            variant="outline" 
-            size="icon" 
+          <span className="w-6 text-center text-sm font-medium">
+            {item.quantity}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
             className="h-8 w-8 rounded-full"
             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
           >

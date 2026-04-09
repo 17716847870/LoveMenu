@@ -7,7 +7,10 @@ import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 
-const themeStyles: Record<ThemeName, { container: string; text: string; icon: string }> = {
+const themeStyles: Record<
+  ThemeName,
+  { container: string; text: string; icon: string }
+> = {
   couple: {
     container: "bg-white/80 backdrop-blur-md border-b border-pink-100",
     text: "text-pink-900",
@@ -36,7 +39,12 @@ export default function CartHeader() {
   const styles = themeStyles[theme];
 
   return (
-    <div className={cn("sticky top-0 z-50 px-4 py-3 flex items-center justify-between", styles.container)}>
+    <div
+      className={cn(
+        "sticky top-0 z-50 px-4 py-3 flex items-center justify-between",
+        styles.container
+      )}
+    >
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}

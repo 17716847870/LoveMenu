@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { signToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
-import bcrypt from 'bcryptjs';
-import { logApiError } from '@/lib/error-log';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { signToken } from "@/lib/auth";
+import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
+import { logApiError } from "@/lib/error-log";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { message: '用户名或密码错误' },
+        { message: "用户名或密码错误" },
         { status: 401 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     if (!isPasswordValid) {
       return NextResponse.json(
-        { message: '用户名或密码错误' },
+        { message: "用户名或密码错误" },
         { status: 401 }
       );
     }
@@ -38,12 +38,12 @@ export async function POST(req: Request) {
 
     const cookieStore = await cookies();
     cookieStore.set({
-      name: 'lovemenu-token',
+      name: "lovemenu-token",
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
       maxAge: 60 * 60 * 24,
     });
 
@@ -58,11 +58,8 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error('[api/auth/login] 登录失败', error);
-    await logApiError({ req, scope: '/api/auth/login[POST]' }, error);
-    return NextResponse.json(
-      { message: '登录失败' },
-      { status: 500 }
-    );
+    console.error("[api/auth/login] 登录失败", error);
+    await logApiError({ req, scope: "/api/auth/login[POST]" }, error);
+    return NextResponse.json({ message: "登录失败" }, { status: 500 });
   }
 }

@@ -23,20 +23,21 @@ export default function MenuPage() {
   const { theme } = useTheme();
 
   const { data: dishes = [], isLoading: dishesLoading } = useDishes();
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
 
   const categoryNames = useMemo(() => {
-    return ["全部", ...categories.map(c => c.name)];
+    return ["全部", ...categories.map((c) => c.name)];
   }, [categories]);
 
   const getCategoryIdByName = (name: string): string | undefined => {
     if (name === "全部") return undefined;
-    const category = categories.find(c => c.name === name);
+    const category = categories.find((c) => c.name === name);
     return category?.id;
   };
 
   const getCategoryNameById = (categoryId: string): string => {
-    const category = categories.find(c => c.id === categoryId);
+    const category = categories.find((c) => c.id === categoryId);
     return category?.name || "";
   };
 
@@ -46,7 +47,7 @@ export default function MenuPage() {
     }
     const categoryId = getCategoryIdByName(activeCategory);
     if (!categoryId) return dishes;
-    return dishes.filter(d => d.categoryId === categoryId);
+    return dishes.filter((d) => d.categoryId === categoryId);
   }, [dishes, activeCategory, categories]);
 
   const handleAddToCart = (dish: Dish) => {
@@ -60,18 +61,21 @@ export default function MenuPage() {
   const isLoading = dishesLoading || categoriesLoading;
 
   return (
-    <div className={cn("min-h-screen pb-22.5 transition-colors duration-300", pageStyles[theme])}>
+    <div
+      className={cn(
+        "min-h-screen pb-22.5 transition-colors duration-300",
+        pageStyles[theme]
+      )}
+    >
       <div className="max-w-120 mx-auto relative">
         <div className="px-4 py-6">
           <h1 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
             LoveMenu
           </h1>
-          <h2 className="text-2xl font-bold">
-            今天想吃什么？
-          </h2>
+          <h2 className="text-2xl font-bold">今天想吃什么？</h2>
         </div>
 
-        <CategoryTabs 
+        <CategoryTabs
           categories={categoryNames}
           activeCategory={activeCategory}
           onSelect={setActiveCategory}
@@ -88,11 +92,7 @@ export default function MenuPage() {
         ) : (
           <div className="p-4 grid grid-cols-2 gap-4">
             {filteredDishes.map((dish) => (
-              <DishCard 
-                key={dish.id} 
-                dish={dish}
-                onAdd={handleAddToCart}
-              />
+              <DishCard key={dish.id} dish={dish} onAdd={handleAddToCart} />
             ))}
           </div>
         )}

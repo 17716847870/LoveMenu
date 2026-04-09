@@ -29,26 +29,26 @@ const pageStyles: Record<ThemeName, string> = {
 export default function DishDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  
+
   const router = useRouter();
   const { theme } = useTheme();
   const { addItem } = useCart();
   const { addToCartWithAnimation } = useFlyToCart();
   const [isFavorite, setIsFavorite] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
-  
+
   const [dish, setDish] = useState<Dish | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchDish = async () => {
       try {
-        const res = await fetch('/api/dishes');
+        const res = await fetch("/api/dishes");
         const data = await res.json();
         const foundDish = data.data?.find((d: Dish) => d.id === id);
         setDish(foundDish || null);
       } catch (error) {
-        console.error('Failed to fetch dish');
+        console.error("Failed to fetch dish");
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +57,11 @@ export default function DishDetailPage() {
   }, [id]);
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">加载中...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        加载中...
+      </div>
+    );
   }
 
   if (!dish) {
@@ -66,14 +70,14 @@ export default function DishDetailPage() {
 
   const handleAddToCart = () => {
     if (imageRef.current) {
-        const rect = imageRef.current.getBoundingClientRect();
-        addToCartWithAnimation(rect, dish.image || "", () => {
-            addItem(dish);
-            router.back();
-        });
-    } else {
+      const rect = imageRef.current.getBoundingClientRect();
+      addToCartWithAnimation(rect, dish.image || "", () => {
         addItem(dish);
         router.back();
+      });
+    } else {
+      addItem(dish);
+      router.back();
     }
   };
 
@@ -82,39 +86,44 @@ export default function DishDetailPage() {
   };
 
   return (
-    <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme] || pageStyles.couple)}>
-      <DishHeader 
-        onBack={() => router.back()} 
-        onFavorite={toggleFavorite} 
-        isFavorite={isFavorite} 
-        theme={theme} 
+    <div
+      className={cn(
+        "min-h-screen pb-24 transition-colors duration-300",
+        pageStyles[theme] || pageStyles.couple
+      )}
+    >
+      <DishHeader
+        onBack={() => router.back()}
+        onFavorite={toggleFavorite}
+        isFavorite={isFavorite}
+        theme={theme}
       />
-      
-      <DishHero 
-        image={dish.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"} 
-        name={dish.name} 
-        theme={theme} 
+
+      <DishHero
+        image={
+          dish.image ||
+          "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+        }
+        name={dish.name}
+        theme={theme}
         imageRef={imageRef}
       />
 
       <div className="flex flex-col gap-6 pb-24">
-        <DishMainCard 
-          description={dish.description} 
-          popularity={dish.popularity} 
-          theme={theme} 
+        <DishMainCard
+          description={dish.description}
+          popularity={dish.popularity}
+          theme={theme}
         />
-        
-        <LoveInteraction 
-          popularity={dish.popularity} 
-          theme={theme} 
+
+        <LoveInteraction popularity={dish.popularity} theme={theme} />
+
+        <IngredientCost
+          kissPrice={dish.kissPrice}
+          hugPrice={dish.hugPrice}
+          theme={theme}
         />
-        
-        <IngredientCost 
-          kissPrice={dish.kissPrice} 
-          hugPrice={dish.hugPrice} 
-          theme={theme} 
-        />
-        
+
         <MemoryTip theme={theme} />
       </div>
 

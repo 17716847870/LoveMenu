@@ -7,6 +7,7 @@
 ## ✨ 功能特性
 
 ### 单文件模式
+
 - ✅ 单个图片上传
 - ✅ 图片预览
 - ✅ 删除功能
@@ -14,6 +15,7 @@
 - ✅ 文件类型验证
 
 ### 多文件模式
+
 - ✅ 多个图片上传（最多9张）
 - ✅ 网格布局展示
 - ✅ 拖拽排序（预留）
@@ -23,6 +25,7 @@
 - ✅ 图片计数显示
 
 ### 通用功能
+
 - 🎨 精美的UI设计
 - ⚡ 异步上传
 - 📊 上传进度显示
@@ -36,11 +39,11 @@
 ### 1. 单文件上传
 
 ```tsx
-import MultiImageUploader from '@/components/common/MultiImageUploader';
-import { useState } from 'react';
+import MultiImageUploader from "@/components/common/MultiImageUploader";
+import { useState } from "react";
 
 function SingleImageUpload() {
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   return (
     <MultiImageUploader
@@ -58,8 +61,8 @@ function SingleImageUpload() {
 ### 2. 多文件上传
 
 ```tsx
-import MultiImageUploader from '@/components/common/MultiImageUploader';
-import { useState } from 'react';
+import MultiImageUploader from "@/components/common/MultiImageUploader";
+import { useState } from "react";
 
 function MultipleImageUpload() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -81,18 +84,18 @@ function MultipleImageUpload() {
 ### 3. 在表单中使用
 
 ```tsx
-import MultiImageUploader from '@/components/common/MultiImageUploader';
-import { useState } from 'react';
+import MultiImageUploader from "@/components/common/MultiImageUploader";
+import { useState } from "react";
 
 function ProductForm() {
   const [formData, setFormData] = useState({
-    name: '',
-    image: '',
+    name: "",
+    image: "",
     images: [] as string[],
   });
 
   const handleSubmit = () => {
-    console.log('表单数据:', formData);
+    console.log("表单数据:", formData);
   };
 
   return (
@@ -101,7 +104,9 @@ function ProductForm() {
         <label>主图</label>
         <MultiImageUploader
           value={formData.image}
-          onChange={(urls) => setFormData(prev => ({ ...prev, image: urls as string }))}
+          onChange={(urls) =>
+            setFormData((prev) => ({ ...prev, image: urls as string }))
+          }
           mode="single"
           path="products"
         />
@@ -111,7 +116,9 @@ function ProductForm() {
         <label>图片集</label>
         <MultiImageUploader
           value={formData.images}
-          onChange={(urls) => setFormData(prev => ({ ...prev, images: urls as string[] }))}
+          onChange={(urls) =>
+            setFormData((prev) => ({ ...prev, images: urls as string[] }))
+          }
           mode="multiple"
           path="products"
           maxCount={6}
@@ -130,27 +137,29 @@ function ProductForm() {
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `value` | `string \| string[]` | `''` 或 `[]` | 图片URL或URL数组 |
-| `onChange` | `(urls: string \| string[]) => void` | - | 值变化回调 |
-| `mode` | `'single' \| 'multiple'` | `'single'` | 上传模式 |
-| `path` | `string` | `'uploads'` | OSS存储路径 |
-| `accept` | `string` | `'image/jpeg,image/png,image/gif,image/webp'` | 接受的文件类型 |
-| `maxSize` | `number` | `5` | 单个文件最大大小（MB） |
-| `maxCount` | `number` | `9` | 多文件模式最大数量 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
-| `showTitle` | `boolean` | `true` | 是否显示标题 |
+| 属性        | 类型                                 | 默认值                                        | 说明                   |
+| ----------- | ------------------------------------ | --------------------------------------------- | ---------------------- |
+| `value`     | `string \| string[]`                 | `''` 或 `[]`                                  | 图片URL或URL数组       |
+| `onChange`  | `(urls: string \| string[]) => void` | -                                             | 值变化回调             |
+| `mode`      | `'single' \| 'multiple'`             | `'single'`                                    | 上传模式               |
+| `path`      | `string`                             | `'uploads'`                                   | OSS存储路径            |
+| `accept`    | `string`                             | `'image/jpeg,image/png,image/gif,image/webp'` | 接受的文件类型         |
+| `maxSize`   | `number`                             | `5`                                           | 单个文件最大大小（MB） |
+| `maxCount`  | `number`                             | `9`                                           | 多文件模式最大数量     |
+| `disabled`  | `boolean`                            | `false`                                       | 是否禁用               |
+| `showTitle` | `boolean`                            | `true`                                        | 是否显示标题           |
 
 ### value 和 onChange 类型
 
 #### 单文件模式
+
 ```typescript
 value: string; // 单个图片URL
 onChange: (urls: string) => void;
 ```
 
 #### 多文件模式
+
 ```typescript
 value: string[]; // 图片URL数组
 onChange: (urls: string[]) => void;
@@ -180,10 +189,7 @@ onChange: (urls: string[]) => void;
 ### 限制文件类型
 
 ```tsx
-<MultiImageUploader
-  accept="image/png,image/jpeg"
-  onChange={handleChange}
-/>
+<MultiImageUploader accept="image/png,image/jpeg" onChange={handleChange} />
 ```
 
 ### 限制文件大小
@@ -198,20 +204,13 @@ onChange: (urls: string[]) => void;
 ### 限制上传数量
 
 ```tsx
-<MultiImageUploader
-  mode="multiple"
-  maxCount={3}
-  onChange={handleChange}
-/>
+<MultiImageUploader mode="multiple" maxCount={3} onChange={handleChange} />
 ```
 
 ### 自定义存储路径
 
 ```tsx
-<MultiImageUploader
-  path="products/main-images"
-  onChange={handleChange}
-/>
+<MultiImageUploader path="products/main-images" onChange={handleChange} />
 ```
 
 ## 📋 完整示例
@@ -219,22 +218,22 @@ onChange: (urls: string[]) => void;
 ### 菜品表单集成
 
 ```tsx
-import MultiImageUploader from '@/components/common/MultiImageUploader';
-import { useState } from 'react';
-import { Dish } from '@/types';
+import MultiImageUploader from "@/components/common/MultiImageUploader";
+import { useState } from "react";
+import { Dish } from "@/types";
 
 function DishForm() {
   const [dish, setDish] = useState<Partial<Dish>>({
-    name: '',
-    image: '',
-    categoryId: '',
+    name: "",
+    image: "",
+    categoryId: "",
     kissPrice: 0,
     hugPrice: 0,
   });
 
   const handleSave = () => {
     // 保存菜品，image 字段存储的就是图片URL
-    console.log('保存菜品:', dish);
+    console.log("保存菜品:", dish);
   };
 
   return (
@@ -242,8 +241,10 @@ function DishForm() {
       <div>
         <label className="block mb-2">菜品图片</label>
         <MultiImageUploader
-          value={dish.image || ''}
-          onChange={(urls) => setDish(prev => ({ ...prev, image: urls as string }))}
+          value={dish.image || ""}
+          onChange={(urls) =>
+            setDish((prev) => ({ ...prev, image: urls as string }))
+          }
           mode="single"
           path="dishes"
           maxSize={5}
@@ -255,7 +256,9 @@ function DishForm() {
         <input
           type="text"
           value={dish.name}
-          onChange={(e) => setDish(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e) =>
+            setDish((prev) => ({ ...prev, name: e.target.value }))
+          }
         />
       </div>
 
@@ -268,15 +271,15 @@ function DishForm() {
 ### 图集管理
 
 ```tsx
-import MultiImageUploader from '@/components/common/MultiImageUploader';
-import { useState } from 'react';
+import MultiImageUploader from "@/components/common/MultiImageUploader";
+import { useState } from "react";
 
 function GalleryManager() {
   const [gallery, setGallery] = useState<string[]>([]);
 
   const handleSave = () => {
     // gallery 数组中存储的就是所有图片的URL
-    console.log('保存图集:', gallery);
+    console.log("保存图集:", gallery);
   };
 
   return (
@@ -325,14 +328,14 @@ function GalleryManager() {
 ### 与其他表单库集成
 
 ```tsx
-import { useForm, Controller } from 'react-hook-form';
-import MultiImageUploader from '@/components/common/MultiImageUploader';
+import { useForm, Controller } from "react-hook-form";
+import MultiImageUploader from "@/components/common/MultiImageUploader";
 
 function MyForm() {
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      image: '',
-    }
+      image: "",
+    },
   });
 
   const onSubmit = (data) => {

@@ -6,7 +6,12 @@ import { cn } from "@/lib/utils";
 import { ThemeName, Feedback } from "@/types";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import { useCreateFeedback, useDeleteFeedback, useFeedbacks, useUpdateFeedback } from "@/apis/feedback";
+import {
+  useCreateFeedback,
+  useDeleteFeedback,
+  useFeedbacks,
+  useUpdateFeedback,
+} from "@/apis/feedback";
 
 import FeedbackHeader from "@/components/mobile/feedback/FeedbackHeader";
 import FeedbackList from "@/components/mobile/feedback/FeedbackList";
@@ -30,7 +35,9 @@ export default function FeedbackPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFeedback, setEditingFeedback] = useState<Feedback | null>(null);
 
-  const handleCreate = (data: Omit<Feedback, "id" | "status" | "createdAt">) => {
+  const handleCreate = (
+    data: Omit<Feedback, "id" | "status" | "createdAt">
+  ) => {
     createMutation.mutate(data, {
       onSuccess: () => {
         setIsCreateOpen(false);
@@ -55,7 +62,12 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
+    <div
+      className={cn(
+        "min-h-screen pb-24 transition-colors duration-300",
+        pageStyles[theme]
+      )}
+    >
       <FeedbackHeader />
 
       {isLoading ? (
@@ -63,10 +75,10 @@ export default function FeedbackPage() {
           <div className="animate-spin w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full" />
         </div>
       ) : feedbacks.length > 0 ? (
-        <FeedbackList 
-          feedbacks={feedbacks} 
-          onEdit={setEditingFeedback} 
-          onDelete={handleDelete} 
+        <FeedbackList
+          feedbacks={feedbacks}
+          onEdit={setEditingFeedback}
+          onDelete={handleDelete}
         />
       ) : (
         <EmptyFeedback onAdd={() => setIsCreateOpen(true)} />
@@ -80,27 +92,27 @@ export default function FeedbackPage() {
           onClick={() => setIsCreateOpen(true)}
           className={cn(
             "fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-40 transition-all",
-            theme === 'couple' && "bg-pink-500 text-white shadow-pink-300",
-            theme === 'cute' && "bg-orange-400 text-white shadow-orange-300",
-            theme === 'minimal' && "bg-black text-white shadow-gray-400",
-            theme === 'night' && "bg-purple-600 text-white shadow-purple-900"
+            theme === "couple" && "bg-pink-500 text-white shadow-pink-300",
+            theme === "cute" && "bg-orange-400 text-white shadow-orange-300",
+            theme === "minimal" && "bg-black text-white shadow-gray-400",
+            theme === "night" && "bg-purple-600 text-white shadow-purple-900"
           )}
         >
           <Plus size={28} />
         </motion.button>
       )}
 
-      <CreateFeedback 
-        isOpen={isCreateOpen} 
-        onClose={() => setIsCreateOpen(false)} 
-        onSubmit={handleCreate} 
+      <CreateFeedback
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSubmit={handleCreate}
       />
 
-      <EditFeedback 
-        isOpen={!!editingFeedback} 
-        onClose={() => setEditingFeedback(null)} 
+      <EditFeedback
+        isOpen={!!editingFeedback}
+        onClose={() => setEditingFeedback(null)}
         feedback={editingFeedback}
-        onSubmit={handleEdit} 
+        onSubmit={handleEdit}
       />
     </div>
   );

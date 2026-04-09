@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 function normalizeText(value: string) {
   return value.replace(/\s+/g, "").toLowerCase();
@@ -42,20 +42,32 @@ export async function GET() {
     const categoryOrderCount = new Map<string, number>();
 
     for (const item of recentOrderItems) {
-      dishOrderCount.set(item.dishId, (dishOrderCount.get(item.dishId) || 0) + item.quantity);
-      categoryOrderCount.set(item.dish.categoryId, (categoryOrderCount.get(item.dish.categoryId) || 0) + item.quantity);
+      dishOrderCount.set(
+        item.dishId,
+        (dishOrderCount.get(item.dishId) || 0) + item.quantity
+      );
+      categoryOrderCount.set(
+        item.dish.categoryId,
+        (categoryOrderCount.get(item.dish.categoryId) || 0) + item.quantity
+      );
     }
 
-    const requestKeywords = recentFoodRequests.map((item) => normalizeText(item.name));
+    const requestKeywords = recentFoodRequests.map((item) =>
+      normalizeText(item.name)
+    );
     const latestRequestedName = recentFoodRequests[0]?.name;
 
     const recommendations = dishes
       .map((dish) => {
         const orderScore = (dishOrderCount.get(dish.id) || 0) * 5;
-        const categoryScore = (categoryOrderCount.get(dish.categoryId) || 0) * 2;
+        const categoryScore =
+          (categoryOrderCount.get(dish.categoryId) || 0) * 2;
         const popularityScore = dish.popularity || 0;
-        const freshnessScore = dish.createdAt.getTime() >= thirtyDaysAgo.getTime() ? 3 : 0;
-        const requestMatched = requestKeywords.some((keyword) => keyword && normalizeText(dish.name).includes(keyword));
+        const freshnessScore =
+          dish.createdAt.getTime() >= thirtyDaysAgo.getTime() ? 3 : 0;
+        const requestMatched = requestKeywords.some(
+          (keyword) => keyword && normalizeText(dish.name).includes(keyword)
+        );
         const requestScore = requestMatched ? 12 : 0;
 
         let reason = "根据最近点单记录推荐";
@@ -84,17 +96,31 @@ export async function GET() {
           allowRestaurant: dish.allowRestaurant,
           createdAt: dish.createdAt.toISOString(),
           reason,
-          score: requestScore + orderScore + categoryScore + popularityScore + freshnessScore,
+          score:
+            requestScore +
+            orderScore +
+            categoryScore +
+            popularityScore +
+            freshnessScore,
         };
       })
-      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, "zh-CN"));
+      .sort(
+        (a, b) => b.score - a.score || a.name.localeCompare(b.name, "zh-CN")
+      );
 
     return NextResponse.json({
       data: recommendations,
     });
   } catch (error) {
     console.error("[api/recommendations][GET] 获取推荐失败", error);
-    await logApiError({ scope: '/api/recommendations[GET]', path: '/api/recommendations', method: 'GET' }, error);
+    await logApiError(
+      {
+        scope: "/api/recommendations[GET]",
+        path: "/api/recommendations",
+        method: "GET",
+      },
+      error
+    );
     return NextResponse.json({ message: "获取推荐失败" }, { status: 500 });
   }
 }

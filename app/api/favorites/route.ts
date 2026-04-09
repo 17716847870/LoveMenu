@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 export async function GET(req: Request) {
   try {
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("[api/favorites][GET] 获取收藏失败", error);
-    await logApiError({ req, scope: '/api/favorites[GET]' }, error);
+    await logApiError({ req, scope: "/api/favorites[GET]" }, error);
     return NextResponse.json({ message: "获取收藏失败" }, { status: 500 });
   }
 }
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[api/favorites][POST] 创建收藏失败", error);
-    await logApiError({ req, scope: '/api/favorites[POST]' }, error);
+    await logApiError({ req, scope: "/api/favorites[POST]" }, error);
     return NextResponse.json({ message: "创建收藏失败" }, { status: 500 });
   }
 }
@@ -98,7 +98,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/favorites][DELETE] 删除收藏失败", error);
-    await logApiError({ req, scope: '/api/favorites[DELETE]' }, error);
+    await logApiError({ req, scope: "/api/favorites[DELETE]" }, error);
     return NextResponse.json({ message: "删除收藏失败" }, { status: 500 });
   }
 }

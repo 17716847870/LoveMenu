@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { useImageUpload } from '@/hooks/useImageUpload';
-import { useMessage } from '@/components/ui/Message';
-import { Upload, X, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import React, { useRef } from "react";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { useMessage } from "@/components/ui/Message";
+import { Upload, X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 interface ImageUploaderProps {
   value?: string;
@@ -18,8 +18,8 @@ interface ImageUploaderProps {
 export default function ImageUploader({
   value,
   onChange,
-  path = 'dishes',
-  accept = 'image/jpeg,image/png,image/gif,image/webp',
+  path = "dishes",
+  accept = "image/jpeg,image/png,image/gif,image/webp",
   maxSize = 5,
   disabled = false,
 }: ImageUploaderProps) {
@@ -40,16 +40,16 @@ export default function ImageUploader({
       const result = await upload(file, { path });
       onChange(result.url);
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     }
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const handleRemove = () => {
-    onChange('');
+    onChange("");
   };
 
   return (
@@ -76,9 +76,10 @@ export default function ImageUploader({
           onClick={() => !disabled && fileInputRef.current?.click()}
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-            ${disabled 
-              ? 'border-gray-200 bg-gray-50 cursor-not-allowed' 
-              : 'border-pink-300 hover:border-pink-400 hover:bg-pink-50'
+            ${
+              disabled
+                ? "border-gray-200 bg-gray-50 cursor-not-allowed"
+                : "border-pink-300 hover:border-pink-400 hover:bg-pink-50"
             }
           `}
         >
@@ -96,9 +97,7 @@ export default function ImageUploader({
           ) : (
             <>
               <Upload className="w-10 h-10 mx-auto text-pink-400 mb-2" />
-              <p className="text-sm text-gray-600">
-                点击上传图片
-              </p>
+              <p className="text-sm text-gray-600">点击上传图片</p>
               <p className="text-xs text-gray-400 mt-1">
                 支持 JPG、PNG、GIF、WebP 格式，最大 {maxSize}MB
               </p>

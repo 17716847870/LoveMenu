@@ -11,7 +11,11 @@ interface FeedbackListProps {
   onDelete: (id: string) => void;
 }
 
-export default function FeedbackList({ feedbacks, onEdit, onDelete }: FeedbackListProps) {
+export default function FeedbackList({
+  feedbacks,
+  onEdit,
+  onDelete,
+}: FeedbackListProps) {
   return (
     <div className="flex flex-col gap-3 px-4 py-4 pb-24">
       <AnimatePresence>

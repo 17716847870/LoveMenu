@@ -9,16 +9,21 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { usePathname } from "next/navigation";
 
-const themeStyles: Record<ThemeName, {
-  button: string;
-  icon: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    button: string;
+    icon: string;
+  }
+> = {
   couple: {
-    button: "bg-white border-pink-200 shadow-lg shadow-pink-100 hover:border-pink-300",
+    button:
+      "bg-white border-pink-200 shadow-lg shadow-pink-100 hover:border-pink-300",
     icon: "text-pink-500",
   },
   cute: {
-    button: "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)] hover:border-orange-300",
+    button:
+      "bg-white border-orange-200 shadow-[4px_4px_0px_0px_rgba(251,146,60,0.2)] hover:border-orange-300",
     icon: "text-orange-500",
   },
   minimal: {
@@ -26,7 +31,8 @@ const themeStyles: Record<ThemeName, {
     icon: "text-gray-900",
   },
   night: {
-    button: "bg-slate-800 border-slate-700 shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:border-violet-500/50",
+    button:
+      "bg-slate-800 border-slate-700 shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:border-violet-500/50",
     icon: "text-violet-400",
   },
 };

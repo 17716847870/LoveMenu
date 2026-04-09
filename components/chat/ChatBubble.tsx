@@ -17,9 +17,14 @@ interface ChatBubbleProps {
 
 export default function ChatBubble({ message }: ChatBubbleProps) {
   const isSender = message.isSender;
-  
+
   return (
-    <div className={classNames("flex gap-3 w-full", isSender ? "flex-row-reverse" : "flex-row")}>
+    <div
+      className={classNames(
+        "flex gap-3 w-full",
+        isSender ? "flex-row-reverse" : "flex-row"
+      )}
+    >
       <Avatar className="h-8 w-8" />
       <div
         className={classNames(
@@ -31,9 +36,15 @@ export default function ChatBubble({ message }: ChatBubbleProps) {
       >
         {message.type === "text" && <p>{message.content}</p>}
         {message.type === "image" && (
-            <img src={message.content} alt="image" className="rounded-lg max-w-full" />
+          <img
+            src={message.content}
+            alt="image"
+            className="rounded-lg max-w-full"
+          />
         )}
-        {message.type === "emoji" && <span className="text-4xl">{message.content}</span>}
+        {message.type === "emoji" && (
+          <span className="text-4xl">{message.content}</span>
+        )}
         {/* Voice placeholder */}
         {message.type === "voice" && <span>🎤 语音消息</span>}
       </div>

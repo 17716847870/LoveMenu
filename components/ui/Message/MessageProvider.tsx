@@ -17,22 +17,25 @@ interface MessageContextType {
 export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const show = useCallback((type: MessageType, content: string, duration = 3000) => {
-    switch (type) {
-      case "success":
-        toast.success(content, { duration });
-        break;
-      case "error":
-        toast.error(content, { duration });
-        break;
-      case "warning":
-        toast.warning(content, { duration });
-        break;
-      case "info":
-        toast.info(content, { duration });
-        break;
-    }
-  }, []);
+  const show = useCallback(
+    (type: MessageType, content: string, duration = 3000) => {
+      switch (type) {
+        case "success":
+          toast.success(content, { duration });
+          break;
+        case "error":
+          toast.error(content, { duration });
+          break;
+        case "warning":
+          toast.warning(content, { duration });
+          break;
+        case "info":
+          toast.info(content, { duration });
+          break;
+      }
+    },
+    []
+  );
 
   const success = useCallback((content: string, duration?: number) => {
     toast.success(content, { duration });
@@ -59,11 +62,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     [show, success, error, warning, info]
   );
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
 
 export const useMessage = (): MessageContextType => {
@@ -85,10 +84,14 @@ export const useMessage = (): MessageContextType => {
             break;
         }
       },
-      success: (content: string, duration?: number) => toast.success(content, { duration }),
-      error: (content: string, duration?: number) => toast.error(content, { duration }),
-      warning: (content: string, duration?: number) => toast.warning(content, { duration }),
-      info: (content: string, duration?: number) => toast.info(content, { duration }),
+      success: (content: string, duration?: number) =>
+        toast.success(content, { duration }),
+      error: (content: string, duration?: number) =>
+        toast.error(content, { duration }),
+      warning: (content: string, duration?: number) =>
+        toast.warning(content, { duration }),
+      info: (content: string, duration?: number) =>
+        toast.info(content, { duration }),
     }),
     []
   );

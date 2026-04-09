@@ -24,8 +24,12 @@ export default function AdminOrdersPage() {
   const updateOrder = useUpdateOrder();
   const message = useMessage();
 
-  const handleUpdateStatus = async (orderId: string, newStatus: Order['status']) => {
-    const targetOrder = orders.find((order) => order.id === orderId) ?? selectedOrder ?? null;
+  const handleUpdateStatus = async (
+    orderId: string,
+    newStatus: Order["status"]
+  ) => {
+    const targetOrder =
+      orders.find((order) => order.id === orderId) ?? selectedOrder ?? null;
 
     try {
       await updateOrder.mutateAsync({ id: orderId, status: newStatus });
@@ -33,33 +37,39 @@ export default function AdminOrdersPage() {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
 
-      if (newStatus === 'cancelled' && targetOrder) {
-        message.success(`订单已取消，已退回 💋 ${targetOrder.totalKiss} / 🫂 ${targetOrder.totalHug}`);
-      } else if (newStatus === 'preparing') {
-        message.success('订单已进入制作中');
-      } else if (newStatus === 'completed') {
-        message.success('订单已标记完成');
+      if (newStatus === "cancelled" && targetOrder) {
+        message.success(
+          `订单已取消，已退回 💋 ${targetOrder.totalKiss} / 🫂 ${targetOrder.totalHug}`
+        );
+      } else if (newStatus === "preparing") {
+        message.success("订单已进入制作中");
+      } else if (newStatus === "completed") {
+        message.success("订单已标记完成");
       }
     } catch (error) {
-      console.error('更新状态失败', error);
-      message.error(error instanceof Error ? error.message : '更新状态失败');
+      console.error("更新状态失败", error);
+      message.error(error instanceof Error ? error.message : "更新状态失败");
     }
   };
 
   const processedData = useMemo(() => {
-    return orders.filter(order => 
-      (order.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-       order.reason?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterStatus === "all" || order.status === filterStatus)
+    return orders.filter(
+      (order) =>
+        (order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.reason?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (filterStatus === "all" || order.status === filterStatus)
     );
   }, [orders, searchTerm, filterStatus]);
 
   const totalItems = processedData.length;
   const totalPages = Math.ceil(totalItems / pageSize);
-  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1));
-  
+  const validCurrentPage = Math.max(
+    1,
+    Math.min(currentPage, totalPages > 0 ? totalPages : 1)
+  );
+
   const currentData = processedData.slice(
-    (validCurrentPage - 1) * pageSize, 
+    (validCurrentPage - 1) * pageSize,
     validCurrentPage * pageSize
   );
 
@@ -69,7 +79,7 @@ export default function AdminOrdersPage() {
         <PageHeader title="订单管理" subtitle="查看和处理所有订单" />
 
         <div className="hidden md:block">
-          <OrderFilterBar 
+          <OrderFilterBar
             onSearch={(term) => {
               setSearchTerm(term);
               setCurrentPage(1);
@@ -86,7 +96,7 @@ export default function AdminOrdersPage() {
           />
         </div>
 
-        <MobileOrderFilterBar 
+        <MobileOrderFilterBar
           onSearch={(term) => {
             setSearchTerm(term);
             setCurrentPage(1);
@@ -98,20 +108,20 @@ export default function AdminOrdersPage() {
         />
 
         <div className="hidden md:block">
-          <OrderDataTable 
+          <OrderDataTable
             data={currentData}
             onView={(order) => setSelectedOrder(order)}
             onUpdateStatus={handleUpdateStatus}
           />
         </div>
 
-        <MobileOrderListView 
+        <MobileOrderListView
           data={currentData}
           onView={(order) => setSelectedOrder(order)}
           onUpdateStatus={handleUpdateStatus}
         />
 
-        <LovePagination 
+        <LovePagination
           total={totalItems}
           page={currentPage}
           pageSize={pageSize}
@@ -125,11 +135,13 @@ export default function AdminOrdersPage() {
       </div>
 
       {selectedOrder && (
-        <OrderDetailModal 
-          order={selectedOrder} 
-          isOpen={!!selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
-          onUpdateStatus={(newStatus) => handleUpdateStatus(selectedOrder.id, newStatus)}
+        <OrderDetailModal
+          order={selectedOrder}
+          isOpen={!!selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onUpdateStatus={(newStatus) =>
+            handleUpdateStatus(selectedOrder.id, newStatus)
+          }
         />
       )}
     </PageContainer>

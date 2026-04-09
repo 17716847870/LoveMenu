@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -8,7 +8,9 @@ export interface SendEmailOptions {
   html: string;
 }
 
-export async function sendEmail(opts: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendEmail(
+  opts: SendEmailOptions
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await resend.emails.send({
       from: `LoveMenu <reminder@${process.env.EMAIL_FROM_DOMAIN}>`,

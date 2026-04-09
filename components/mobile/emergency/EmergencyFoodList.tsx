@@ -9,7 +9,10 @@ interface EmergencyFoodListProps {
   onQuickOrder: (dish: Dish) => void;
 }
 
-export default function EmergencyFoodList({ dishes, onQuickOrder }: EmergencyFoodListProps) {
+export default function EmergencyFoodList({
+  dishes,
+  onQuickOrder,
+}: EmergencyFoodListProps) {
   return (
     <div className="flex flex-col gap-3 px-4 py-4 pb-10">
       {dishes.map((dish) => (

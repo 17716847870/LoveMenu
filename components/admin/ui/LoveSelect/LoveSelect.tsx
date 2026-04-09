@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Select,
@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/Select"
+} from "@/components/ui/Select";
 
 export type Option = {
   label: string;
@@ -28,22 +28,24 @@ export type LoveSelectProps = {
 export default function LoveSelect({
   options,
   value,
-  placeholder = '请选择',
+  placeholder = "请选择",
   onChange,
-  className = '',
+  className = "",
   disabled = false,
 }: LoveSelectProps) {
   const handleValueChange = (newValue: string) => {
     onChange?.(newValue);
   };
 
-  const validOptions = options.filter(opt => opt.value !== '');
-  const stringValue = typeof value === 'string' ? value : undefined;
-  const selectedOption = validOptions.find(opt => opt.value === stringValue);
-  const displayValue = validOptions.some(opt => opt.value === stringValue) ? stringValue : undefined;
+  const validOptions = options.filter((opt) => opt.value !== "");
+  const stringValue = typeof value === "string" ? value : undefined;
+  const selectedOption = validOptions.find((opt) => opt.value === stringValue);
+  const displayValue = validOptions.some((opt) => opt.value === stringValue)
+    ? stringValue
+    : undefined;
 
   return (
-    <Select 
+    <Select
       value={displayValue}
       onValueChange={handleValueChange}
       disabled={disabled}
@@ -55,8 +57,8 @@ export default function LoveSelect({
       </SelectTrigger>
       <SelectContent>
         {validOptions.map((option) => (
-          <SelectItem 
-            key={option.value} 
+          <SelectItem
+            key={option.value}
             value={option.value}
             className="cursor-pointer hover:bg-pink-50 focus:bg-pink-50"
           >

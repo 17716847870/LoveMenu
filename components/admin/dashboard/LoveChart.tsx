@@ -12,11 +12,11 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
-import { cn } from '@/lib/utils';
+} from "recharts";
+import { cn } from "@/lib/utils";
 
 interface LoveChartProps {
-  type: 'line' | 'pie';
+  type: "line" | "pie";
   data: any[];
   title?: string;
   dataKeys?: string[];
@@ -26,7 +26,7 @@ interface LoveChartProps {
   pieOuterRadius?: number;
 }
 
-const DEFAULT_COLORS = ['#ff4d7d', '#ffb347', '#6366f1', '#10b981'];
+const DEFAULT_COLORS = ["#ff4d7d", "#ffb347", "#6366f1", "#10b981"];
 
 export default function LoveChart({
   type,
@@ -39,57 +39,68 @@ export default function LoveChart({
   pieOuterRadius = 100,
 }: LoveChartProps) {
   return (
-    <div className={cn(
-      "bg-[var(--card)] text-[var(--card-foreground)] border border-[var(--border)] rounded-[var(--radius-lg)] p-6 shadow-sm flex flex-col",
-      className
-    )}>
-      {title && (
-        <h3 className="text-lg font-bold mb-6 text-[var(--foreground)]">{title}</h3>
+    <div
+      className={cn(
+        "flex flex-col rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm",
+        className
       )}
-      
+    >
+      {title && (
+        <h3 className="mb-6 text-lg font-bold text-foreground">
+          {title}
+        </h3>
+      )}
+
       <div className="w-full flex-1 relative min-h-[300px]">
         <div className="absolute inset-0">
           <ResponsiveContainer width="100%" height="100%">
-            {type === 'line' ? (
-              <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="var(--muted-foreground)" 
+            {type === "line" ? (
+              <LineChart
+                data={data}
+                margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  stroke="var(--muted-foreground)" 
+                <YAxis
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => `${value}`}
                 />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'var(--card)', 
-                    borderColor: 'var(--border)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--card-foreground)'
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--card)",
+                    borderColor: "var(--border)",
+                    borderRadius: "var(--radius-md)",
+                    color: "var(--card-foreground)",
                   }}
                   formatter={(value: any, name: any) => {
                     const labelMap: Record<string, string> = {
-                      interactions: '互动订单',
-                      points: '积分趋势',
-                      priority: '紧急想吃'
+                      interactions: "互动订单",
+                      points: "积分趋势",
+                      priority: "紧急想吃",
                     };
                     return [value, labelMap[String(name)] || String(name)];
                   }}
                 />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
+                <Legend
+                  wrapperStyle={{ paddingTop: "20px" }}
                   formatter={(value: any) => {
                     const labelMap: Record<string, string> = {
-                      interactions: '互动订单',
-                      points: '积分趋势',
-                      priority: '紧急想吃'
+                      interactions: "互动订单",
+                      points: "积分趋势",
+                      priority: "紧急想吃",
                     };
                     return labelMap[String(value)] || String(value);
                   }}
@@ -101,7 +112,12 @@ export default function LoveChart({
                     dataKey={key}
                     stroke={colors[index % colors.length]}
                     strokeWidth={3}
-                    dot={{ r: 4, fill: colors[index % colors.length], strokeWidth: 2, stroke: 'var(--card)' }}
+                    dot={{
+                      r: 4,
+                      fill: colors[index % colors.length],
+                      strokeWidth: 2,
+                      stroke: "var(--card)",
+                    }}
                     activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                 ))}
@@ -120,19 +136,28 @@ export default function LoveChart({
                   strokeWidth={2}
                 >
                   {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'var(--card)', 
-                    borderColor: 'var(--border)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--card-foreground)'
-                  }} 
-                  itemStyle={{ color: 'var(--foreground)' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--card)",
+                    borderColor: "var(--border)",
+                    borderRadius: "var(--radius-md)",
+                    color: "var(--card-foreground)",
+                  }}
+                  itemStyle={{ color: "var(--foreground)" }}
                 />
-                {showLegend && <Legend verticalAlign="bottom" height={36} iconType="circle" />}
+                {showLegend && (
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
+                )}
               </PieChart>
             )}
           </ResponsiveContainer>

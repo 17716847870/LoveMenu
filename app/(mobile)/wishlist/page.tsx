@@ -6,7 +6,12 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import { useFoodRequests, useCreateFoodRequest, useUpdateFoodRequest, FoodRequest } from "@/apis/foodRequests";
+import {
+  useFoodRequests,
+  useCreateFoodRequest,
+  useUpdateFoodRequest,
+  FoodRequest,
+} from "@/apis/foodRequests";
 
 import WishlistHeader from "@/components/mobile/wishlist/WishlistHeader";
 import RequestList from "@/components/mobile/wishlist/RequestList";
@@ -28,13 +33,17 @@ export default function WishlistPage() {
   const updateMutation = useUpdateFoodRequest();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingRequest, setEditingRequest] = useState<FoodRequest | null>(null);
+  const [editingRequest, setEditingRequest] = useState<FoodRequest | null>(
+    null
+  );
 
-  const handleCreate = (data: Omit<FoodRequest, "id" | "status" | "createdAt">) => {
+  const handleCreate = (
+    data: Omit<FoodRequest, "id" | "status" | "createdAt">
+  ) => {
     createMutation.mutate(data, {
       onSuccess: () => {
         setIsCreateOpen(false);
-      }
+      },
     });
   };
 
@@ -42,7 +51,7 @@ export default function WishlistPage() {
     updateMutation.mutate(data, {
       onSuccess: () => {
         setEditingRequest(null);
-      }
+      },
     });
   };
 
@@ -53,7 +62,12 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className={cn("min-h-screen pb-24 transition-colors duration-300", pageStyles[theme])}>
+    <div
+      className={cn(
+        "min-h-screen pb-24 transition-colors duration-300",
+        pageStyles[theme]
+      )}
+    >
       <WishlistHeader />
 
       {isLoading ? (
@@ -61,10 +75,10 @@ export default function WishlistPage() {
           <div className="animate-spin w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full" />
         </div>
       ) : requests.length > 0 ? (
-        <RequestList 
-          requests={requests} 
-          onEdit={setEditingRequest} 
-          onDelete={handleDelete} 
+        <RequestList
+          requests={requests}
+          onEdit={setEditingRequest}
+          onDelete={handleDelete}
         />
       ) : (
         <EmptyRequest onAdd={() => setIsCreateOpen(true)} />
@@ -77,27 +91,27 @@ export default function WishlistPage() {
           onClick={() => setIsCreateOpen(true)}
           className={cn(
             "fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-40 transition-all",
-            theme === 'couple' && "bg-pink-500 text-white shadow-pink-300",
-            theme === 'cute' && "bg-orange-400 text-white shadow-orange-300",
-            theme === 'minimal' && "bg-black text-white shadow-gray-400",
-            theme === 'night' && "bg-purple-600 text-white shadow-purple-900"
+            theme === "couple" && "bg-pink-500 text-white shadow-pink-300",
+            theme === "cute" && "bg-orange-400 text-white shadow-orange-300",
+            theme === "minimal" && "bg-black text-white shadow-gray-400",
+            theme === "night" && "bg-purple-600 text-white shadow-purple-900"
           )}
         >
           <Plus size={28} />
         </motion.button>
       )}
 
-      <CreateFoodRequest 
-        isOpen={isCreateOpen} 
-        onClose={() => setIsCreateOpen(false)} 
-        onSubmit={handleCreate} 
+      <CreateFoodRequest
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSubmit={handleCreate}
       />
 
-      <EditFoodRequest 
-        isOpen={!!editingRequest} 
-        onClose={() => setEditingRequest(null)} 
+      <EditFoodRequest
+        isOpen={!!editingRequest}
+        onClose={() => setEditingRequest(null)}
         request={editingRequest}
-        onSubmit={handleEdit} 
+        onSubmit={handleEdit}
       />
     </div>
   );

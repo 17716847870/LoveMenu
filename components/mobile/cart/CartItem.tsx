@@ -15,12 +15,15 @@ interface CartItemProps {
   onRemove: (id: string) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  card: string;
-  title: string;
-  desc: string;
-  price: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    card: string;
+    title: string;
+    desc: string;
+    price: string;
+  }
+> = {
   couple: {
     card: "bg-white border border-pink-100 shadow-sm rounded-2xl",
     title: "text-pink-900",
@@ -47,13 +50,20 @@ const themeStyles: Record<ThemeName, {
   },
 };
 
-export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
+export default function CartItem({
+  item,
+  onUpdateQuantity,
+  onRemove,
+}: CartItemProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
   const x = useMotionValue(0);
   const opacity = useTransform(x, [-100, 0], [0, 1]);
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
     if (info.offset.x < -100) {
       onRemove(item.id);
     } else {
@@ -103,7 +113,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
               <h3 className={cn("font-bold text-sm", styles.title)}>
                 {item.dish.name}
               </h3>
-              <button 
+              <button
                 onClick={() => onRemove(item.id)}
                 className="text-gray-400 p-1 -mt-1 -mr-1"
               >

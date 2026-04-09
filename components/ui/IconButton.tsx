@@ -19,7 +19,7 @@ export const IconButton = ({
       className={cn(
         "inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-text)] transition",
         sizes[size],
-        className,
+        className
       )}
       {...props}
     />

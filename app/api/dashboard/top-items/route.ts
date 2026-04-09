@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logApiError } from '@/lib/error-log';
-import { unstable_noStore as noStore } from 'next/cache';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logApiError } from "@/lib/error-log";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET() {
   noStore();
@@ -13,20 +13,23 @@ export async function GET() {
       where: {
         order: {
           createdAt: { gte: thirtyDaysAgo },
-          status: { not: 'cancelled' }
-        }
+          status: { not: "cancelled" },
+        },
       },
       include: {
         dish: {
           include: {
-            category: true
-          }
-        }
-      }
+            category: true,
+          },
+        },
+      },
     });
 
-    const dishStats = new Map<string, { count: number; dish: typeof orderItems[0]['dish'] }>();
-    
+    const dishStats = new Map<
+      string,
+      { count: number; dish: (typeof orderItems)[0]["dish"] }
+    >();
+
     for (const item of orderItems) {
       const existing = dishStats.get(item.dishId);
       if (existing) {
@@ -45,39 +48,45 @@ export async function GET() {
         category: item.dish.category.name,
         orderCount: item.count,
         likes: item.dish.popularity,
-        status: '有效订单中'
+        status: "有效订单中",
       }));
 
     const topWishlist = await prisma.foodRequest.groupBy({
-      by: ['name', 'status'],
+      by: ["name", "status"],
       _count: { _all: true },
       _max: { createdAt: true },
-      orderBy: [
-        { _count: { name: 'desc' } },
-        { _max: { createdAt: 'desc' } }
-      ],
-      take: 5
+      orderBy: [{ _count: { name: "desc" } }, { _max: { createdAt: "desc" } }],
+      take: 5,
     });
 
     const formattedWishlist = topWishlist.map((item, idx) => ({
       id: `${item.name}-${item.status}-${idx}`,
       name: item.name,
-      category: '待分类',
+      category: "待分类",
       mentionCount: item._count._all,
       likes: 0,
-      status: item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已添加' : '已拒绝'
+      status:
+        item.status === "pending"
+          ? "待审核"
+          : item.status === "approved"
+            ? "已添加"
+            : "已拒绝",
     }));
 
     return NextResponse.json({
       topDishes,
-      topWishlist: formattedWishlist
+      topWishlist: formattedWishlist,
     });
   } catch (error) {
-    console.error('Top items API error:', error);
-    await logApiError({ scope: '/api/dashboard/top-items[GET]', path: '/api/dashboard/top-items', method: 'GET' }, error);
-    return NextResponse.json(
-      { message: '获取热门数据失败' },
-      { status: 500 }
+    console.error("Top items API error:", error);
+    await logApiError(
+      {
+        scope: "/api/dashboard/top-items[GET]",
+        path: "/api/dashboard/top-items",
+        method: "GET",
+      },
+      error
     );
+    return NextResponse.json({ message: "获取热门数据失败" }, { status: 500 });
   }
 }

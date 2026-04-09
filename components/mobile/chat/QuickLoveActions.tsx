@@ -9,11 +9,14 @@ interface QuickLoveActionsProps {
   onSend: (content: string, type: "text" | "love" | "image" | "emoji") => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  button: string;
-  icon: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    button: string;
+    icon: string;
+  }
+> = {
   couple: {
     container: "bg-white/90 backdrop-blur-sm border-t border-pink-100",
     button: "bg-pink-50 hover:bg-pink-100 border-pink-100",
@@ -52,10 +55,12 @@ export default function QuickLoveActions({ onSend }: QuickLoveActionsProps) {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
 
   return (
-    <div className={cn(
-      "px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar",
+        currentTheme.container
+      )}
+    >
       {actions.map((action) => (
         <motion.button
           key={action.label}

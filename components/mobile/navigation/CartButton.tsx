@@ -14,12 +14,17 @@ interface CartButtonProps {
   cartCount: number;
 }
 
-export default function CartButton({ isActive, theme, cartCount }: CartButtonProps) {
+export default function CartButton({
+  isActive,
+  theme,
+  cartCount,
+}: CartButtonProps) {
   const { cartRef, isCartAnimating } = useFlyToCart();
 
   const getButtonStyles = () => {
-    const baseStyles = "relative -top-5 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-300";
-    
+    const baseStyles =
+      "relative -top-5 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-300";
+
     switch (theme) {
       case "couple":
         return cn(
@@ -60,7 +65,7 @@ export default function CartButton({ isActive, theme, cartCount }: CartButtonPro
         },
       };
     }
-    
+
     // Heartbeat animation when has items
     if (cartCount > 0) {
       return {
@@ -84,19 +89,19 @@ export default function CartButton({ isActive, theme, cartCount }: CartButtonPro
         whileTap={{ scale: 0.9 }}
         animate={getAnimation()}
       >
-        <ShoppingCart 
-          size={28} 
+        <ShoppingCart
+          size={28}
           className={cn(
             "transition-all",
             theme === "couple" && "fill-white/20",
             theme === "night" && "drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]"
           )}
         />
-        
+
         {/* Custom Badge Positioning for Floating Button */}
         {cartCount > 0 && (
           <div className="absolute top-0 right-0">
-             <CartBadge count={cartCount} theme={theme} />
+            <CartBadge count={cartCount} theme={theme} />
           </div>
         )}
       </motion.div>

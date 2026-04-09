@@ -22,7 +22,8 @@ const emergencyDishes: Dish[] = [
     hugPrice: 1,
     popularity: 99,
     categoryId: "c1",
-    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=60"
+    image:
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=60",
   },
   {
     id: "102",
@@ -32,7 +33,8 @@ const emergencyDishes: Dish[] = [
     hugPrice: 1,
     popularity: 95,
     categoryId: "c2",
-    image: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&auto=format&fit=crop&q=60"
+    image:
+      "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&auto=format&fit=crop&q=60",
   },
   {
     id: "103",
@@ -42,8 +44,9 @@ const emergencyDishes: Dish[] = [
     hugPrice: 0,
     popularity: 92,
     categoryId: "c3",
-    image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=60"
-  }
+    image:
+      "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=60",
+  },
 ];
 
 const pageStyles: Record<ThemeName, string> = {
@@ -61,24 +64,33 @@ export default function EmergencyPage() {
   const handleQuickOrder = async (dish: Dish) => {
     // 1. Add to cart (or directly create order payload)
     addItem(dish);
-    
+
     // 2. Mock: Create emergency order
-    console.log("Creating Emergency Order for:", dish.name, "isEmergency: true");
-    
+    console.log(
+      "Creating Emergency Order for:",
+      dish.name,
+      "isEmergency: true"
+    );
+
     // 3. Navigate to success or order tracking
     router.push("/orders");
   };
 
   return (
-    <div className={cn("min-h-screen transition-colors duration-300", pageStyles[theme])}>
+    <div
+      className={cn(
+        "min-h-screen transition-colors duration-300",
+        pageStyles[theme]
+      )}
+    >
       <EmergencyHeader />
-      
+
       <EmergencyTip />
 
       {emergencyDishes.length > 0 ? (
-        <EmergencyFoodList 
-          dishes={emergencyDishes} 
-          onQuickOrder={handleQuickOrder} 
+        <EmergencyFoodList
+          dishes={emergencyDishes}
+          onQuickOrder={handleQuickOrder}
         />
       ) : (
         <EmptyEmergency />

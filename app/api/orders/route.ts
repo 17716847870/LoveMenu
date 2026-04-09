@@ -1,26 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 export const GET = async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
+    const status = searchParams.get("status");
 
     const where = status ? { status } : {};
 
     const orders = await prisma.order.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: {
         user: { select: { id: true, name: true, avatar: true } },
         items: {
           include: {
             dish: true,
-          }
+          },
         },
         feedback: true,
-      }
+      },
     });
 
     // 格式化以适配前端类型
@@ -33,7 +33,7 @@ export const GET = async (req: NextRequest) => {
           memoryImage = order.feedback.image;
         }
       }
-      
+
       return {
         ...order,
         createdAt: order.createdAt.toISOString(),
@@ -41,27 +41,34 @@ export const GET = async (req: NextRequest) => {
           id: item.id,
           quantity: item.quantity,
           note: item.note,
-          dish: item.dish || { id: '', name: '已删除菜品', category: { name: '' } },
+          dish: item.dish || {
+            id: "",
+            name: "已删除菜品",
+            category: { name: "" },
+          },
         })),
-        memory: order.feedback ? {
-          text: order.feedback.text,
-          image: memoryImage,
-        } : undefined,
+        memory: order.feedback
+          ? {
+              text: order.feedback.text,
+              image: memoryImage,
+            }
+          : undefined,
       };
     });
 
     return NextResponse.json({ data: formattedOrders });
   } catch (error) {
-    console.error('获取订单失败:', error);
-    await logApiError({ req, scope: '/api/orders[GET]' }, error);
-    return NextResponse.json({ message: '获取订单失败' }, { status: 500 });
+    console.error("获取订单失败:", error);
+    await logApiError({ req, scope: "/api/orders[GET]" }, error);
+    return NextResponse.json({ message: "获取订单失败" }, { status: 500 });
   }
 };
 
 export const POST = async (req: Request) => {
   try {
     const body = await req.json();
-    const { userId, items, totalKiss, totalHug, note, reason, isEmergency } = body;
+    const { userId, items, totalKiss, totalHug, note, reason, isEmergency } =
+      body;
 
     // 检查用户是否存在且获取当前余额
     const user = await prisma.user.findUnique({
@@ -70,13 +77,16 @@ export const POST = async (req: Request) => {
     });
 
     if (!user) {
-      return NextResponse.json({ message: '用户不存在' }, { status: 404 });
+      return NextResponse.json({ message: "用户不存在" }, { status: 404 });
     }
 
     // 检查余额是否足够
-    if ((user.kissBalance || 0) < totalKiss || (user.hugBalance || 0) < totalHug) {
+    if (
+      (user.kissBalance || 0) < totalKiss ||
+      (user.hugBalance || 0) < totalHug
+    ) {
       return NextResponse.json(
-        { message: '亲亲或贴贴余额不足，无法完成下单' },
+        { message: "亲亲或贴贴余额不足，无法完成下单" },
         { status: 400 }
       );
     }
@@ -87,7 +97,7 @@ export const POST = async (req: Request) => {
       const order = await tx.order.create({
         data: {
           userId,
-          status: 'pending',
+          status: "pending",
           totalKiss,
           totalHug,
           note,
@@ -117,8 +127,8 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('[api/orders][POST] 创建订单失败', error);
-    await logApiError({ req, scope: '/api/orders[POST]' }, error);
-    return NextResponse.json({ message: '创建订单失败' }, { status: 500 });
+    console.error("[api/orders][POST] 创建订单失败", error);
+    await logApiError({ req, scope: "/api/orders[POST]" }, error);
+    return NextResponse.json({ message: "创建订单失败" }, { status: 500 });
   }
 };

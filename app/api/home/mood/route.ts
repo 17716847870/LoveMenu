@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logApiError } from '@/lib/error-log';
+import { logApiError } from "@/lib/error-log";
 
 export async function GET() {
   try {
@@ -11,7 +11,13 @@ export async function GET() {
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const [configs, todayOrders, todayEmergencyOrders, latestFoodRequest, topDish] = await Promise.all([
+    const [
+      configs,
+      todayOrders,
+      todayEmergencyOrders,
+      latestFoodRequest,
+      topDish,
+    ] = await Promise.all([
       prisma.systemConfig.findMany({
         where: {
           key: {
@@ -91,7 +97,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[api/home/mood][GET] 获取首页状态失败", error);
-    await logApiError({ scope: '/api/home/mood[GET]', path: '/api/home/mood', method: 'GET' }, error);
+    await logApiError(
+      { scope: "/api/home/mood[GET]", path: "/api/home/mood", method: "GET" },
+      error
+    );
     return NextResponse.json({ message: "获取首页状态失败" }, { status: 500 });
   }
 }

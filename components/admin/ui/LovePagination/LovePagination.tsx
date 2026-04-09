@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import LoveSelect from '../LoveSelect/LoveSelect';
+import React, { useMemo, useState, useEffect } from "react";
+import LoveSelect from "../LoveSelect/LoveSelect";
 import {
   Pagination,
   PaginationContent,
@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 
 export type LovePaginationProps = {
   total: number;
@@ -27,9 +27,9 @@ export default function LovePagination({
   pageSizeOptions = [10, 20, 50, 100],
   onPageChange,
   onPageSizeChange,
-  className = '',
+  className = "",
 }: LovePaginationProps) {
-  const [jumpPage, setJumpPage] = useState('');
+  const [jumpPage, setJumpPage] = useState("");
   const totalPages = Math.ceil(total / pageSize);
 
   // 确保当前页在合法范围内
@@ -37,7 +37,7 @@ export default function LovePagination({
 
   // 监听 page 变化，同步更新 jumpPage 输入框
   useEffect(() => {
-    setJumpPage('');
+    setJumpPage("");
   }, [currentPage]);
 
   const handlePageChange = (newPage: number) => {
@@ -49,12 +49,12 @@ export default function LovePagination({
     const pageNum = parseInt(jumpPage, 10);
     if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
       handlePageChange(pageNum);
-      setJumpPage(''); // 跳转成功后清空输入框
+      setJumpPage(""); // 跳转成功后清空输入框
     }
   };
 
   const handleJumpKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleJump();
     }
   };
@@ -62,7 +62,7 @@ export default function LovePagination({
   // 生成页码数组
   const pageNumbers = useMemo(() => {
     const pages: (number | string)[] = [];
-    
+
     if (totalPages <= 7) {
       // 页数少时全显示
       for (let i = 1; i <= totalPages; i++) {
@@ -73,7 +73,7 @@ export default function LovePagination({
       pages.push(1);
 
       if (currentPage > 4) {
-        pages.push('...');
+        pages.push("...");
       }
 
       // 显示当前页附近的页码
@@ -85,7 +85,7 @@ export default function LovePagination({
       }
 
       if (currentPage < totalPages - 3) {
-        pages.push('...');
+        pages.push("...");
       }
 
       // 始终显示最后一页
@@ -97,7 +97,9 @@ export default function LovePagination({
   if (total === 0) return null;
 
   return (
-    <div className={`flex flex-wrap justify-between items-center py-4 text-sm text-gray-600 bg-white px-6 rounded-xl shadow-sm border border-pink-50 gap-4 ${className}`}>
+    <div
+      className={`flex flex-wrap justify-between items-center py-4 text-sm text-gray-600 bg-white px-6 rounded-xl shadow-sm border border-pink-50 gap-4 ${className}`}
+    >
       <div className="flex items-center gap-3">
         <span className="text-gray-500">共 {total} 条数据</span>
       </div>
@@ -105,26 +107,31 @@ export default function LovePagination({
       <Pagination className="flex-1 justify-center">
         <PaginationContent className="flex gap-1">
           <PaginationItem>
-            <PaginationPrevious 
+            <PaginationPrevious
               onClick={() => handlePageChange(currentPage - 1)}
-              className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'hover:bg-pink-50 hover:text-pink-600'}
+              className={
+                currentPage <= 1
+                  ? "pointer-events-none opacity-50"
+                  : "hover:bg-pink-50 hover:text-pink-600"
+              }
             />
           </PaginationItem>
-          
+
           {pageNumbers.map((num, index) => {
-            if (num === '...') {
+            if (num === "...") {
               return <PaginationEllipsis key={`ellipsis-${index}`} />;
             }
-            
+
             const isCurrent = num === currentPage;
             return (
               <PaginationItem key={num}>
                 <PaginationLink
                   onClick={() => handlePageChange(num as number)}
                   isActive={isCurrent}
-                  className={isCurrent 
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer' 
-                    : 'hover:bg-pink-50 hover:text-pink-600 cursor-pointer'
+                  className={
+                    isCurrent
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                      : "hover:bg-pink-50 hover:text-pink-600 cursor-pointer"
                   }
                 >
                   {num}
@@ -134,20 +141,24 @@ export default function LovePagination({
           })}
 
           <PaginationItem>
-            <PaginationNext 
+            <PaginationNext
               onClick={() => handlePageChange(currentPage + 1)}
-              className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'hover:bg-pink-50 hover:text-pink-600'}
+              className={
+                currentPage >= totalPages
+                  ? "pointer-events-none opacity-50"
+                  : "hover:bg-pink-50 hover:text-pink-600"
+              }
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
-      
+
       <div className="flex items-center gap-4">
         <div className="w-[150px]">
           <LoveSelect
-            options={pageSizeOptions.map(size => ({ 
-              label: `${size} 条/页`, 
-              value: String(size) 
+            options={pageSizeOptions.map((size) => ({
+              label: `${size} 条/页`,
+              value: String(size),
             }))}
             value={String(pageSize)}
             onChange={(val) => onPageSizeChange?.(Number(val))}
@@ -158,11 +169,11 @@ export default function LovePagination({
         <div className="flex items-center gap-2">
           <span className="text-gray-500">跳至</span>
           <div className="relative">
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={jumpPage}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '');
+                const val = e.target.value.replace(/\D/g, "");
                 setJumpPage(val);
               }}
               onKeyDown={handleJumpKeyDown}

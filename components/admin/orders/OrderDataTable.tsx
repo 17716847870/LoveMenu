@@ -1,24 +1,43 @@
-import React from 'react';
-import { Order } from '@/types';
-import { Clock, AlertCircle, CheckCircle2, XCircle, Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { formatDateTime } from '@/utils/format';
-
+import React from "react";
+import { Order } from "@/types";
+import { Clock, AlertCircle, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { formatDateTime } from "@/utils/format";
 
 interface OrderDataTableProps {
   data: Order[];
   onView?: (order: Order) => void;
-  onUpdateStatus?: (orderId: string, newStatus: Order['status']) => void;
+  onUpdateStatus?: (orderId: string, newStatus: Order["status"]) => void;
 }
 
 const statusConfig = {
-  pending: { label: "待处理", color: "text-orange-500 bg-orange-50", icon: Clock },
-  preparing: { label: "制作中", color: "text-blue-500 bg-blue-50", icon: AlertCircle },
-  completed: { label: "已完成", color: "text-green-500 bg-green-50", icon: CheckCircle2 },
-  cancelled: { label: "已取消", color: "text-gray-500 bg-gray-50", icon: XCircle },
+  pending: {
+    label: "待处理",
+    color: "text-orange-500 bg-orange-50",
+    icon: Clock,
+  },
+  preparing: {
+    label: "制作中",
+    color: "text-blue-500 bg-blue-50",
+    icon: AlertCircle,
+  },
+  completed: {
+    label: "已完成",
+    color: "text-green-500 bg-green-50",
+    icon: CheckCircle2,
+  },
+  cancelled: {
+    label: "已取消",
+    color: "text-gray-500 bg-gray-50",
+    icon: XCircle,
+  },
 };
 
-export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDataTableProps) {
+export default function OrderDataTable({
+  data,
+  onView,
+  onUpdateStatus,
+}: OrderDataTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-pink-50 overflow-hidden mb-6">
       <table className="w-full text-left border-collapse">
@@ -34,21 +53,34 @@ export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDa
         </thead>
         <tbody className="divide-y divide-pink-50/50">
           {data.map((order) => {
-            const StatusIcon = statusConfig[order.status as keyof typeof statusConfig]?.icon || Clock;
+            const StatusIcon =
+              statusConfig[order.status as keyof typeof statusConfig]?.icon ||
+              Clock;
             return (
-              <tr key={order.id} className="hover:bg-pink-50/30 transition-colors group">
+              <tr
+                key={order.id}
+                className="hover:bg-pink-50/30 transition-colors group"
+              >
                 <td className="py-4 px-6 font-medium text-gray-900">
                   {order.id}
                   {order.isEmergency && (
-                    <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-500 rounded-full">紧急</span>
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-500 rounded-full">
+                      紧急
+                    </span>
                   )}
                 </td>
-                <td className="py-4 px-6 text-sm text-gray-500">{formatDateTime(order.createdAt)}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">
+                  {formatDateTime(order.createdAt)}
+                </td>
                 <td className="py-4 px-6 text-sm text-gray-600">
                   <div className="max-w-50 truncate">
-                    {order.items.map(item => item.dish.name).join(", ")}
+                    {order.items.map((item) => item.dish.name).join(", ")}
                   </div>
-                  {order.reason && <div className="text-xs text-gray-400 mt-1">备注: {order.reason}</div>}
+                  {order.reason && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      备注: {order.reason}
+                    </div>
+                  )}
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-2 text-sm font-medium text-pink-500">
@@ -57,30 +89,39 @@ export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDa
                   </div>
                 </td>
                 <td className="py-4 px-6">
-                  <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium", statusConfig[order.status as keyof typeof statusConfig]?.color)}>
+                  <div
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                      statusConfig[order.status as keyof typeof statusConfig]
+                        ?.color
+                    )}
+                  >
                     <StatusIcon className="w-3.5 h-3.5" />
-                    {statusConfig[order.status as keyof typeof statusConfig]?.label}
+                    {
+                      statusConfig[order.status as keyof typeof statusConfig]
+                        ?.label
+                    }
                   </div>
                 </td>
                 <td className="py-4 px-6 text-right">
                   <div className="flex justify-end items-center gap-2">
-                    {order.status === 'pending' && (
-                      <button 
-                        onClick={() => onUpdateStatus?.(order.id, 'preparing')}
+                    {order.status === "pending" && (
+                      <button
+                        onClick={() => onUpdateStatus?.(order.id, "preparing")}
                         className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border border-blue-100"
                       >
                         开始制作
                       </button>
                     )}
-                    {order.status === 'preparing' && (
-                      <button 
-                        onClick={() => onUpdateStatus?.(order.id, 'completed')}
+                    {order.status === "preparing" && (
+                      <button
+                        onClick={() => onUpdateStatus?.(order.id, "completed")}
                         className="text-green-500 hover:text-green-600 hover:bg-green-50 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border border-green-100"
                       >
                         标记完成
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={() => onView?.(order)}
                       className="text-gray-400 hover:text-pink-500 transition-colors p-2"
                       title="查看详情"
@@ -95,9 +136,7 @@ export default function OrderDataTable({ data, onView, onUpdateStatus }: OrderDa
         </tbody>
       </table>
       {data.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          暂无订单数据
-        </div>
+        <div className="p-8 text-center text-gray-500">暂无订单数据</div>
       )}
     </div>
   );

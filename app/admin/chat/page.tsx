@@ -2,7 +2,14 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import PageHeader from "@/components/admin/shared/PageHeader";
-import { Send, Image as ImageIcon, Smile, Heart, Loader2, X } from "lucide-react";
+import {
+  Send,
+  Image as ImageIcon,
+  Smile,
+  Heart,
+  Loader2,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types";
 import { useChatMessages, useSendChatMessage } from "@/apis/chat";
@@ -29,20 +36,26 @@ export default function AdminChatPage() {
 
   const { user: currentUser } = useUser();
   const { data: users = [] } = useUsers();
-  const partner = useMemo(() => users.find((u) => u.id !== currentUser?.id), [users, currentUser]);
+  const partner = useMemo(
+    () => users.find((u) => u.id !== currentUser?.id),
+    [users, currentUser]
+  );
 
   const myAvatar = currentUser?.avatar || "";
   const myName = currentUser?.name || currentUser?.username || "我";
   const partnerAvatar = partner?.avatar || "";
   const partnerName = partner?.name || partner?.username || "TA";
 
-  const handleQuickSend = async (content: string, type: "love" | "text" | "image" | "emoji") => {
+  const handleQuickSend = async (
+    content: string,
+    type: "love" | "text" | "image" | "emoji"
+  ) => {
     try {
       let msgType: "text" | "image" | "voice" | "emoji" = "text";
       if (type === "love") msgType = "emoji";
       else if (type === "image") msgType = "image";
       else if (type === "emoji") msgType = "emoji";
-      
+
       await sendMessage.mutateAsync({
         type: msgType,
         content,
@@ -68,10 +81,16 @@ export default function AdminChatPage() {
         const formData = new FormData();
         formData.append("file", imageFile);
         formData.append("path", "chat");
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message);
-        await sendMessage.mutateAsync({ type: "image", content: json.data.url });
+        await sendMessage.mutateAsync({
+          type: "image",
+          content: json.data.url,
+        });
         setImagePreview(null);
         setImageFile(null);
       } catch (err) {
@@ -131,8 +150,15 @@ export default function AdminChatPage() {
     }
     if (msg.type === "emoji") {
       if (msg.content === "kiss" || msg.content === "hug") {
-        const LOVE_MAP: Record<string, string> = { kiss: "💋 亲亲", hug: "🤗 贴贴" };
-        return <span className="text-2xl">{LOVE_MAP[msg.content] ?? msg.content}</span>;
+        const LOVE_MAP: Record<string, string> = {
+          kiss: "💋 亲亲",
+          hug: "🤗 贴贴",
+        };
+        return (
+          <span className="text-2xl">
+            {LOVE_MAP[msg.content] ?? msg.content}
+          </span>
+        );
       }
       if (msg.content.startsWith("quick:")) {
         return <span className="text-sm">{msg.content.slice(6)}</span>;
@@ -150,9 +176,12 @@ export default function AdminChatPage() {
             <Heart size={20} className="fill-current" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 text-base leading-tight">宝贝</h3>
+            <h3 className="font-bold text-gray-800 text-base leading-tight">
+              宝贝
+            </h3>
             <p className="text-[11px] text-green-500 flex items-center gap-1 font-medium mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 在线
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>{" "}
+              在线
             </p>
           </div>
         </div>
@@ -178,9 +207,15 @@ export default function AdminChatPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-4 bg-[#f8f9fa] custom-scrollbar scroll-smooth">
-          {isLoading && <div className="text-center text-sm text-gray-400 py-8">加载中...</div>}
+          {isLoading && (
+            <div className="text-center text-sm text-gray-400 py-8">
+              加载中...
+            </div>
+          )}
           {!isLoading && messages.length === 0 && (
-            <div className="text-center text-sm text-gray-400 py-8">还没有聊天记录，快发一条吧</div>
+            <div className="text-center text-sm text-gray-400 py-8">
+              还没有聊天记录，快发一条吧
+            </div>
           )}
 
           {messages.map((msg: ChatMessage) => {
@@ -192,13 +227,21 @@ export default function AdminChatPage() {
             return (
               <div
                 key={msg.id}
-                className={cn("flex gap-2 w-full mb-2", isMe ? "flex-row-reverse" : "flex-row")}
+                className={cn(
+                  "flex gap-2 w-full mb-2",
+                  isMe ? "flex-row-reverse" : "flex-row"
+                )}
               >
                 <Avatar className="w-8 h-8 mt-1 shrink-0 border border-white shadow-sm">
                   <AvatarImage src={avatarSrc} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
-                <div className={cn("max-w-[70%] flex flex-col gap-1", isMe ? "items-end" : "items-start")}>
+                <div
+                  className={cn(
+                    "max-w-[70%] flex flex-col gap-1",
+                    isMe ? "items-end" : "items-start"
+                  )}
+                >
                   <div
                     className={cn(
                       "rounded-2xl text-[15px] leading-relaxed relative group shadow-sm",
@@ -221,7 +264,10 @@ export default function AdminChatPage() {
                     </span>
                   ) : (
                     <span className="text-[10px] text-gray-400 px-1">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   )}
                 </div>
@@ -233,7 +279,10 @@ export default function AdminChatPage() {
 
         {/* Emoji Panel */}
         {showEmoji && (
-          <EmojiPanel onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />
+          <EmojiPanel
+            onSelect={handleEmojiSelect}
+            onClose={() => setShowEmoji(false)}
+          />
         )}
 
         {/* Quick Love Actions */}
@@ -245,15 +294,24 @@ export default function AdminChatPage() {
             <div className="mb-2 flex items-center gap-2">
               <div className="relative w-14 h-14">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePreview} alt="预览" className="w-14 h-14 rounded-xl object-cover border border-gray-200" />
+                <img
+                  src={imagePreview}
+                  alt="预览"
+                  className="w-14 h-14 rounded-xl object-cover border border-gray-200"
+                />
                 <button
-                  onClick={() => { setImagePreview(null); setImageFile(null); }}
+                  onClick={() => {
+                    setImagePreview(null);
+                    setImageFile(null);
+                  }}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white rounded-full flex items-center justify-center"
                 >
                   <X size={12} />
                 </button>
               </div>
-              <span className="text-xs text-gray-400">点击发送按钮上传图片</span>
+              <span className="text-xs text-gray-400">
+                点击发送按钮上传图片
+              </span>
             </div>
           )}
 
@@ -268,7 +326,10 @@ export default function AdminChatPage() {
           <div className="flex items-end gap-2 bg-gray-50 rounded-[20px] p-1.5 lg:p-2 border border-gray-200 focus-within:border-pink-300 focus-within:bg-white transition-colors">
             <div className="flex items-center gap-1 pb-1 px-1">
               <button
-                onClick={() => { fileInputRef.current?.click(); setShowEmoji(false); }}
+                onClick={() => {
+                  fileInputRef.current?.click();
+                  setShowEmoji(false);
+                }}
                 className="p-2 text-gray-400 hover:text-pink-500 transition-colors rounded-full hover:bg-pink-50"
                 type="button"
               >
@@ -278,7 +339,9 @@ export default function AdminChatPage() {
                 onClick={() => setShowEmoji((v) => !v)}
                 className={cn(
                   "p-2 transition-colors rounded-full",
-                  showEmoji ? "text-pink-500 bg-pink-50" : "text-gray-400 hover:text-pink-500 hover:bg-pink-50"
+                  showEmoji
+                    ? "text-pink-500 bg-pink-50"
+                    : "text-gray-400 hover:text-pink-500 hover:bg-pink-50"
                 )}
                 type="button"
               >
@@ -300,10 +363,16 @@ export default function AdminChatPage() {
 
             <button
               onClick={handleSend}
-              disabled={(!inputValue.trim() && !imageFile) || sendMessage.isPending || isUploading}
+              disabled={
+                (!inputValue.trim() && !imageFile) ||
+                sendMessage.isPending ||
+                isUploading
+              }
               className={cn(
                 "w-10 h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center transition-all shrink-0 mb-0.5 mr-0.5",
-                (inputValue.trim() || imageFile) && !sendMessage.isPending && !isUploading
+                (inputValue.trim() || imageFile) &&
+                  !sendMessage.isPending &&
+                  !isUploading
                   ? "bg-pink-500 text-white shadow-md hover:bg-pink-600 scale-100"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed scale-95"
               )}
@@ -311,11 +380,19 @@ export default function AdminChatPage() {
               {isUploading ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
-                <Send size={18} className={cn((inputValue.trim() || imageFile) && "translate-x-0.5 -translate-y-0.5")} />
+                <Send
+                  size={18}
+                  className={cn(
+                    (inputValue.trim() || imageFile) &&
+                      "translate-x-0.5 -translate-y-0.5"
+                  )}
+                />
               )}
             </button>
           </div>
-          <p className="text-[10px] text-center text-gray-400 mt-2 hidden lg:block">按 Enter 发送，Shift + Enter 换行</p>
+          <p className="text-[10px] text-center text-gray-400 mt-2 hidden lg:block">
+            按 Enter 发送，Shift + Enter 换行
+          </p>
         </div>
       </div>
     </div>

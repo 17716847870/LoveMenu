@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 function sendFrontendError(payload: Record<string, unknown>) {
-  fetch('/api/error-logs', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  fetch("/api/error-logs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      source: 'frontend',
+      source: "frontend",
       ...payload,
     }),
   }).catch(() => {
@@ -19,9 +19,9 @@ export default function FrontendErrorReporter() {
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
       sendFrontendError({
-        scope: 'window.error',
+        scope: "window.error",
         path: window.location.pathname,
-        message: event.message || 'Unknown frontend error',
+        message: event.message || "Unknown frontend error",
         stack: event.error instanceof Error ? event.error.stack : undefined,
         url: window.location.href,
         metadata: {
@@ -34,14 +34,15 @@ export default function FrontendErrorReporter() {
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason;
-      const message = reason instanceof Error
-        ? reason.message
-        : typeof reason === 'string'
-          ? reason
-          : 'Unhandled promise rejection';
+      const message =
+        reason instanceof Error
+          ? reason.message
+          : typeof reason === "string"
+            ? reason
+            : "Unhandled promise rejection";
 
       sendFrontendError({
-        scope: 'window.unhandledrejection',
+        scope: "window.unhandledrejection",
         path: window.location.pathname,
         message,
         stack: reason instanceof Error ? reason.stack : undefined,
@@ -49,12 +50,15 @@ export default function FrontendErrorReporter() {
       });
     };
 
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
     return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener("error", handleError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection
+      );
     };
   }, []);
 

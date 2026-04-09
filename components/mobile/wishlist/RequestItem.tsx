@@ -14,12 +14,15 @@ interface RequestItemProps {
   onDelete: (id: string) => void;
 }
 
-const themeStyles: Record<ThemeName, {
-  card: string;
-  title: string;
-  desc: string;
-  statusBadge: Record<string, string>;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    card: string;
+    title: string;
+    desc: string;
+    statusBadge: Record<string, string>;
+  }
+> = {
   couple: {
     card: "bg-white border border-pink-100 shadow-sm rounded-2xl",
     title: "text-pink-900",
@@ -68,7 +71,11 @@ const statusConfig = {
   rejected: { label: "未通过", icon: XCircle },
 };
 
-export default function RequestItem({ request, onEdit, onDelete }: RequestItemProps) {
+export default function RequestItem({
+  request,
+  onEdit,
+  onDelete,
+}: RequestItemProps) {
   const { theme } = useTheme();
   const styles = themeStyles[theme];
   const StatusIcon = statusConfig[request.status].icon;
@@ -76,7 +83,10 @@ export default function RequestItem({ request, onEdit, onDelete }: RequestItemPr
   const x = useMotionValue(0);
   const opacity = useTransform(x, [-100, 0], [0, 1]);
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
     if (info.offset.x < -100) {
       onDelete(request.id);
     } else {
@@ -127,11 +137,11 @@ export default function RequestItem({ request, onEdit, onDelete }: RequestItemPr
                 {request.name}
               </h3>
               <div className="flex gap-2">
-                <button 
-                    onClick={() => onEdit(request)}
-                    className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
+                <button
+                  onClick={() => onEdit(request)}
+                  className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors"
                 >
-                    <Edit2 size={16} />
+                  <Edit2 size={16} />
                 </button>
               </div>
             </div>
@@ -141,10 +151,12 @@ export default function RequestItem({ request, onEdit, onDelete }: RequestItemPr
           </div>
 
           <div className="flex items-center justify-between mt-3">
-            <div className={cn(
-              "text-xs px-2 py-1 rounded-full flex items-center gap-1 border",
-              styles.statusBadge[request.status]
-            )}>
+            <div
+              className={cn(
+                "text-xs px-2 py-1 rounded-full flex items-center gap-1 border",
+                styles.statusBadge[request.status]
+              )}
+            >
               <StatusIcon size={12} />
               <span>{statusConfig[request.status].label}</span>
             </div>

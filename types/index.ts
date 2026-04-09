@@ -96,8 +96,8 @@ export interface Feedback {
 
 export interface AppErrorLog {
   id: string;
-  source: 'api' | 'frontend';
-  level: 'error' | 'warn';
+  source: "api" | "frontend";
+  level: "error" | "warn";
   scope?: string | null;
   path?: string | null;
   method?: string | null;

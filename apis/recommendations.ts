@@ -18,7 +18,9 @@ export function useRecommendations() {
   return useQuery({
     queryKey: recommendationKeys.list(),
     queryFn: async (): Promise<RecommendationItem[]> => {
-      const response = await http.get<RecommendationItem[]>("/api/recommendations");
+      const response = await http.get<RecommendationItem[]>(
+        "/api/recommendations"
+      );
       return response.data || [];
     },
   });

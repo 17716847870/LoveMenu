@@ -1,12 +1,18 @@
-import { Lunar } from 'lunar-javascript';
+import { Lunar } from "lunar-javascript";
 
-export type RepeatType = 'once' | 'weekly' | 'monthly' | 'quarterly' | 'halfyear' | 'yearly';
-export type CalendarType = 'solar' | 'lunar';
+export type RepeatType =
+  | "once"
+  | "weekly"
+  | "monthly"
+  | "quarterly"
+  | "halfyear"
+  | "yearly";
+export type CalendarType = "solar" | "lunar";
 
 interface AnniversaryConfig {
   calendarType: CalendarType;
-  month: number;       // 国历月 or 农历月
-  day: number;         // 国历日 or 农历日
+  month: number; // 国历月 or 农历月
+  day: number; // 国历日 or 农历日
   weekday?: number | null; // 0=周日 1=周一 ... 6=周六，仅 weekly 使用
   repeatType: RepeatType;
   advanceDays: number; // 提前几天提醒
@@ -19,7 +25,9 @@ function lunarToSolar(year: number, month: number, day: number): Date {
   const lunar = Lunar.fromYmd(year, month, day);
   const solar = lunar.getSolar();
   // 北京时间 10:00 = UTC 02:00
-  return new Date(Date.UTC(solar.getYear(), solar.getMonth() - 1, solar.getDay(), 2, 0, 0));
+  return new Date(
+    Date.UTC(solar.getYear(), solar.getMonth() - 1, solar.getDay(), 2, 0, 0)
+  );
 }
 
 /**
@@ -40,7 +48,10 @@ function lastDayOfMonth(year: number, month: number): number {
  * 计算从 baseDate 起，下一次触发的公历日期（考虑 advanceDays 提前量）
  * 返回的是「发送提醒邮件」的时间，即 触发日期 - advanceDays
  */
-export function calcNextRemindAt(config: AnniversaryConfig, baseDate: Date = new Date()): Date | null {
+export function calcNextRemindAt(
+  config: AnniversaryConfig,
+  baseDate: Date = new Date()
+): Date | null {
   const now = baseDate;
   const nowYear = now.getUTCFullYear();
   const nowMonth = now.getUTCMonth() + 1;
@@ -51,21 +62,23 @@ export function calcNextRemindAt(config: AnniversaryConfig, baseDate: Date = new
   // 候选触发日期（公历），先算出「事件日期」，再减去 advanceDays
   const candidates: Date[] = [];
 
-  if (repeatType === 'weekly') {
+  if (repeatType === "weekly") {
     // 每周：找从今天起，下一个符合 weekday 的日期
     const targetWeekday = weekday ?? 1; // 默认周一
     const todayWeekday = now.getUTCDay(); // 0=周日
     let daysAhead = (targetWeekday - todayWeekday + 7) % 7;
     if (daysAhead === 0) daysAhead = 7; // 今天就是目标星期，取下周
-    const eventDate = new Date(Date.UTC(nowYear, nowMonth - 1, nowDay + daysAhead, 2, 0, 0));
+    const eventDate = new Date(
+      Date.UTC(nowYear, nowMonth - 1, nowDay + daysAhead, 2, 0, 0)
+    );
     // weekly 不需要提前，直接就是提醒日
     candidates.push(eventDate);
-  } else if (repeatType === 'once' || repeatType === 'yearly') {
+  } else if (repeatType === "once" || repeatType === "yearly") {
     // 单次/每年：遍历今年和明年
     for (let yearOffset = 0; yearOffset <= 1; yearOffset++) {
       const year = nowYear + yearOffset;
       let eventDate: Date;
-      if (calendarType === 'lunar') {
+      if (calendarType === "lunar") {
         eventDate = lunarToSolar(year, month, day);
       } else {
         const actualDay = Math.min(day, lastDayOfMonth(year, month));
@@ -78,12 +91,15 @@ export function calcNextRemindAt(config: AnniversaryConfig, baseDate: Date = new
         break;
       }
     }
-  } else if (repeatType === 'monthly') {
+  } else if (repeatType === "monthly") {
     // 每月：遍历本月、下月、下下月
     for (let offset = 0; offset <= 2; offset++) {
       let year = nowYear;
       let mon = nowMonth + offset;
-      if (mon > 12) { mon -= 12; year += 1; }
+      if (mon > 12) {
+        mon -= 12;
+        year += 1;
+      }
       const actualDay = Math.min(day, lastDayOfMonth(year, mon));
       const eventDate = bjTime10(year, mon, actualDay);
       const remindDate = new Date(eventDate.getTime() - advanceDays * 86400000);
@@ -92,32 +108,40 @@ export function calcNextRemindAt(config: AnniversaryConfig, baseDate: Date = new
         break;
       }
     }
-  } else if (repeatType === 'quarterly') {
+  } else if (repeatType === "quarterly") {
     // 每季度：未来 4 个季度
     for (let offset = 0; offset <= 4; offset++) {
       let year = nowYear;
       let mon = month + offset * 3;
-      while (mon > 12) { mon -= 12; year += 1; }
+      while (mon > 12) {
+        mon -= 12;
+        year += 1;
+      }
       const actualDay = Math.min(day, lastDayOfMonth(year, mon));
-      const eventDate = calendarType === 'lunar'
-        ? lunarToSolar(year, mon, day)
-        : bjTime10(year, mon, actualDay);
+      const eventDate =
+        calendarType === "lunar"
+          ? lunarToSolar(year, mon, day)
+          : bjTime10(year, mon, actualDay);
       const remindDate = new Date(eventDate.getTime() - advanceDays * 86400000);
       if (remindDate.getTime() > now.getTime()) {
         candidates.push(remindDate);
         break;
       }
     }
-  } else if (repeatType === 'halfyear') {
+  } else if (repeatType === "halfyear") {
     // 每半年：未来 4 个半年
     for (let offset = 0; offset <= 4; offset++) {
       let year = nowYear;
       let mon = month + offset * 6;
-      while (mon > 12) { mon -= 12; year += 1; }
+      while (mon > 12) {
+        mon -= 12;
+        year += 1;
+      }
       const actualDay = Math.min(day, lastDayOfMonth(year, mon));
-      const eventDate = calendarType === 'lunar'
-        ? lunarToSolar(year, mon, day)
-        : bjTime10(year, mon, actualDay);
+      const eventDate =
+        calendarType === "lunar"
+          ? lunarToSolar(year, mon, day)
+          : bjTime10(year, mon, actualDay);
       const remindDate = new Date(eventDate.getTime() - advanceDays * 86400000);
       if (remindDate.getTime() > now.getTime()) {
         candidates.push(remindDate);
@@ -140,6 +164,6 @@ export function renderEmailContent(
   return template
     .replace(/\{title\}/g, vars.title)
     .replace(/\{date\}/g, vars.date)
-    .replace(/\{days\}/g, String(vars.days ?? ''))
-    .replace(/\{content\}/g, vars.content ?? '');
+    .replace(/\{days\}/g, String(vars.days ?? ""))
+    .replace(/\{content\}/g, vars.content ?? "");
 }

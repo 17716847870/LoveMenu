@@ -13,7 +13,12 @@ interface DishHeroProps {
   imageRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function DishHero({ image, name, theme, imageRef }: DishHeroProps) {
+export default function DishHero({
+  image,
+  name,
+  theme,
+  imageRef,
+}: DishHeroProps) {
   return (
     <motion.div
       ref={imageRef}
@@ -23,12 +28,7 @@ export default function DishHero({ image, name, theme, imageRef }: DishHeroProps
       className="relative w-full aspect-video overflow-hidden"
     >
       {/* Image */}
-      <Image
-        src={image}
-        alt={name}
-        fill
-        className="object-cover"
-      />
+      <Image src={image} alt={name} fill className="object-cover" />
 
       {/* Gradient Overlay */}
       <div

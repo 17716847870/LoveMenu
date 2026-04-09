@@ -14,9 +14,12 @@ interface ChatMessagesProps {
   messages: Message[];
 }
 
-const themeStyles: Record<ThemeName, {
-  date: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    date: string;
+  }
+> = {
   couple: { date: "text-pink-400 bg-pink-50/50" },
   cute: { date: "text-orange-400 bg-orange-50/50" },
   minimal: { date: "text-gray-400 bg-gray-50/50" },
@@ -28,7 +31,10 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
   const currentTheme = themeStyles[theme] || themeStyles.couple;
   const { user: currentUser } = useUser();
   const { data: users = [] } = useUsers();
-  const partner = useMemo(() => users.find((u) => u.id !== currentUser?.id), [users, currentUser]);
+  const partner = useMemo(
+    () => users.find((u) => u.id !== currentUser?.id),
+    [users, currentUser]
+  );
 
   const myAvatar = currentUser?.avatar || "";
   const myName = currentUser?.name || currentUser?.username || "我";
@@ -36,17 +42,19 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
   const partnerName = partner?.name || partner?.username || "TA";
 
   const avatarInfo = {
-    myAvatar, myName, partnerAvatar, partnerName,
+    myAvatar,
+    myName,
+    partnerAvatar,
+    partnerName,
   };
 
   return (
     <div className="flex flex-col p-4 pb-6 pt-20">
       {/* Date Divider */}
       <div className="flex justify-center mb-6">
-        <span className={cn(
-          "text-xs px-3 py-1 rounded-full",
-          currentTheme.date
-        )}>
+        <span
+          className={cn("text-xs px-3 py-1 rounded-full", currentTheme.date)}
+        >
           今天 12:30
         </span>
       </div>

@@ -40,7 +40,7 @@ export default function FlyToCart({
         transition: {
           duration: 0.6,
           // Custom bezier for "throw" feel
-          ease: [0.25, 0.1, 0.25, 1.0], 
+          ease: [0.25, 0.1, 0.25, 1.0],
           // Separate axes for parabolic effect
           x: { duration: 0.6, ease: "linear" },
           y: { duration: 0.6, ease: "circIn" }, // Accelerate down (gravity)
@@ -83,16 +83,11 @@ export default function FlyToCart({
       }}
       className={`rounded-full overflow-hidden border-2 bg-white ${getThemeStyles(theme)}`}
     >
-        {imageSrc ? (
-            <Image 
-                src={imageSrc} 
-                alt="flying-item" 
-                fill
-                className="object-cover"
-            />
-        ) : (
-            <div className="w-full h-full bg-gray-200" />
-        )}
+      {imageSrc ? (
+        <Image src={imageSrc} alt="flying-item" fill className="object-cover" />
+      ) : (
+        <div className="w-full h-full bg-gray-200" />
+      )}
     </motion.div>
   );
 }

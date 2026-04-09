@@ -42,7 +42,7 @@ export default function CartSummary({ totals }: CartSummaryProps) {
             <span>🤗 {totals.hug}</span>
           </div>
         </div>
-        
+
         {/* Placeholder for future features like discounts or balance deduction */}
         <div className="flex justify-between items-center text-sm">
           <span className="text-gray-500">亲亲余额抵扣</span>
@@ -58,8 +58,8 @@ export default function CartSummary({ totals }: CartSummaryProps) {
         <div className="flex justify-between items-center font-bold text-lg">
           <span className={styles.text}>总计</span>
           <div className={cn("flex gap-3", styles.text)}>
-             <span>❤️ {totals.kiss}</span>
-             <span>🤗 {totals.hug}</span>
+            <span>❤️ {totals.kiss}</span>
+            <span>🤗 {totals.hug}</span>
           </div>
         </div>
       </div>

@@ -7,17 +7,24 @@ import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
 import { Heart, Sparkles, Coffee, Moon } from "lucide-react";
 
-const themeConfig: Record<ThemeName, { 
-  bg: string; 
-  text: string; 
-  icon: React.ElementType; 
-  tips: string[] 
-}> = {
+const themeConfig: Record<
+  ThemeName,
+  {
+    bg: string;
+    text: string;
+    icon: React.ElementType;
+    tips: string[];
+  }
+> = {
   couple: {
     bg: "bg-pink-50 border border-pink-100",
     text: "text-pink-600",
     icon: Heart,
-    tips: ["今天一起吃点什么呢？", "给宝贝准备一顿好吃的 ❤️", "今天也要喂饱宝贝 ❤️"],
+    tips: [
+      "今天一起吃点什么呢？",
+      "给宝贝准备一顿好吃的 ❤️",
+      "今天也要喂饱宝贝 ❤️",
+    ],
   },
   cute: {
     bg: "bg-orange-50 border border-orange-100",
@@ -43,7 +50,7 @@ export default function CartLoveTip() {
   const { theme } = useTheme();
   const config = themeConfig[theme];
   const Icon = config.icon;
-  
+
   // Randomly select a tip based on time or just random
   const tip = config.tips[Math.floor(Math.random() * config.tips.length)];
 
@@ -51,7 +58,11 @@ export default function CartLoveTip() {
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("mx-4 mt-4 p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium", config.bg, config.text)}
+      className={cn(
+        "mx-4 mt-4 p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium",
+        config.bg,
+        config.text
+      )}
     >
       <Icon size={16} className="animate-pulse" />
       <span>{tip}</span>

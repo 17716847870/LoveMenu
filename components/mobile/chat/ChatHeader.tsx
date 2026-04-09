@@ -10,12 +10,15 @@ import { useUser } from "@/context/UserContext";
 import { useUsers } from "@/apis/user";
 import { useMemo } from "react";
 
-const themeStyles: Record<ThemeName, {
-  container: string;
-  title: string;
-  status: string;
-  icon: string;
-}> = {
+const themeStyles: Record<
+  ThemeName,
+  {
+    container: string;
+    title: string;
+    status: string;
+    icon: string;
+  }
+> = {
   couple: {
     container: "bg-white/80 backdrop-blur-md border-b border-pink-100",
     title: "text-pink-900",
@@ -58,10 +61,12 @@ export default function ChatHeader() {
   const partnerInitial = partnerName.charAt(0).toUpperCase();
 
   return (
-    <div className={cn(
-      "fixed top-0 left-0 right-0 z-50 h-16 px-4 flex items-center justify-between",
-      currentTheme.container
-    )}>
+    <div
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 h-16 px-4 flex items-center justify-between",
+        currentTheme.container
+      )}
+    >
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}
@@ -82,19 +87,25 @@ export default function ChatHeader() {
         </div>
 
         <div className="flex flex-col">
-          <span className={cn("font-bold text-sm leading-none", currentTheme.title)}>
+          <span
+            className={cn("font-bold text-sm leading-none", currentTheme.title)}
+          >
             {partnerName}
           </span>
-          <span className={cn("text-[10px] font-medium mt-1 leading-none", currentTheme.status)}>
+          <span
+            className={cn(
+              "text-[10px] font-medium mt-1 leading-none",
+              currentTheme.status
+            )}
+          >
             在线
           </span>
         </div>
       </div>
 
-      <button className={cn(
-        "p-2 rounded-full transition-colors",
-        currentTheme.icon
-      )}>
+      <button
+        className={cn("p-2 rounded-full transition-colors", currentTheme.icon)}
+      >
         <MoreHorizontal className="w-6 h-6" />
       </button>
     </div>

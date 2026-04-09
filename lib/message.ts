@@ -8,9 +8,7 @@ let messageFuncs: {
   info: (content: string, duration?: number) => void;
 } | null = null;
 
-export const registerMessage = (
-  funcs: typeof messageFuncs
-) => {
+export const registerMessage = (funcs: typeof messageFuncs) => {
   messageFuncs = funcs;
 };
 

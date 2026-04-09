@@ -1,6 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import { CartItem, Dish } from "@/types";
 import { useUser } from "@/context/UserContext";
 
@@ -50,7 +58,11 @@ function saveCartToStorage(items: CartItem[]) {
   localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(data));
 }
 
-async function syncCartToServer(userId: string, items: CartItem[], onProgress?: (done: number, total: number) => void) {
+async function syncCartToServer(
+  userId: string,
+  items: CartItem[],
+  onProgress?: (done: number, total: number) => void
+) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
   for (let i = 0; i < items.length; i++) {
@@ -75,7 +87,11 @@ async function clearServerCart(userId: string) {
   });
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }): React.ReactElement {
+export function CartProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   const { user, isLoading: userLoading } = useUser();
   const userId = user?.id || "";
 

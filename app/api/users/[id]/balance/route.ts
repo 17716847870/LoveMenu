@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logApiError } from '@/lib/error-log';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logApiError } from "@/lib/error-log";
 
 export async function PATCH(
   req: Request,
@@ -16,14 +16,14 @@ export async function PATCH(
     });
 
     if (!user) {
-      return NextResponse.json({ message: '用户不存在' }, { status: 404 });
+      return NextResponse.json({ message: "用户不存在" }, { status: 404 });
     }
 
     const newKissBalance = (user.kissBalance || 0) + (kissAmount || 0);
     const newHugBalance = (user.hugBalance || 0) + (hugAmount || 0);
 
     if (newKissBalance < 0 || newHugBalance < 0) {
-      return NextResponse.json({ message: '余额不能为负数' }, { status: 400 });
+      return NextResponse.json({ message: "余额不能为负数" }, { status: 400 });
     }
 
     const updatedUser = await prisma.user.update({
@@ -45,8 +45,8 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: updatedUser });
   } catch (error) {
-    console.error('[api/users/:id/balance][PATCH] 更新余额失败', error);
-    await logApiError({ req, scope: '/api/users/[id]/balance[PATCH]' }, error);
-    return NextResponse.json({ message: '更新余额失败' }, { status: 500 });
+    console.error("[api/users/:id/balance][PATCH] 更新余额失败", error);
+    await logApiError({ req, scope: "/api/users/[id]/balance[PATCH]" }, error);
+    return NextResponse.json({ message: "更新余额失败" }, { status: 500 });
   }
 }

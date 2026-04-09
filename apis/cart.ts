@@ -47,14 +47,16 @@ export function useAddToCart() {
 
   return useMutation({
     mutationFn: async ({ userId, dishId, quantity = 1 }: AddToCartParams) => {
-      const response = await http.post<{ success: boolean; data: CartItemResponse }>(
-        "/api/cart",
-        { userId, dishId, quantity }
-      );
+      const response = await http.post<{
+        success: boolean;
+        data: CartItemResponse;
+      }>("/api/cart", { userId, dishId, quantity });
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: cartKeys.list(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: cartKeys.list(variables.userId),
+      });
     },
   });
 }
@@ -64,10 +66,10 @@ export function useUpdateCart() {
 
   return useMutation({
     mutationFn: async ({ itemId, quantity }: UpdateCartParams) => {
-      const response = await http.put<{ success: boolean; data: CartItemResponse | null }>(
-        "/api/cart",
-        { itemId, quantity }
-      );
+      const response = await http.put<{
+        success: boolean;
+        data: CartItemResponse | null;
+      }>("/api/cart", { itemId, quantity });
       return response.data;
     },
     onMutate: async ({ itemId, quantity }) => {

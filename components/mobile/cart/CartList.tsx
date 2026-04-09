@@ -11,7 +11,11 @@ interface CartListProps {
   onRemove: (id: string) => void;
 }
 
-export default function CartList({ items, onUpdateQuantity, onRemove }: CartListProps) {
+export default function CartList({
+  items,
+  onUpdateQuantity,
+  onRemove,
+}: CartListProps) {
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
       <AnimatePresence>

@@ -12,6 +12,9 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { useMessage } from "@/components/ui/Message";
+import { useTheme } from "@/context/ThemeContext";
+import { ThemeName } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface ImageItem {
   id: string;
@@ -40,6 +43,91 @@ export interface ImageUploaderProps {
   showTitle?: boolean;
 }
 
+const themeStyles: Record<
+  ThemeName,
+  {
+    title: string;
+    helper: string;
+    card: string;
+    addTile: string;
+    addIcon: string;
+    addText: string;
+    singleDropzone: string;
+    singleTitle: string;
+    singleHelper: string;
+    previewButton: string;
+    counter: string;
+    modalButton: string;
+    progressTrack: string;
+    progressBar: string;
+  }
+> = {
+  couple: {
+    title: "text-pink-900",
+    helper: "text-pink-400",
+    card: "border-pink-100 bg-pink-50/30",
+    addTile: "border-pink-300 bg-pink-50/50 hover:border-pink-400 hover:bg-pink-50",
+    addIcon: "text-pink-400",
+    addText: "text-pink-500",
+    singleDropzone: "border-pink-300 bg-pink-50/40 hover:border-pink-400 hover:bg-pink-50",
+    singleTitle: "text-pink-700",
+    singleHelper: "text-pink-400",
+    previewButton: "bg-white/90 text-pink-600 hover:bg-white",
+    counter: "bg-pink-500/80 text-white",
+    modalButton: "bg-white/10 hover:bg-white/20",
+    progressTrack: "bg-white/30",
+    progressBar: "bg-white",
+  },
+  cute: {
+    title: "text-orange-900",
+    helper: "text-orange-400",
+    card: "border-orange-100 bg-[#fff8ef]",
+    addTile: "border-orange-300 bg-orange-50/60 hover:border-orange-400 hover:bg-orange-50",
+    addIcon: "text-orange-400",
+    addText: "text-orange-500",
+    singleDropzone: "border-orange-300 bg-orange-50/50 hover:border-orange-400 hover:bg-orange-50",
+    singleTitle: "text-orange-700",
+    singleHelper: "text-orange-400",
+    previewButton: "bg-white/95 text-orange-500 hover:bg-white",
+    counter: "bg-orange-400/90 text-white",
+    modalButton: "bg-white/10 hover:bg-white/20",
+    progressTrack: "bg-white/30",
+    progressBar: "bg-white",
+  },
+  minimal: {
+    title: "text-gray-900",
+    helper: "text-gray-400",
+    card: "border-gray-200 bg-gray-50",
+    addTile: "border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50",
+    addIcon: "text-gray-500",
+    addText: "text-gray-600",
+    singleDropzone: "border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-white",
+    singleTitle: "text-gray-700",
+    singleHelper: "text-gray-400",
+    previewButton: "bg-white/95 text-gray-700 hover:bg-white",
+    counter: "bg-gray-900/85 text-white",
+    modalButton: "bg-white/10 hover:bg-white/20",
+    progressTrack: "bg-white/30",
+    progressBar: "bg-white",
+  },
+  night: {
+    title: "text-slate-100",
+    helper: "text-slate-400",
+    card: "border-slate-700 bg-slate-800/70",
+    addTile: "border-slate-600 bg-slate-800 hover:border-blue-500 hover:bg-slate-800/90",
+    addIcon: "text-blue-400",
+    addText: "text-slate-300",
+    singleDropzone: "border-slate-600 bg-slate-800 hover:border-blue-500 hover:bg-slate-800/90",
+    singleTitle: "text-slate-200",
+    singleHelper: "text-slate-400",
+    previewButton: "bg-slate-900/85 text-blue-300 hover:bg-slate-900",
+    counter: "bg-blue-500/85 text-white",
+    modalButton: "bg-white/10 hover:bg-white/20",
+    progressTrack: "bg-white/20",
+    progressBar: "bg-blue-300",
+  },
+};
+
 export default function ImageUploader({
   value,
   onChange,
@@ -53,6 +141,8 @@ export default function ImageUploader({
 }: ImageUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const message = useMessage();
+  const { theme } = useTheme();
+  const styles = themeStyles[theme];
   const [images, setImages] = useState<ImageItem[]>([]);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const isMultiple = mode === "multiple";
@@ -405,12 +495,12 @@ export default function ImageUploader({
     <div className="space-y-3">
       {showTitle && (
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">
+          <span className={cn("text-sm font-medium", styles.title)}>
             {isMultiple
               ? `图片（${images.filter((i) => i.status === "success").length}/${maxCount}）`
               : "图片"}
           </span>
-          <span className="text-xs text-gray-400">
+          <span className={cn("text-xs", styles.helper)}>
             支持 JPG、PNG、GIF、WebP 格式，最大 {maxSize}MB
           </span>
         </div>
@@ -433,7 +523,7 @@ export default function ImageUploader({
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
-              <div className="relative w-full h-full rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+              <div className={cn("relative w-full h-full rounded-lg overflow-hidden border", styles.card)}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
@@ -448,9 +538,9 @@ export default function ImageUploader({
                 {isUploading && (
                   <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                     <Loader2 className="w-8 h-8 text-white animate-spin mb-2" />
-                    <div className="w-3/4 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                    <div className={cn("w-3/4 h-1.5 rounded-full overflow-hidden", styles.progressTrack)}>
                       <div
-                        className="h-full bg-white rounded-full transition-all duration-300"
+                        className={cn("h-full rounded-full transition-all duration-300", styles.progressBar)}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -478,9 +568,12 @@ export default function ImageUploader({
                       <button
                         type="button"
                         onClick={() => handlePreview(index)}
-                        className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                        className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg",
+                          styles.previewButton
+                        )}
                       >
-                        <ZoomIn size={20} className="text-gray-700" />
+                        <ZoomIn size={20} />
                       </button>
                     </div>
                   </>
@@ -498,7 +591,7 @@ export default function ImageUploader({
                 </div>
 
                 {isMultiple && images.length > 1 && !disabled && (
-                  <div className="absolute top-1 left-1 px-2 py-0.5 bg-black/60 text-white text-xs rounded">
+                  <div className={cn("absolute top-1 left-1 px-2 py-0.5 text-xs rounded", styles.counter)}>
                     {index + 1}
                   </div>
                 )}
@@ -510,19 +603,17 @@ export default function ImageUploader({
         {showGridUploadButton && (
           <div
             onClick={handleAddClick}
-            className={`
-              relative aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all
-              ${
-                disabled
-                  ? "border-gray-200 bg-gray-50 cursor-not-allowed"
-                  : "border-pink-300 hover:border-pink-400 hover:bg-pink-50"
-              }
-            `}
+            className={cn(
+              "relative aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all",
+              disabled
+                ? "border-gray-200 bg-gray-50 cursor-not-allowed"
+                : styles.addTile
+            )}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
-            <Upload className="w-8 h-8 text-pink-400 mb-1" />
-            <span className="text-xs text-gray-500">添加图片</span>
+            <Upload className={cn("w-8 h-8 mb-1", styles.addIcon)} />
+            <span className={cn("text-xs", styles.addText)}>添加图片</span>
           </div>
         )}
       </div>
@@ -541,18 +632,16 @@ export default function ImageUploader({
         <button
           type="button"
           onClick={handleAddClick}
-          className={`
-            w-full border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-            ${
-              disabled
-                ? "border-gray-200 bg-gray-50 cursor-not-allowed"
-                : "border-pink-300 hover:border-pink-400 hover:bg-pink-50"
-            }
-          `}
+          className={cn(
+            "w-full border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+            disabled
+              ? "border-gray-200 bg-gray-50 cursor-not-allowed"
+              : styles.singleDropzone
+          )}
         >
-          <Upload className="w-10 h-10 mx-auto text-pink-400 mb-2" />
-          <p className="text-sm text-gray-600">点击上传图片</p>
-          <p className="text-xs text-gray-400 mt-1">
+          <Upload className={cn("w-10 h-10 mx-auto mb-2", styles.addIcon)} />
+          <p className={cn("text-sm", styles.singleTitle)}>点击上传图片</p>
+          <p className={cn("text-xs mt-1", styles.singleHelper)}>
             支持 JPG、PNG、GIF、WebP 格式，最大 {maxSize}MB
           </p>
         </button>
@@ -566,7 +655,10 @@ export default function ImageUploader({
           <button
             type="button"
             onClick={closePreview}
-            className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors z-10"
+            className={cn(
+              "absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center transition-colors z-10",
+              styles.modalButton
+            )}
           >
             <X size={24} className="text-white" />
           </button>
@@ -578,7 +670,10 @@ export default function ImageUploader({
                 e.stopPropagation();
                 goToPrevious();
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+              className={cn(
+                "absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+                styles.modalButton
+              )}
             >
               <ChevronLeft size={24} className="text-white" />
             </button>
@@ -591,7 +686,10 @@ export default function ImageUploader({
                 e.stopPropagation();
                 goToNext();
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+              className={cn(
+                "absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+                styles.modalButton
+              )}
             >
               <ChevronRight size={24} className="text-white" />
             </button>

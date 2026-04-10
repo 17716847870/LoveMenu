@@ -4,7 +4,6 @@ import React, { useRef } from "react";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useMessage } from "@/components/ui/Message";
 import { Upload, X, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 
 interface ImageUploaderProps {
   value?: string;
@@ -56,6 +55,7 @@ export default function ImageUploader({
     <div className="space-y-3">
       {value ? (
         <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt="Preview"

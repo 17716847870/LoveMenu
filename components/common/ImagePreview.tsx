@@ -33,7 +33,7 @@ export default function ImagePreview({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-9999 flex items-center justify-center bg-black/90 backdrop-blur-sm"
       onClick={onClose}
     >
       <button
@@ -47,6 +47,7 @@ export default function ImagePreview({
         className="max-w-[90vw] max-h-[90vh] p-4"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt}

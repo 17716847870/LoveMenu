@@ -71,36 +71,51 @@ export default function ImageUploader({
         ? [value as string]
         : [];
 
-    if (existingUrls.length > 0) {
-      const existingImages = existingUrls.map((url, index) => ({
+    if (existingUrls.length === 0) {
+      setImages((prev) => {
+        if (
+          prev.length === 0 ||
+          prev.some((img) => img.status === "uploading")
+        ) {
+          return prev;
+        }
+
+        prev.forEach((img) => {
+          if (!img.remoteUrl) {
+            URL.revokeObjectURL(img.localUrl);
+          }
+        });
+
+        return [];
+      });
+      setPreviewIndex(null);
+      return;
+    }
+
+    setImages((prev) => {
+      const currentRemoteUrls = prev
+        .filter((img) => img.status === "success" && img.remoteUrl)
+        .map((img) => img.remoteUrl!);
+
+      if (JSON.stringify(existingUrls) === JSON.stringify(currentRemoteUrls)) {
+        return prev;
+      }
+
+      prev.forEach((img) => {
+        if (!img.remoteUrl) {
+          URL.revokeObjectURL(img.localUrl);
+        }
+      });
+
+      return existingUrls.map((url, index) => ({
         id: `existing-${index}`,
         localUrl: url,
         remoteUrl: url,
         progress: 100,
         status: "success" as const,
       }));
-
-      const remoteUrls = existingImages.map((img) => img.remoteUrl);
-      const currentRemoteUrls = images
-        .filter((img) => img.status === "success" && img.remoteUrl)
-        .map((img) => img.remoteUrl);
-
-      if (JSON.stringify(remoteUrls) !== JSON.stringify(currentRemoteUrls)) {
-        setImages(existingImages);
-      }
-    } else if (
-      images.length > 0 &&
-      !images.some((img) => img.status === "uploading")
-    ) {
-      images.forEach((img) => {
-        if (!img.remoteUrl) {
-          URL.revokeObjectURL(img.localUrl);
-        }
-      });
-      setImages([]);
-      setPreviewIndex(null);
-    }
-  }, [value, isMultiple, images]);
+    });
+  }, [value, isMultiple]);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -124,7 +139,6 @@ export default function ImageUploader({
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    console.log("handleFileChange 被调用, files:", files);
     if (!files.length) return;
 
     if (!isMultiple && files.length > 1) {
@@ -224,7 +238,6 @@ export default function ImageUploader({
           xhr.send(formData);
         });
 
-        console.log("上传成功, result:", result);
         setImages((prev) =>
           prev.map((img) =>
             img.id === newImages[i].id
@@ -288,7 +301,7 @@ export default function ImageUploader({
     }
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
 
@@ -338,17 +351,17 @@ export default function ImageUploader({
     setPreviewIndex(null);
   };
 
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     if (previewIndex !== null && previewIndex > 0) {
       setPreviewIndex(previewIndex - 1);
     }
-  };
+  }, [previewIndex]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     if (previewIndex !== null && previewIndex < images.length - 1) {
       setPreviewIndex(previewIndex + 1);
     }
-  };
+  }, [images.length, previewIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -372,7 +385,7 @@ export default function ImageUploader({
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "unset";
     };
-  }, [previewIndex]);
+  }, [previewIndex, goToNext, goToPrevious]);
 
   useEffect(() => {
     return () => {
@@ -387,7 +400,6 @@ export default function ImageUploader({
   const displayUrls = images.map((img) => img.localUrl);
 
   const showGridUploadButton = isMultiple && images.length < maxCount;
-  const showFullUploadButton = !isMultiple && images.length === 0;
 
   return (
     <div className="space-y-3">
@@ -422,6 +434,7 @@ export default function ImageUploader({
               onDragOver={handleDragOver}
             >
               <div className="relative w-full h-full rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
                   alt={`图片 ${index + 1}`}
@@ -584,6 +597,7 @@ export default function ImageUploader({
             </button>
           )}
 
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={
               images[previewIndex].remoteUrl || images[previewIndex].localUrl

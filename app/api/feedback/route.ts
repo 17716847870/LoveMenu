@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       type?: string;
       title?: string;
       content?: string;
-      image?: string;
+      image?: string[];
     };
 
     if (!type || !title?.trim() || !content?.trim()) {
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         type,
         title: title.trim(),
         content: content.trim(),
-        image,
+        image: Array.isArray(image) ? image : [],
       },
     });
 

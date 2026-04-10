@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
-import { cn } from "@/lib/utils";
+import { asyncSetState, cn } from "@/lib/utils";
 import { ThemeName, Feedback, FeedbackType } from "@/types";
 import { X, Loader2 } from "lucide-react";
+import MultiImageUploader from "@/components/common/MultiImageUploader";
 
 interface EditFeedbackProps {
   isOpen: boolean;
@@ -94,13 +95,17 @@ export default function EditFeedback({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<FeedbackType>("experience");
+  const [image, setImage] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (feedback) {
-      setTitle(feedback.title);
-      setContent(feedback.content);
-      setType(feedback.type);
+      asyncSetState(() => {
+        setTitle(feedback.title);
+        setContent(feedback.content);
+        setType(feedback.type);
+        setImage(feedback.image ?? []);
+      });
     }
   }, [feedback]);
 
@@ -116,6 +121,7 @@ export default function EditFeedback({
       title,
       content,
       type,
+      image,
     });
 
     setIsSubmitting(false);
@@ -131,7 +137,7 @@ export default function EditFeedback({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className={cn("fixed inset-0 z-[100]", styles.overlay)}
+            className={cn("fixed inset-0 z-100", styles.overlay)}
           />
           <motion.div
             initial={{ y: "100%" }}
@@ -139,11 +145,11 @@ export default function EditFeedback({
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[101] rounded-t-3xl p-6 pb-safe max-w-[480px] mx-auto h-[85vh] overflow-y-auto",
+              "fixed bottom-0 left-0 right-0 z-101 mx-auto h-[85vh] max-w-[480px] overflow-y-auto rounded-t-3xl p-6 pb-safe",
               styles.sheet
             )}
           >
-            <div className="flex justify-between items-center mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <h3 className={cn("text-xl font-bold", styles.title)}>
                 编辑反馈
               </h3>
@@ -157,7 +163,7 @@ export default function EditFeedback({
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>
+                <label className={cn("text-sm font-medium", styles.label)}>
                   反馈类型
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -167,7 +173,7 @@ export default function EditFeedback({
                       type="button"
                       onClick={() => setType(t.value)}
                       className={cn(
-                        "py-3 px-2 rounded-xl text-sm font-medium border transition-all",
+                        "rounded-xl border px-2 py-3 text-sm font-medium transition-all",
                         type === t.value ? styles.typeBtnActive : styles.typeBtn
                       )}
                     >
@@ -178,7 +184,7 @@ export default function EditFeedback({
               </div>
 
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>
+                <label className={cn("text-sm font-medium", styles.label)}>
                   标题
                 </label>
                 <input
@@ -186,14 +192,14 @@ export default function EditFeedback({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className={cn(
-                    "w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl",
+                    "w-full rounded-xl px-4 py-3 outline-none transition-all focus:ring-2",
                     styles.input
                   )}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className={cn("font-medium text-sm", styles.label)}>
+                <label className={cn("text-sm font-medium", styles.label)}>
                   详细内容
                 </label>
                 <textarea
@@ -201,9 +207,24 @@ export default function EditFeedback({
                   onChange={(e) => setContent(e.target.value)}
                   rows={4}
                   className={cn(
-                    "w-full px-4 py-3 outline-none focus:ring-2 transition-all rounded-xl resize-none",
+                    "w-full resize-none rounded-xl px-4 py-3 outline-none transition-all focus:ring-2",
                     styles.input
                   )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className={cn("text-sm font-medium", styles.label)}>
+                  截图（可选，可上传多张）
+                </label>
+                <MultiImageUploader
+                  value={image}
+                  onChange={(urls) => setImage((urls as string[]) ?? [])}
+                  mode="multiple"
+                  path="feedback"
+                  maxCount={9}
+                  maxSize={5}
+                  showTitle={false}
                 />
               </div>
 
@@ -212,13 +233,13 @@ export default function EditFeedback({
                 type="submit"
                 disabled={!title.trim() || !content.trim() || isSubmitting}
                 className={cn(
-                  "w-full py-4 font-bold text-lg flex items-center justify-center gap-2 transition-all rounded-full mt-2 disabled:opacity-50 disabled:scale-100",
+                  "mt-2 flex w-full items-center justify-center gap-2 rounded-full py-4 text-lg font-bold transition-all disabled:scale-100 disabled:opacity-50",
                   styles.submitBtn
                 )}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                     保存修改
                   </>
                 ) : (

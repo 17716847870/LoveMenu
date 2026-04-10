@@ -33,7 +33,7 @@ export function useCreateFeedback() {
       type: Feedback["type"];
       title: string;
       content: string;
-      image?: string;
+      image?: string[];
     }) => {
       const response = await http.post<Feedback>("/api/feedback", data);
       return response.data;

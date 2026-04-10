@@ -1,26 +1,23 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ChevronLeft,
   Search,
   Receipt,
   Sparkles,
   Zap,
   Clock,
   X,
-  Image as ImageIcon,
   Loader2,
-  Trash2,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { useMessage } from "@/components/ui/Message";
 import { cn } from "@/lib/utils";
 import { ThemeName } from "@/types";
-import { useOrders, Order as ApiOrder } from "@/apis/orders";
+import { useOrders } from "@/apis/orders";
 import OrderItemCard from "@/components/mobile/OrderItemCard";
+import MultiImageUploader from "@/components/common/MultiImageUploader";
 
 const themeStyles: Record<
   ThemeName,
@@ -36,8 +33,6 @@ const themeStyles: Record<
     modalBg: string;
     primaryBtn: string;
     textareaBg: string;
-    uploadZone: string;
-    uploadText: string;
   }
 > = {
   couple: {
@@ -52,8 +47,6 @@ const themeStyles: Record<
     modalBg: "bg-white border-pink-100",
     primaryBtn: "bg-pink-500 text-white hover:bg-pink-600 shadow-pink-200",
     textareaBg: "bg-pink-50/30 border-pink-100 focus:border-pink-300",
-    uploadZone: "border-pink-200 bg-pink-50/30",
-    uploadText: "text-pink-400",
   },
   cute: {
     bg: "bg-orange-50/30",
@@ -69,8 +62,6 @@ const themeStyles: Record<
     primaryBtn:
       "bg-orange-400 text-white hover:bg-orange-500 shadow-orange-200",
     textareaBg: "bg-white border-orange-200 focus:border-orange-400",
-    uploadZone: "border-orange-200 bg-orange-50/30",
-    uploadText: "text-orange-400",
   },
   minimal: {
     bg: "bg-gray-50",
@@ -85,8 +76,6 @@ const themeStyles: Record<
     modalBg: "bg-white border-gray-200",
     primaryBtn: "bg-gray-900 text-white hover:bg-gray-800 shadow-gray-200",
     textareaBg: "bg-gray-50 border-gray-200 focus:border-gray-400",
-    uploadZone: "border-gray-200 bg-gray-50",
-    uploadText: "text-gray-400",
   },
   night: {
     bg: "bg-slate-950",
@@ -102,8 +91,6 @@ const themeStyles: Record<
     primaryBtn: "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/20",
     textareaBg:
       "bg-slate-800 border-slate-700 focus:border-blue-500 text-white",
-    uploadZone: "border-slate-700 bg-slate-800/50",
-    uploadText: "text-slate-400",
   },
 };
 
@@ -124,20 +111,16 @@ interface OrderForCard {
 }
 
 export default function OrdersPage() {
-  const router = useRouter();
   const { theme } = useTheme();
   const message = useMessage();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentTheme = themeStyles[theme] || themeStyles.couple;
-  const Icon = currentTheme.icon;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStatus, setActiveStatus] = useState("all");
 
   const [recordingOrderId, setRecordingOrderId] = useState<string | null>(null);
   const [memoryText, setMemoryText] = useState("");
-  const [memoryImage, setMemoryImage] = useState<string>("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [memoryImage, setMemoryImage] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: apiOrders = [], isLoading } = useOrders();
@@ -169,48 +152,15 @@ export default function OrdersPage() {
     );
   });
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("path", "order-memories");
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (result.success && result.data?.url) {
-        setMemoryImage(result.data.url);
-      } else {
-        message.error(result.message || "图片上传失败");
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      message.error("图片上传失败，请重试");
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
   const handleRecordMemory = (orderId: string) => {
     setRecordingOrderId(orderId);
     setMemoryText("");
-    setMemoryImage("");
+    setMemoryImage([]);
   };
 
   const handleSubmitMemory = async () => {
-    if (!recordingOrderId || (!memoryText.trim() && !memoryImage)) return;
+    if (!recordingOrderId || (!memoryText.trim() && memoryImage.length === 0))
+      return;
 
     setIsSubmitting(true);
 
@@ -386,71 +336,37 @@ export default function OrdersPage() {
                     )}
                   />
 
-                  {memoryImage ? (
-                    <div className="relative rounded-xl overflow-hidden">
-                      <img
-                        src={memoryImage}
-                        alt="预览"
-                        className="w-full h-32 object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setMemoryImage("")}
-                        className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className={cn(
-                        "w-full h-24 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
-                        currentTheme.uploadZone,
-                        isUploading && "opacity-50 cursor-wait"
-                      )}
+                  <div className="flex flex-col gap-2">
+                    <span
+                      className={cn("text-sm font-medium", currentTheme.text)}
                     >
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                          <span
-                            className={cn("text-xs", currentTheme.uploadText)}
-                          >
-                            上传中...
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon className="w-6 h-6" />
-                          <span
-                            className={cn("text-xs", currentTheme.uploadText)}
-                          >
-                            添加照片
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  )}
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/gif,image/webp"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
+                      回忆照片（可选，可上传多张）
+                    </span>
+                    <MultiImageUploader
+                      value={memoryImage}
+                      onChange={(urls) =>
+                        setMemoryImage((urls as string[]) ?? [])
+                      }
+                      mode="multiple"
+                      path="order-memories"
+                      maxCount={9}
+                      maxSize={5}
+                      showTitle={false}
+                    />
+                  </div>
                 </div>
 
                 <button
                   onClick={handleSubmitMemory}
                   disabled={
-                    (!memoryText.trim() && !memoryImage) || isSubmitting
+                    (!memoryText.trim() && memoryImage.length === 0) ||
+                    isSubmitting
                   }
                   className={cn(
                     "w-full py-3.5 rounded-2xl font-bold mt-2 shadow-lg transition-all flex items-center justify-center gap-2",
                     currentTheme.primaryBtn,
                     !memoryText.trim() &&
-                      !memoryImage &&
+                      memoryImage.length === 0 &&
                       "opacity-50 cursor-not-allowed"
                   )}
                 >

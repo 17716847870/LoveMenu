@@ -116,7 +116,7 @@ model Feedback {
   type      String
   title     String
   content   String
-  image     String?
+  image     String[] @default([])
   status    String   @default("open")
   createdAt DateTime @default(now())
 }

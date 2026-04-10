@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import { Feedback, ThemeName, FeedbackType, FeedbackStatus } from "@/types";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { Edit2, Trash2, Bug, Lightbulb, Utensils, Smile } from "lucide-react";
+import ImagePreview from "@/components/common/ImagePreview";
 
 interface FeedbackItemProps {
   feedback: Feedback;
@@ -91,6 +92,7 @@ export default function FeedbackItem({
 
   const x = useMotionValue(0);
   const opacity = useTransform(x, [-100, 0], [0, 1]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,
@@ -155,6 +157,25 @@ export default function FeedbackItem({
           {feedback.content}
         </p>
 
+        {(feedback.image?.length ?? 0) > 0 && (
+          <div className="grid grid-cols-3 gap-2">
+            {feedback.image!.map((url, index) => (
+              <button
+                key={`${feedback.id}-${index}`}
+                type="button"
+                onClick={() => setPreviewImage(url)}
+                className="relative aspect-square overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
+              >
+                <img
+                  src={url}
+                  alt={`反馈截图 ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mt-1 pt-3 border-t border-dashed border-gray-100">
           <div
             className={cn(
@@ -169,6 +190,13 @@ export default function FeedbackItem({
           </span>
         </div>
       </div>
+
+      <ImagePreview
+        isOpen={!!previewImage}
+        onClose={() => setPreviewImage(null)}
+        src={previewImage || ""}
+        alt="反馈截图预览"
+      />
     </motion.div>
   );
 }

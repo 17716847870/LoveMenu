@@ -5,7 +5,11 @@ import { logApiError } from "@/lib/error-log";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { orderId, text, image } = body;
+    const { orderId, text, image } = body as {
+      orderId?: string;
+      text?: string;
+      image?: string[];
+    };
 
     if (!orderId) {
       return NextResponse.json({ message: "订单ID不能为空" }, { status: 400 });
@@ -23,12 +27,14 @@ export async function POST(req: Request) {
       where: { orderId },
       update: {
         text: text || undefined,
-        image: image || undefined,
+        image:
+          image !== undefined ? JSON.stringify(Array.isArray(image) ? image : []) : undefined,
       },
       create: {
         orderId,
         text: text || "",
-        image: image,
+        image:
+          image !== undefined ? JSON.stringify(Array.isArray(image) ? image : []) : undefined,
       },
     });
 

@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ThemeName, Feedback, FeedbackType } from "@/types";
-import { X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
+import MultiImageUploader from "@/components/common/MultiImageUploader";
 
 interface CreateFeedbackProps {
   isOpen: boolean;
@@ -92,6 +93,7 @@ export default function CreateFeedback({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<FeedbackType>("experience");
+  const [image, setImage] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,12 +107,13 @@ export default function CreateFeedback({
       title,
       content,
       type,
-      image: "",
+      image,
     });
 
     setTitle("");
     setContent("");
     setType("experience");
+    setImage([]);
     setIsSubmitting(false);
     onClose();
   };
@@ -124,7 +127,7 @@ export default function CreateFeedback({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className={cn("fixed inset-0 z-[100]", styles.overlay)}
+            className={cn("fixed inset-0 z-100", styles.overlay)}
           />
           <motion.div
             initial={{ y: "100%" }}
@@ -132,7 +135,7 @@ export default function CreateFeedback({
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[101] rounded-t-3xl p-6 pb-safe max-w-[480px] mx-auto h-[85vh] overflow-y-auto",
+              "fixed bottom-0 left-0 right-0 z-101 rounded-t-3xl p-6 pb-safe max-w-[480px] mx-auto h-[85vh] overflow-y-auto",
               styles.sheet
             )}
           >
@@ -204,17 +207,17 @@ export default function CreateFeedback({
 
               <div className="space-y-2">
                 <label className={cn("font-medium text-sm", styles.label)}>
-                  截图 (可选)
+                  截图（可选，可上传多张）
                 </label>
-                <div
-                  className={cn(
-                    "w-full h-24 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors opacity-60 hover:opacity-100",
-                    styles.input
-                  )}
-                >
-                  <ImageIcon className="w-6 h-6" />
-                  <span className="text-xs">点击上传截图</span>
-                </div>
+                <MultiImageUploader
+                  value={image}
+                  onChange={(urls) => setImage((urls as string[]) ?? [])}
+                  mode="multiple"
+                  path="feedback"
+                  maxCount={9}
+                  maxSize={5}
+                  showTitle={false}
+                />
               </div>
 
               <motion.button

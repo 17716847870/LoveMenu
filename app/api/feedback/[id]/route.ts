@@ -13,7 +13,7 @@ export async function PATCH(
       type?: string;
       title?: string;
       content?: string;
-      image?: string;
+      image?: string[];
       status?: string;
     };
 
@@ -23,7 +23,7 @@ export async function PATCH(
         ...(type !== undefined ? { type } : {}),
         ...(title !== undefined ? { title: title.trim() } : {}),
         ...(content !== undefined ? { content: content.trim() } : {}),
-        ...(image !== undefined ? { image } : {}),
+        ...(image !== undefined ? { image: Array.isArray(image) ? image : [] } : {}),
         ...(status !== undefined ? { status } : {}),
       },
     });

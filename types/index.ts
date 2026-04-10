@@ -89,7 +89,7 @@ export interface Feedback {
   type: FeedbackType;
   title: string;
   content: string;
-  image?: string;
+  image?: string[];
   status: FeedbackStatus;
   createdAt: string;
 }

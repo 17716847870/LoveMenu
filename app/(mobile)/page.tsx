@@ -8,6 +8,7 @@ import DailyRecommendation from "@/components/mobile/recommendation/DailyRecomme
 import WishlistCard from "@/components/mobile/WishlistCard";
 import UrgentCravingCard from "@/components/mobile/UrgentCravingCard";
 import RecentFeedbackCard from "@/components/mobile/RecentFeedbackCard";
+import CycleEntryCard from "@/components/mobile/CycleEntryCard";
 
 export default function HomePage() {
   return (
@@ -35,6 +36,9 @@ export default function HomePage() {
 
       {/* Recent Feedback */}
       <RecentFeedbackCard />
+
+      {/* Cycle Entry */}
+      <CycleEntryCard />
     </div>
   );
 }

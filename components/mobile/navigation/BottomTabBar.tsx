@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Menu, Receipt, User } from "lucide-react";
+import { Home, Menu, Receipt, User, CalendarHeart } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,11 @@ const leftTabs = [
 // Right tabs (after cart)
 const rightTabs = [
   {
+    label: "周期",
+    path: "/cycle",
+    icon: CalendarHeart,
+  },
+  {
     label: "订单",
     path: "/orders",
     icon: Receipt,
@@ -37,7 +42,7 @@ const rightTabs = [
   },
 ];
 
-const visiblePaths = ["/", "/menu", "/orders", "/profile"];
+const visiblePaths = ["/", "/menu", "/cycle", "/orders", "/profile"];
 
 export default function BottomTabBar() {
   const pathname = usePathname();

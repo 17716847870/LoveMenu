@@ -7,21 +7,25 @@ datasource db {
 }
 
 model User {
-  id           String            @id @default(cuid())
-  username     String            @unique
-  password     String
-  name         String
-  email        String?           @unique
-  avatar       String?
-  role         String            @default("user")
-  kissBalance  Int               @default(100)
-  hugBalance   Int               @default(100)
-  createdAt    DateTime          @default(now())
-  cartItems    CartItem[]
-  chat         ChatMessage[]     @relation("ChatSender")
-  chatReads    ChatMessageRead[]
-  orders       Order[]
-  favorites    DishFavorite[]
+  id                String                    @id @default(cuid())
+  username          String                    @unique
+  password          String
+  name              String
+  email             String?                   @unique
+  avatar            String?
+  role              String                    @default("user")
+  kissBalance       Int                       @default(100)
+  hugBalance        Int                       @default(100)
+  createdAt         DateTime                  @default(now())
+  cartItems         CartItem[]
+  chat              ChatMessage[]             @relation("ChatSender")
+  chatReads         ChatMessageRead[]
+  orders            Order[]
+  favorites         DishFavorite[]
+  menstrualProfile  MenstrualProfile?
+  periodRecords     MenstrualPeriodRecord[]
+  cycleDailyLogs    MenstrualCycleDailyLog[]
+  cyclePredictions  MenstrualCyclePrediction[]
 }
 
 model DishCategory {
@@ -208,4 +212,101 @@ model ErrorLog {
 
   @@index([source, createdAt])
   @@index([createdAt])
+}
+
+model MenstrualProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  age               Int?
+  isRegular         Boolean?
+  avgCycle          Int?
+  avgDuration       Int?
+  stdCycle          Float?
+  cycleStability    String?
+  dataQuality       String?
+  baseConfidence    String?
+  lastPeriodDate    DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model MenstrualPeriodRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  profileId         String?
+  startDate         DateTime
+  endDate           DateTime?
+  durationDays      Int?
+  flowLevel         String?
+  source            String   @default("manual")
+  notes             String?
+  isCycleAnchor     Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
+  @@index([profileId])
+}
+
+model MenstrualCycleDailyLog {
+  id                String   @id @default(cuid())
+  userId            String
+  date              DateTime
+  stressLevel       String?
+  sleep             String?
+  stayUpLate        Boolean?
+  dietChange        String?
+  dietExtreme       Boolean?
+  exerciseChange    String?
+  travel            Boolean?
+  sex               Boolean?
+  contraception     String?
+  pregnancyRisk     String?
+  hormoneMedication Boolean?
+  medicalHistory    String?
+  symptoms          String[] @default([])
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model MenstrualCyclePrediction {
+  id                  String   @id @default(cuid())
+  userId              String
+  profileId           String?
+  basedOnRecordId     String?
+  status              String
+  baseCycle           Int
+  adjustment          Int      @default(0)
+  finalCycle          Int
+  avgDuration         Int?
+  cycleStability      String?
+  dataQuality         String?
+  baseConfidence      String?
+  confidence          String
+  baseNextDate        DateTime
+  predictedNextDate   DateTime
+  baseOvulationDate   DateTime?
+  fertileStart        DateTime?
+  fertileEnd          DateTime?
+  keyFactors          String[] @default([])
+  baseAlerts          String[] @default([])
+  alerts              String[] @default([])
+  reason              String?
+  generatedBy         String   @default("rule")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, predictedNextDate])
+  @@index([userId, createdAt])
 }

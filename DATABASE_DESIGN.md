@@ -225,19 +225,147 @@
 
 ## 5. 互动与反馈表
 
-## 5.1 `OrderFeedback` 订单反馈/回忆表
+## 12. 生理周期 / 姨妈期模块设计（静态页面 + 数据结构预留）
 
-| 字段        | 类型       | 说明                                |
-| ----------- | ---------- | ----------------------------------- |
-| `id`        | `String`   | 主键                                |
-| `orderId`   | `String`   | 外键，且唯一，关联 `Order.id`       |
-| `text`      | `String`   | 回忆文字                            |
-| `image`     | `String?`  | 图片数据，通常为 URL 或 JSON 字符串 |
-| `createdAt` | `DateTime` | 创建时间                            |
+该模块对应 `CycleMind-ClosedLoop.md` 中的闭环方案，但当前阶段**只做数据库承载与静态页面**，不实现实际预测逻辑。
 
-### 关系
+### 12.1 设计目标
 
-- `Order 1 - 1 OrderFeedback`
+数据库需要支持三类核心能力：
+
+1. **用户基础画像**：年龄、规律程度、平均周期、平均经期等。
+2. **历史记录与日级影响因素**：月经开始/结束记录、压力、睡眠、熬夜、旅行、症状等。
+3. **预测结果快照**：保存某次规则引擎 / AI 修正后的结果，便于回显与审计。
+
+### 12.2 新增表
+
+#### `MenstrualProfile`
+
+用户生理周期基础画像，一位用户最多一条。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `String` | 主键 |
+| `userId` | `String` | 用户 ID，唯一 |
+| `age` | `Int?` | 年龄 |
+| `isRegular` | `Boolean?` | 是否长期规律 |
+| `avgCycle` | `Int?` | 平均周期天数 |
+| `avgDuration` | `Int?` | 平均经期天数 |
+| `stdCycle` | `Float?` | 周期标准差 |
+| `cycleStability` | `String?` | `stable / medium / unstable` |
+| `dataQuality` | `String?` | `high / medium / low` |
+| `baseConfidence` | `String?` | 规则层基础置信度 |
+| `lastPeriodDate` | `DateTime?` | 最近一次月经开始日 |
+| `notes` | `String?` | 补充备注 |
+| `createdAt` | `DateTime` | 创建时间 |
+| `updatedAt` | `DateTime` | 更新时间 |
+
+#### `MenstrualPeriodRecord`
+
+记录每一次月经期，用于后续周期计算与日历展示。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `String` | 主键 |
+| `userId` | `String` | 用户 ID |
+| `profileId` | `String?` | 预留基础画像关联 ID |
+| `startDate` | `DateTime` | 经期开始日期 |
+| `endDate` | `DateTime?` | 经期结束日期 |
+| `durationDays` | `Int?` | 经期天数 |
+| `flowLevel` | `String?` | 流量等级，如 `light / medium / heavy` |
+| `source` | `String` | 来源，默认 `manual` |
+| `notes` | `String?` | 备注 |
+| `isCycleAnchor` | `Boolean` | 是否作为周期锚点 |
+| `createdAt` | `DateTime` | 创建时间 |
+| `updatedAt` | `DateTime` | 更新时间 |
+
+#### `MenstrualCycleDailyLog`
+
+按天记录影响因素，适合日历页直接展示与后续修正计算。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `String` | 主键 |
+| `userId` | `String` | 用户 ID |
+| `date` | `DateTime` | 日期，用户维度唯一 |
+| `stressLevel` | `String?` | `low / medium / high` |
+| `sleep` | `String?` | `good / normal / poor` |
+| `stayUpLate` | `Boolean?` | 是否熬夜 |
+| `dietChange` | `String?` | `none / mild / drastic` |
+| `dietExtreme` | `Boolean?` | 是否极端饮食 |
+| `exerciseChange` | `String?` | `none / increase / decrease` |
+| `travel` | `Boolean?` | 是否旅行/时差 |
+| `sex` | `Boolean?` | 是否有性行为 |
+| `contraception` | `String?` | 避孕方式 |
+| `pregnancyRisk` | `String?` | `low / medium / high` |
+| `hormoneMedication` | `Boolean?` | 是否服用激素类药物 |
+| `medicalHistory` | `String?` | `none / pcos / other` |
+| `symptoms` | `String[]` | 症状列表 |
+| `notes` | `String?` | 补充描述 |
+| `createdAt` | `DateTime` | 创建时间 |
+| `updatedAt` | `DateTime` | 更新时间 |
+
+#### `MenstrualCyclePrediction`
+
+保存某次预测快照，便于回显“本次预测结果”和保留历史版本。
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `String` | 主键 |
+| `userId` | `String` | 用户 ID |
+| `profileId` | `String?` | 预留画像关联 ID |
+| `basedOnRecordId` | `String?` | 预留基于某次记录的预测 |
+| `status` | `String` | `early / normal / delayed` |
+| `baseCycle` | `Int` | 基础周期 |
+| `adjustment` | `Int` | 修正值 |
+| `finalCycle` | `Int` | 最终周期 |
+| `avgDuration` | `Int?` | 平均经期长度 |
+| `cycleStability` | `String?` | 周期稳定性 |
+| `dataQuality` | `String?` | 数据质量 |
+| `baseConfidence` | `String?` | 基础置信度 |
+| `confidence` | `String` | 最终置信度 |
+| `baseNextDate` | `DateTime` | 基础预测下次月经日期 |
+| `predictedNextDate` | `DateTime` | 最终预测日期 |
+| `baseOvulationDate` | `DateTime?` | 基础排卵日 |
+| `fertileStart` | `DateTime?` | 易孕期开始 |
+| `fertileEnd` | `DateTime?` | 易孕期结束 |
+| `keyFactors` | `String[]` | 关键影响因素 |
+| `baseAlerts` | `String[]` | 规则提醒 |
+| `alerts` | `String[]` | 最终提醒 |
+| `reason` | `String?` | 简短解释 |
+| `generatedBy` | `String` | `rule / ai / fallback` 等 |
+| `createdAt` | `DateTime` | 创建时间 |
+| `updatedAt` | `DateTime` | 更新时间 |
+
+### 12.3 为什么这样拆分
+
+- `MenstrualProfile`：存用户长期稳定信息。
+- `MenstrualPeriodRecord`：存每一次正式经期记录，是周期计算的主依据。
+- `MenstrualCycleDailyLog`：存每天影响因素，更适合日历 UI 和闭环修正。
+- `MenstrualCyclePrediction`：存预测结果快照，避免每次页面都现场重算。
+
+### 12.4 页面映射建议
+
+静态页面建议采用“**日历主视图 + 底部详情卡片**”的结构：
+
+- 月历格子：展示 `period / fertile / ovulation / predicted` 等状态
+- 顶部概览：展示本次周期、预计日期、稳定性、置信度
+- 底部记录面板：展示当天症状、情绪、睡眠、压力等内容
+- 主题适配：沿用现有 `couple / cute / minimal / night`
+
+### 12.5 当前阶段边界
+
+当前只完成：
+
+- Prisma 数据结构设计
+- 页面静态视觉稿
+
+当前不包含：
+
+- 周期计算逻辑
+- AI 修正逻辑
+- 接口读写
+- 日历交互保存
 
 ---
 
